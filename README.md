@@ -65,8 +65,8 @@ OrgScript transforms simple text into powerful operational assets:
 ## Integration & Ecosystem
 
 - **VS Code Extension**: Official highlighting and language support under `editors/vscode`.
-- **GitHub Actions**: Deployment and quality gate recipes under `docs/integrations`.
-- **Showcase**: Visit our [Live Documentation Showcase](https://dkfuh.github.io/OrgScript/).
+- **Quality Automation**: CI checks for tests and example validation live in `.github/workflows`.
+- **Showcase**: Generated demo artifacts live in `docs/demos` and can be rebuilt locally with `npm run demo:generate`.
 
 ## Testing
 
