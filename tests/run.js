@@ -25,6 +25,7 @@ function run() {
   testFormatterStability();
   testCliDiagnosticsAndExitCodes();
   testFormatCheckMode();
+  testCheckCommand();
   console.log("All tests passed.");
 }
 
@@ -316,6 +317,80 @@ function testFormatCheckMode() {
     invalidCheck.stderr.includes("Cannot format invalid OrgScript"),
     "Expected invalid format --check message"
   );
+}
+
+function testCheckCommand() {
+  const cliPath = path.join(repoRoot, "bin", "orgscript.js");
+  const canonicalSourcePath = path.join(examplesDir, "craft-business-lead-to-order.orgs");
+  const canonicalSource = fs.readFileSync(canonicalSourcePath, "utf8");
+
+  const checkOk = runCli([cliPath, "check", "./examples/craft-business-lead-to-order.orgs"]);
+  assert.strictEqual(checkOk.status, 0, "Expected check to pass for canonical example");
+  assert.ok(
+    checkOk.stdout.includes("CHECK examples/craft-business-lead-to-order.orgs"),
+    "Expected check header in check output"
+  );
+  assert.ok(checkOk.stdout.includes("validate: ok"), "Expected validate pass in check output");
+  assert.ok(checkOk.stdout.includes("lint: ok (0 error(s), 0 warning(s), 0 info)"), "Expected lint pass in check output");
+  assert.ok(checkOk.stdout.includes("format: ok"), "Expected format pass in check output");
+  assert.ok(checkOk.stdout.includes("Result: PASS"), "Expected passing summary in check output");
+
+  const checkWarning = runCli([cliPath, "check", "./tests/lint/process-missing-trigger.orgs"]);
+  assert.strictEqual(checkWarning.status, 0, "Expected warning-only check to stay non-failing");
+  assert.ok(
+    checkWarning.stdout.includes("lint: ok (0 error(s), 1 warning(s), 0 info)"),
+    "Expected warning summary in check output"
+  );
+  assert.ok(
+    checkWarning.stdout.includes("Result: PASS"),
+    "Expected overall pass for warning-only check"
+  );
+
+  const checkLintError = runCli([cliPath, "check", "./tests/lint/process-multiple-triggers.orgs"]);
+  assert.strictEqual(checkLintError.status, 1, "Expected check to fail on lint errors");
+  assert.ok(
+    checkLintError.stderr.includes("lint: failed"),
+    "Expected lint failure in check output"
+  );
+  assert.ok(
+    checkLintError.stderr.includes("Result: FAIL"),
+    "Expected failed summary for lint-error check"
+  );
+
+  const nonCanonicalPath = path.join(repoRoot, "tests", ".tmp-check-noncanonical.orgs");
+  const nonCanonicalSource = canonicalSource.replace("\n\n  when lead.created", "\n  when lead.created");
+  fs.writeFileSync(nonCanonicalPath, nonCanonicalSource, "utf8");
+
+  try {
+    const checkFormatFailure = runCli([cliPath, "check", "./tests/.tmp-check-noncanonical.orgs"]);
+    assert.strictEqual(checkFormatFailure.status, 1, "Expected check to fail on format drift");
+    assert.ok(
+      checkFormatFailure.stderr.includes("format: failed"),
+      "Expected format failure in check output"
+    );
+    assert.strictEqual(
+      fs.readFileSync(nonCanonicalPath, "utf8"),
+      nonCanonicalSource,
+      "Expected check to leave non-canonical file unchanged"
+    );
+  } finally {
+    if (fs.existsSync(nonCanonicalPath)) {
+      fs.unlinkSync(nonCanonicalPath);
+    }
+  }
+
+  const checkInvalid = runCli([cliPath, "check", "./tests/invalid/unknown-top-level.orgs"]);
+  assert.strictEqual(checkInvalid.status, 1, "Expected check to fail for invalid file");
+  assert.ok(
+    checkInvalid.stderr.includes("validate: failed"),
+    "Expected validate failure in check output"
+  );
+  assert.ok(checkInvalid.stderr.includes("lint: skipped"), "Expected skipped lint in check output");
+  assert.ok(
+    checkInvalid.stderr.includes("format: skipped"),
+    "Expected skipped format in check output"
+  );
+  assert.ok(checkInvalid.stderr.includes("Result: FAIL"), "Expected failed summary for invalid file");
 }
 
 function runCli(args) {

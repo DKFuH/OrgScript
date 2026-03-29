@@ -15,6 +15,7 @@ function printUsage() {
 
 Usage:
   orgscript validate <file> [--json]
+  orgscript check <file>
   orgscript format <file> [--check]
   orgscript lint <file> [--json]
   orgscript export json <file>
@@ -49,6 +50,15 @@ function run(args) {
       `  top-level blocks: ${result.summary.topLevelBlocks}, statements: ${result.summary.statements}`
     );
     process.exit(0);
+  }
+
+  if (command === "check") {
+    const absolutePath = resolveFile("check", maybeSubcommand);
+    const result = runCheck(absolutePath);
+    const lines = renderCheckReport(absolutePath, result);
+    const stream = result.ok ? console.log : console.error;
+    stream(lines.join("\n"));
+    process.exit(result.ok ? 0 : 1);
   }
 
   if (command === "export" && maybeSubcommand === "json") {
@@ -202,6 +212,95 @@ function printIssues(header, issues) {
   for (const issue of issues) {
     console.error(`  line ${issue.line}: ${issue.message}`);
   }
+}
+
+function runCheck(filePath) {
+  const validation = validateFile(filePath);
+
+  if (!validation.ok) {
+    return {
+      ok: false,
+      validate: {
+        ok: false,
+        issues: validation.issues,
+      },
+      lint: {
+        ok: false,
+        skipped: true,
+        findings: [],
+        summary: { error: 0, warning: 0, info: 0 },
+      },
+      format: {
+        ok: false,
+        skipped: true,
+        requiresChanges: false,
+      },
+    };
+  }
+
+  const findings = lintDocument(validation.ast);
+  const lintSummary = summarizeFindings(findings);
+  const current = fs.readFileSync(filePath, "utf8");
+  const formatted = formatDocument(validation.ast);
+  const requiresChanges = current !== formatted;
+  const lintOk = lintSummary.error === 0;
+  const formatOk = !requiresChanges;
+
+  return {
+    ok: lintOk && formatOk,
+    validate: {
+      ok: true,
+      issues: [],
+    },
+    lint: {
+      ok: lintOk,
+      skipped: false,
+      findings,
+      summary: lintSummary,
+    },
+    format: {
+      ok: formatOk,
+      skipped: false,
+      requiresChanges,
+    },
+  };
+}
+
+function renderCheckReport(filePath, result) {
+  const lines = [`CHECK ${toDisplayPath(filePath)}`];
+
+  if (result.validate.ok) {
+    lines.push("  validate: ok");
+  } else {
+    lines.push("  validate: failed");
+    for (const issue of result.validate.issues) {
+      lines.push(`    line ${issue.line}: ${issue.message}`);
+    }
+  }
+
+  if (result.lint.skipped) {
+    lines.push("  lint: skipped");
+  } else {
+    const { error, warning, info } = result.lint.summary;
+    const status = result.lint.ok ? "ok" : "failed";
+    lines.push(`  lint: ${status} (${error} error(s), ${warning} warning(s), ${info} info)`);
+  }
+
+  if (result.format.skipped) {
+    lines.push("  format: skipped");
+  } else if (result.format.ok) {
+    lines.push("  format: ok");
+  } else {
+    lines.push("  format: failed (canonical formatting changes required)");
+  }
+
+  lines.push(`Result: ${result.ok ? "PASS" : "FAIL"}`);
+  return lines;
+}
+
+function toDisplayPath(filePath) {
+  const relative = path.relative(process.cwd(), filePath).replace(/\\/g, "/");
+  return relative || path.basename(filePath);
 }
 
 module.exports = { run };

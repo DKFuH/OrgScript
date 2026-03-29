@@ -17,6 +17,7 @@ Implemented:
 - `export json`
 - `validate --json`
 - `lint --json`
+- `check`
 
 Planned next:
 
@@ -76,6 +77,26 @@ Output model:
 - one stable line per finding using severity, code, line, and message
 - optional machine-readable diagnostics via `--json`
 
+### `orgscript check <file>`
+
+Runs the quality pipeline in one command:
+
+- `validate`
+- `lint`
+- `format --check`
+
+Output:
+
+- compact pass/fail summary for each stage
+- clear indication of which stage failed
+- stable text output suitable for CI logs
+
+Exit behavior:
+
+- `0` when validation passes, lint has no `error`, and formatting is canonical
+- `1` when validation fails, lint finds at least one `error`, or formatting drift is detected
+- warnings and info findings alone do not fail the command
+
 Initial lint rules:
 
 - duplicate state names
@@ -126,6 +147,7 @@ TypeScript is the fastest start:
 - One can run `orgscript validate --json` and `orgscript lint --json` for downstream tooling.
 - One can run `orgscript format` on example files without changing canonical files.
 - One can run `orgscript format --check` in CI or pre-commit workflows.
+- One can run `orgscript check` to combine validation, linting, and format checks.
 - One can run `orgscript lint` on valid but suspicious models and get stable findings.
 - Lint exit codes are safe for CI use with advisory warnings.
 - Invalid files produce useful errors with line references.
