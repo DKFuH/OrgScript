@@ -21,7 +21,11 @@
 
 ## v0.3
 
+- Implement AST-backed formatter
 - Implement linter rules for common modeling errors
+- Freeze AST, model, and formatter output with golden snapshots
+- Add machine-readable diagnostics for validation and linting
+- Add CI-ready command behavior and GitHub Actions
 - Generate diagrams and documentation from the model
 - Add localization architecture for keyword packs
 
@@ -32,6 +36,8 @@
 - Add first AST-backed linter command
 - Add lint fixtures for suspicious but syntactically valid models
 - Formalize lint severities and stable lint output ordering
+- Add machine-readable diagnostics for validate and lint
+- Add CI workflows for tests, validation, and example linting
 
 ## Later
 

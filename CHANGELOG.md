@@ -12,6 +12,10 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 - Added lint fixtures for process triggers, unreachable statements, orphan states, and conflicting role permissions.
 - Formalized lint severities as `error`, `warning`, and `info`.
 - Stabilized lint output with deterministic ordering and a severity summary line.
+- Added machine-readable diagnostics for `validate --json` and `lint --json`.
+- Made lint exit codes CI-friendly by failing only when findings contain `error`.
+- Added GitHub Actions CI for tests, example validation, and example linting.
+- Added human and AI usage guides plus a documented diagnostics contract.
 
 ## [0.2.0] - 2026-03-29
 

@@ -142,6 +142,7 @@ See the full example in [`examples/craft-business-lead-to-order.orgs`](examples/
 - AST-backed formatting: `orgscript format <file>`
 - AST-backed linting: `orgscript lint <file>`
 - Canonical JSON export: `orgscript export json <file>`
+- Machine-readable diagnostics: `orgscript validate <file> --json`, `orgscript lint <file> --json`
 - Golden snapshot tests for AST, canonical model, and formatter output
 - Stable lint severities: `error`, `warning`, `info`
 
@@ -150,17 +151,23 @@ See the full example in [`examples/craft-business-lead-to-order.orgs`](examples/
 ```text
 npm install
 node ./bin/orgscript.js validate ./examples/craft-business-lead-to-order.orgs
+node ./bin/orgscript.js validate ./examples/craft-business-lead-to-order.orgs --json
 node ./bin/orgscript.js format ./examples/craft-business-lead-to-order.orgs
 node ./bin/orgscript.js lint ./tests/lint/process-missing-trigger.orgs
+node ./bin/orgscript.js lint ./tests/lint/process-missing-trigger.orgs --json
 node ./bin/orgscript.js export json ./examples/craft-business-lead-to-order.orgs
 ```
 
-Lint exits with a non-zero code when findings contain `error` or `warning` severities. `info` findings are reported without failing the command.
+Exit codes are CI-friendly:
+
+- `validate` returns `0` for valid files and `1` for invalid files.
+- `lint` returns `0` when findings contain only `warning` and `info`, and `1` when findings contain at least one `error`.
 
 ## Guides
 
 - Human authoring guide: [`docs/orgscript-for-humans.md`](docs/orgscript-for-humans.md)
 - AI interpretation guide: [`docs/orgscript-for-ai.md`](docs/orgscript-for-ai.md)
+- Diagnostics contract: [`spec/diagnostics.md`](spec/diagnostics.md)
 
 ## Near-term plan
 
@@ -176,8 +183,10 @@ Available now:
 
 ```text
 orgscript validate file.orgs
+orgscript validate file.orgs --json
 orgscript format file.orgs
 orgscript lint file.orgs
+orgscript lint file.orgs --json
 orgscript export json file.orgs
 ```
 
@@ -187,6 +196,8 @@ See [`docs/cli-v0.1-plan.md`](docs/cli-v0.1-plan.md) for the implementation plan
 
 ```text
 npm test
+npm run validate:all
+npm run lint:all
 npm run golden:generate
 ```
 

@@ -14,6 +14,8 @@ Implemented:
 - `format`
 - `lint`
 - `export json`
+- `validate --json`
+- `lint --json`
 
 Planned next:
 
@@ -36,6 +38,7 @@ Output:
 
 - success confirmation on valid files
 - file path, line, and message on errors
+- optional machine-readable diagnostics via `--json`
 
 ### `orgscript export json <file>`
 
@@ -71,6 +74,7 @@ Output model:
 - deterministic finding order
 - one summary line with counts by severity
 - one stable line per finding using severity, code, line, and message
+- optional machine-readable diagnostics via `--json`
 
 Initial lint rules:
 
@@ -119,8 +123,10 @@ TypeScript is the fastest start:
 ## Success criteria for v0.1
 
 - One can run `orgscript validate` on example files.
+- One can run `orgscript validate --json` and `orgscript lint --json` for downstream tooling.
 - One can run `orgscript format` on example files without changing canonical files.
 - One can run `orgscript lint` on valid but suspicious models and get stable findings.
+- Lint exit codes are safe for CI use with advisory warnings.
 - Invalid files produce useful errors with line references.
 - Valid files can be exported to canonical JSON.
 - Formatter output is deterministic.

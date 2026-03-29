@@ -1,5 +1,10 @@
 const fs = require("fs");
 const path = require("path");
+const {
+  createCliErrorReport,
+  createLintReport: createLintJsonReport,
+  createValidateReport,
+} = require("./diagnostics");
 const { toCanonicalModel } = require("./export-json");
 const { formatDocument } = require("./formatter");
 const { lintDocument, renderLintReport, summarizeFindings } = require("./linter");
@@ -9,15 +14,16 @@ function printUsage() {
   console.log(`OrgScript CLI
 
 Usage:
-  orgscript validate <file>
+  orgscript validate <file> [--json]
   orgscript format <file>
-  orgscript lint <file>
+  orgscript lint <file> [--json]
   orgscript export json <file>
 `);
 }
 
 function run(args) {
-  const [command, maybeSubcommand, maybeFile] = args;
+  const options = parseArgs(args);
+  const [command, maybeSubcommand, maybeFile] = options.positionals;
 
   if (!command || command === "--help" || command === "-h") {
     printUsage();
@@ -25,8 +31,13 @@ function run(args) {
   }
 
   if (command === "validate") {
-    const absolutePath = resolveFile(maybeSubcommand);
+    const absolutePath = resolveFile("validate", maybeSubcommand, options.json);
     const result = validateFile(absolutePath);
+
+    if (options.json) {
+      console.log(JSON.stringify(createValidateReport(absolutePath, result), null, 2));
+      process.exit(result.ok ? 0 : 1);
+    }
 
     if (!result.ok) {
       printIssues(`Invalid OrgScript: ${absolutePath}`, result.issues);
@@ -41,7 +52,7 @@ function run(args) {
   }
 
   if (command === "export" && maybeSubcommand === "json") {
-    const absolutePath = resolveFile(maybeFile);
+    const absolutePath = resolveFile("export", maybeFile);
     const result = buildModel(absolutePath);
 
     if (!result.ok) {
@@ -58,7 +69,7 @@ function run(args) {
   }
 
   if (command === "format") {
-    const absolutePath = resolveFile(maybeSubcommand);
+    const absolutePath = resolveFile("format", maybeSubcommand);
     const result = buildModel(absolutePath);
 
     if (!result.ok) {
@@ -83,8 +94,13 @@ function run(args) {
   }
 
   if (command === "lint") {
-    const absolutePath = resolveFile(maybeSubcommand);
+    const absolutePath = resolveFile("lint", maybeSubcommand, options.json);
     const result = buildModel(absolutePath);
+
+    if (options.json && !result.ok) {
+      console.log(JSON.stringify(createValidateReport(absolutePath, result), null, 2));
+      process.exit(1);
+    }
 
     if (!result.ok) {
       printIssues(`Cannot lint invalid OrgScript: ${absolutePath}`, [
@@ -95,15 +111,26 @@ function run(args) {
     }
 
     const findings = lintDocument(result.ast);
+    const summary = summarizeFindings(findings);
+
+    if (options.json) {
+      console.log(JSON.stringify(createLintJsonReport(absolutePath, findings), null, 2));
+      process.exit(summary.error > 0 ? 1 : 0);
+    }
 
     if (findings.length === 0) {
       console.log(renderLintReport(absolutePath, findings).join("\n"));
       process.exit(0);
     }
 
-    const summary = summarizeFindings(findings);
-    console.error(renderLintReport(absolutePath, findings).join("\n"));
-    process.exit(summary.error > 0 || summary.warning > 0 ? 1 : 0);
+    const report = renderLintReport(absolutePath, findings).join("\n");
+    if (summary.error > 0) {
+      console.error(report);
+      process.exit(1);
+    }
+
+    console.log(report);
+    process.exit(0);
   }
 
   console.error(`Unknown command: ${command}`);
@@ -111,21 +138,47 @@ function run(args) {
   process.exit(1);
 }
 
-function resolveFile(filePath) {
+function parseArgs(args) {
+  const options = {
+    json: false,
+    positionals: [],
+  };
+
+  for (const argument of args) {
+    if (argument === "--json") {
+      options.json = true;
+      continue;
+    }
+
+    options.positionals.push(argument);
+  }
+
+  return options;
+}
+
+function resolveFile(command, filePath, jsonMode = false) {
   if (!filePath) {
-    console.error("Missing file path.\n");
-    printUsage();
-    process.exit(1);
+    exitCliError(command, "missing_file_path", "Missing file path.", jsonMode);
   }
 
   const absolutePath = path.resolve(process.cwd(), filePath);
 
   if (!fs.existsSync(absolutePath)) {
-    console.error(`File not found: ${absolutePath}`);
-    process.exit(1);
+    exitCliError(command, "file_not_found", `File not found: ${absolutePath}`, jsonMode, absolutePath);
   }
 
   return absolutePath;
+}
+
+function exitCliError(command, code, message, jsonMode, filePath) {
+  if (jsonMode && (command === "validate" || command === "lint")) {
+    console.log(JSON.stringify(createCliErrorReport(command, code, message, filePath), null, 2));
+    process.exit(1);
+  }
+
+  console.error(`${message}\n`);
+  printUsage();
+  process.exit(1);
 }
 
 function printIssues(header, issues) {

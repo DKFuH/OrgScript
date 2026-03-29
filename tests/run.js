@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const assert = require("assert");
+const { spawnSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 const { formatDocument } = require("../src/formatter");
@@ -22,6 +23,7 @@ function run() {
   testInvalidFixtures();
   testLintFixtures();
   testFormatterStability();
+  testCliDiagnosticsAndExitCodes();
   console.log("All tests passed.");
 }
 
@@ -177,6 +179,94 @@ function testLintFixtures() {
       );
     }
   }
+}
+
+function testCliDiagnosticsAndExitCodes() {
+  const cliPath = path.join(repoRoot, "bin", "orgscript.js");
+
+  const validateOk = runCli([
+    cliPath,
+    "validate",
+    "./examples/craft-business-lead-to-order.orgs",
+    "--json",
+  ]);
+  assert.strictEqual(validateOk.status, 0, "Expected validate --json to succeed for valid file");
+  const validateOkPayload = JSON.parse(validateOk.stdout);
+  assert.strictEqual(validateOkPayload.command, "validate");
+  assert.strictEqual(validateOkPayload.valid, true);
+  assert.strictEqual(validateOkPayload.summary.error, 0);
+
+  const validateInvalid = runCli([
+    cliPath,
+    "validate",
+    "./tests/invalid/unknown-top-level.orgs",
+    "--json",
+  ]);
+  assert.strictEqual(validateInvalid.status, 1, "Expected validate --json to fail for invalid file");
+  const validateInvalidPayload = JSON.parse(validateInvalid.stdout);
+  assert.strictEqual(validateInvalidPayload.command, "validate");
+  assert.strictEqual(validateInvalidPayload.valid, false);
+  assert.ok(validateInvalidPayload.summary.error > 0);
+  assert.ok(validateInvalidPayload.diagnostics.length > 0);
+
+  const lintWarning = runCli([
+    cliPath,
+    "lint",
+    "./tests/lint/process-missing-trigger.orgs",
+    "--json",
+  ]);
+  assert.strictEqual(lintWarning.status, 0, "Expected lint warnings to stay non-failing");
+  const lintWarningPayload = JSON.parse(lintWarning.stdout);
+  assert.strictEqual(lintWarningPayload.command, "lint");
+  assert.strictEqual(lintWarningPayload.clean, true);
+  assert.ok(lintWarningPayload.summary.warning > 0);
+  assert.strictEqual(lintWarningPayload.summary.error, 0);
+
+  const lintError = runCli([
+    cliPath,
+    "lint",
+    "./tests/lint/process-multiple-triggers.orgs",
+    "--json",
+  ]);
+  assert.strictEqual(lintError.status, 1, "Expected lint errors to fail");
+  const lintErrorPayload = JSON.parse(lintError.stdout);
+  assert.strictEqual(lintErrorPayload.command, "lint");
+  assert.strictEqual(lintErrorPayload.clean, false);
+  assert.ok(lintErrorPayload.summary.error > 0);
+
+  const exportJson = runCli([
+    cliPath,
+    "export",
+    "json",
+    "./examples/craft-business-lead-to-order.orgs",
+  ]);
+  assert.strictEqual(exportJson.status, 0, "Expected export json to succeed");
+  const exportPayload = JSON.parse(exportJson.stdout);
+  assert.strictEqual(exportPayload.type, "document");
+
+  const formatCommand = runCli([
+    cliPath,
+    "format",
+    "./examples/craft-business-lead-to-order.orgs",
+  ]);
+  assert.strictEqual(formatCommand.status, 0, "Expected format to succeed on canonical file");
+  assert.ok(
+    formatCommand.stdout.includes("Already formatted"),
+    "Expected format command to report already formatted file"
+  );
+}
+
+function runCli(args) {
+  const result = spawnSync(process.execPath, args, {
+    cwd: repoRoot,
+    encoding: "utf8",
+  });
+
+  if (result.error) {
+    throw result.error;
+  }
+
+  return result;
 }
 
 function normalizeAst(ast) {
