@@ -4,6 +4,7 @@
   "description": "Minimal VS Code language support for OrgScript (.orgs) files.",
   "version": "0.8.0",
   "publisher": "dkfuh",
+  "icon": "icon.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/DKFuH/OrgScript"

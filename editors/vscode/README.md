@@ -1,55 +1,41 @@
-# OrgScript VS Code
+# OrgScript for Visual Studio Code
 
-This folder contains the official, locally testable VS Code extension for `.orgs` files.
+Official language support for **OrgScript** (`.orgs`) - the human-readable, AI-friendly description language for business logic and operational systems.
 
-## What is included
+## Features
 
-- `package.json` registers the `OrgScript` language with language id `orgscript`
-- `syntaxes/orgscript.tmLanguage.json` provides TextMate-based syntax highlighting
-- `language-configuration.json` adds lightweight editor behavior for double-quoted strings
-- `.vscode/launch.json` provides an Extension Development Host launch target for F5 testing
+- **Syntax Highlighting**: Comprehensive TextMate grammar for all OrgScript constructs.
+- **Language Detection**: Automatically recognizes `.orgs` files.
+- **Smart Indentation**: Lightweight configuration for indentation-based logic.
 
-## What is highlighted
+## Supported Syntax
 
-- top-level blocks such as `process`, `stateflow`, `rule`, `role`, `policy`, `metric`, and `event`
-- block names such as `LeadQualification` or `OrderLifecycle`
-- section keywords such as `states`, `transitions`, `applies to`, `can`, `cannot`, `formula`, `owner`, and `target`
-- core statements such as `when`, `if`, `else`, `then`, `assign`, `transition`, `notify`, `create`, `update`, `require`, and `stop`
-- operator forms such as `=`, `!=`, `<`, `<=`, `>`, `>=`, and `->`
-- dotted references such as `lead.status` and `lead.created`
-- strings, booleans, and numeric literals
+- **Top-level Blocks**: `process`, `stateflow`, `rule`, `role`, `policy`, `metric`, `event`.
+- **Core Statements**: `when`, `if`, `else`, `then`, `assign`, `transition`, `notify`, `create`, `update`, `require`, `stop`.
+- **Dotted References**: Native support for field paths like `order.status` or `lead.source`.
+- **Rich Literals**: Highlights strings, booleans, and numeric values.
 
-OrgScript does not define an official comment syntax in the language spec yet, so this extension intentionally does not add comment highlighting.
+## Getting Started
 
-## Local testing in VS Code
+1. Install the extension.
+2. Open any `.orgs` file.
+3. Enjoy clean, high-contrast highlighting for your organizational logic.
 
-1. Open this repository in VS Code.
-2. Open the `editors/vscode/` folder directly in VS Code, or add it to your Workspace. It works best if `editors/vscode/` is the active root workspace because `.vscode/launch.json` is located there.
-3. Open the Run and Debug side panel (Ctrl+Shift+D).
-4. Make sure "Launch OrgScript Extension" is selected at the top.
-5. Press `F5` to start the Extension Development Host.
-6. In the newly opened Extension Development Host window, open the root `OrgScript` folder and open one of these realistic test files:
-   - `examples/craft-business-lead-to-order.orgs`
-   - `examples/order-approval.orgs`
-   - `examples/service-escalation.orgs`
-7. Confirm that the language mode in the bottom right corner is `OrgScript`.
-8. Check that blocks, statements, strings, operators, and dotted references are highlighted correctly (including inline occurrences of `then` and dotted properties).
+## Usage with CLI
 
-## Good demo files
+The extension works best when used alongside the [OrgScript CLI](https://github.com/DKFuH/OrgScript).
 
-- `examples/craft-business-lead-to-order.orgs`
-  Good for `process`, `if`, strings, dotted references, operators, and `stateflow`.
-- `examples/order-approval.orgs`
-  Good for `stateflow`, `rule`, `applies to`, and transitions.
-- `examples/service-escalation.orgs`
-  Good for `policy`, `event`, `metric`, and role-oriented language.
+```bash
+# Check your logic
+orgscript check your-file.orgs
 
-## Current scope
+# Export to diagrams
+orgscript export mermaid your-file.orgs > diagram.mmd
+```
 
-- TextMate grammar only
-- no semantic tokens
-- no IntelliSense
-- no snippets
-- no hover provider
-- no diagnostics integration
-- no editor-driven formatting
+## Contributing
+
+OrgScript is open-source. Join us on [GitHub](https://github.com/DKFuH/OrgScript) to contribute to the language spec or tooling.
+
+---
+Part of the OrgScript Foundation.

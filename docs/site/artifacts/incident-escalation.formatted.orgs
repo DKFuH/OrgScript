@@ -1,0 +1,62 @@
+stateflow IncidentLifecycle
+
+  states
+    open
+    triaged
+    investigating
+    mitigated
+    resolved
+    closed
+
+  transitions
+    open -> triaged
+    triaged -> investigating
+    triaged -> mitigated
+    investigating -> mitigated
+    mitigated -> resolved
+    resolved -> closed
+
+role OnCallEngineer
+
+  can
+    triage incident
+    assign responder
+    update status
+    resolve incident
+
+role IncidentManager
+
+  can
+    escalate incident
+    declare major incident
+    notify stakeholders
+
+policy EscalationPolicy
+
+  when incident.severity = "high" and incident.status = "open"
+  then
+    require triage_sla
+    notify on_call_manager with "SLA Warning: High severity incident untriaged"
+
+  when incident.status = "investigating"
+  then
+    require regular_status_updates
+
+process IncidentHandling
+
+  when system.alert_received
+
+  create incident
+  assign incident.severity = "medium"
+  transition incident.status to "open"
+
+  if alert.source = "critical_infrastructure" then
+    assign incident.severity = "high"
+    notify on_call_team with "Critical alert detected"
+
+  if incident.status = "triaged" then
+    assign incident.primary_responder = "on_call_engineer"
+    transition incident.status to "investigating"
+
+  else
+    notify incident_manager with "Incident requiring triage"

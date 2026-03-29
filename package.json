@@ -3,10 +3,34 @@
   "version": "0.8.0",
   "description": "A human-readable, AI-friendly description language for business logic and operational systems.",
   "license": "Apache-2.0",
-  "private": true,
+  "main": "./src/index.js",
   "bin": {
     "orgscript": "./bin/orgscript.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DKFuH/OrgScript"
+  },
+  "bugs": {
+    "url": "https://github.com/DKFuH/OrgScript/issues"
+  },
+  "homepage": "https://github.com/DKFuH/OrgScript#readme",
+  "keywords": [
+    "business-logic",
+    "documentation",
+    "mermaid",
+    "markdown",
+    "operational-logic",
+    "automation"
+  ],
+  "files": [
+    "bin/",
+    "src/",
+    "spec/",
+    "LICENSE",
+    "README.md",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "validate": "node ./bin/orgscript.js validate ./examples/lead-qualification.orgs",
     "check": "node ./bin/orgscript.js check ./examples/craft-business-lead-to-order.orgs",
