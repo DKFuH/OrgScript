@@ -10,6 +10,7 @@
   "scripts": {
     "validate": "node ./bin/orgscript.js validate ./examples/lead-qualification.orgs",
     "format": "node ./bin/orgscript.js format ./examples/craft-business-lead-to-order.orgs",
+    "format:check:all": "node ./scripts/format-check-all.js",
     "lint": "node ./bin/orgscript.js lint ./tests/lint/process-missing-trigger.orgs",
     "validate:all": "node ./scripts/validate-all.js",
     "lint:all": "node ./scripts/lint-all.js",

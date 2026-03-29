@@ -24,6 +24,7 @@ function run() {
   testLintFixtures();
   testFormatterStability();
   testCliDiagnosticsAndExitCodes();
+  testFormatCheckMode();
   console.log("All tests passed.");
 }
 
@@ -253,6 +254,67 @@ function testCliDiagnosticsAndExitCodes() {
   assert.ok(
     formatCommand.stdout.includes("Already formatted"),
     "Expected format command to report already formatted file"
+  );
+}
+
+function testFormatCheckMode() {
+  const cliPath = path.join(repoRoot, "bin", "orgscript.js");
+  const canonicalSourcePath = path.join(examplesDir, "craft-business-lead-to-order.orgs");
+  const canonicalSource = fs.readFileSync(canonicalSourcePath, "utf8");
+
+  const canonicalCheck = runCli([
+    cliPath,
+    "format",
+    "./examples/craft-business-lead-to-order.orgs",
+    "--check",
+  ]);
+  assert.strictEqual(canonicalCheck.status, 0, "Expected format --check to pass for canonical file");
+  assert.ok(
+    canonicalCheck.stdout.includes("Formatting check passed"),
+    "Expected format --check success message"
+  );
+
+  const nonCanonicalPath = path.join(repoRoot, "tests", ".tmp-format-noncanonical.orgs");
+  const nonCanonicalSource = canonicalSource.replace("\n\n  when lead.created", "\n  when lead.created");
+  fs.writeFileSync(nonCanonicalPath, nonCanonicalSource, "utf8");
+
+  try {
+    const nonCanonicalCheck = runCli([
+      cliPath,
+      "format",
+      "./tests/.tmp-format-noncanonical.orgs",
+      "--check",
+    ]);
+    assert.strictEqual(
+      nonCanonicalCheck.status,
+      1,
+      "Expected format --check to fail for non-canonical file"
+    );
+    assert.ok(
+      nonCanonicalCheck.stderr.includes("Formatting changes required"),
+      "Expected format --check failure message"
+    );
+    assert.strictEqual(
+      fs.readFileSync(nonCanonicalPath, "utf8"),
+      nonCanonicalSource,
+      "Expected format --check to leave the file unchanged"
+    );
+  } finally {
+    if (fs.existsSync(nonCanonicalPath)) {
+      fs.unlinkSync(nonCanonicalPath);
+    }
+  }
+
+  const invalidCheck = runCli([
+    cliPath,
+    "format",
+    "./tests/invalid/unknown-top-level.orgs",
+    "--check",
+  ]);
+  assert.strictEqual(invalidCheck.status, 1, "Expected format --check to fail for invalid file");
+  assert.ok(
+    invalidCheck.stderr.includes("Cannot format invalid OrgScript"),
+    "Expected invalid format --check message"
   );
 }
 

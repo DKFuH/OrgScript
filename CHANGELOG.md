@@ -6,6 +6,9 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 ## [Unreleased]
 
+- Added `orgscript format <file> --check` for canonical formatting checks without rewriting files.
+- Added `npm run format:check:all` and integrated formatting checks into CI.
+
 ## [0.3.0] - 2026-03-29
 
 - Added the first AST-backed formatter via `orgscript format <file>`.

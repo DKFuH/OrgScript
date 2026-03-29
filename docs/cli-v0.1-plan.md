@@ -12,6 +12,7 @@ Implemented:
 
 - `validate`
 - `format`
+- `format --check`
 - `lint`
 - `export json`
 - `validate --json`
@@ -19,7 +20,6 @@ Implemented:
 
 Planned next:
 
-- `format --check`
 - `lint --strict`
 
 ## Command behavior
@@ -57,7 +57,7 @@ Output:
 
 - formatted file in place
 - idempotent output for already canonical files
-- optional `--check` mode later
+- `--check` reports whether a file is already canonical without modifying it
 
 ### `orgscript lint <file>`
 
@@ -125,6 +125,7 @@ TypeScript is the fastest start:
 - One can run `orgscript validate` on example files.
 - One can run `orgscript validate --json` and `orgscript lint --json` for downstream tooling.
 - One can run `orgscript format` on example files without changing canonical files.
+- One can run `orgscript format --check` in CI or pre-commit workflows.
 - One can run `orgscript lint` on valid but suspicious models and get stable findings.
 - Lint exit codes are safe for CI use with advisory warnings.
 - Invalid files produce useful errors with line references.

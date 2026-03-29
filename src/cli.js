@@ -15,7 +15,7 @@ function printUsage() {
 
 Usage:
   orgscript validate <file> [--json]
-  orgscript format <file>
+  orgscript format <file> [--check]
   orgscript lint <file> [--json]
   orgscript export json <file>
 `);
@@ -84,8 +84,17 @@ function run(args) {
     const current = fs.readFileSync(absolutePath, "utf8");
 
     if (current === formatted) {
-      console.log(`Already formatted: ${absolutePath}`);
+      console.log(
+        options.check
+          ? `Formatting check passed: ${absolutePath}`
+          : `Already formatted: ${absolutePath}`
+      );
       process.exit(0);
+    }
+
+    if (options.check) {
+      console.error(`Formatting changes required: ${absolutePath}`);
+      process.exit(1);
     }
 
     fs.writeFileSync(absolutePath, formatted, "utf8");
@@ -140,11 +149,17 @@ function run(args) {
 
 function parseArgs(args) {
   const options = {
+    check: false,
     json: false,
     positionals: [],
   };
 
   for (const argument of args) {
+    if (argument === "--check") {
+      options.check = true;
+      continue;
+    }
+
     if (argument === "--json") {
       options.json = true;
       continue;

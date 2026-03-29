@@ -25,6 +25,9 @@ jobs:
       - name: Run test suite
         run: npm test
 
+      - name: Check canonical formatting
+        run: npm run format:check:all
+
       - name: Validate examples
         run: npm run validate:all
 

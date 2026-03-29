@@ -143,6 +143,7 @@ See the full example in [`examples/craft-business-lead-to-order.orgs`](examples/
 - Separate guides for human authors and AI/tooling
 - AST-backed validation: `orgscript validate <file>`
 - AST-backed formatting: `orgscript format <file>`
+- Canonical format checks: `orgscript format <file> --check`
 - AST-backed linting: `orgscript lint <file>`
 - Canonical JSON export: `orgscript export json <file>`
 - Machine-readable diagnostics: `orgscript validate <file> --json`, `orgscript lint <file> --json`
@@ -156,6 +157,7 @@ npm install
 node ./bin/orgscript.js validate ./examples/craft-business-lead-to-order.orgs
 node ./bin/orgscript.js validate ./examples/craft-business-lead-to-order.orgs --json
 node ./bin/orgscript.js format ./examples/craft-business-lead-to-order.orgs
+node ./bin/orgscript.js format ./examples/craft-business-lead-to-order.orgs --check
 node ./bin/orgscript.js lint ./tests/lint/process-missing-trigger.orgs
 node ./bin/orgscript.js lint ./tests/lint/process-missing-trigger.orgs --json
 node ./bin/orgscript.js export json ./examples/craft-business-lead-to-order.orgs
@@ -190,6 +192,7 @@ Available now:
 orgscript validate file.orgs
 orgscript validate file.orgs --json
 orgscript format file.orgs
+orgscript format file.orgs --check
 orgscript lint file.orgs
 orgscript lint file.orgs --json
 orgscript export json file.orgs
@@ -201,6 +204,7 @@ See [`docs/cli-v0.1-plan.md`](docs/cli-v0.1-plan.md) for the implementation plan
 
 ```text
 npm test
+npm run format:check:all
 npm run validate:all
 npm run lint:all
 npm run golden:generate
