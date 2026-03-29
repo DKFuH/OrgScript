@@ -119,18 +119,23 @@ See the full example in [`examples/craft-business-lead-to-order.orgs`](examples/
 - [`docs/language-principles.md`](docs/language-principles.md)
 - [`docs/github-labels.md`](docs/github-labels.md)
 - [`docs/github-project-setup.md`](docs/github-project-setup.md)
+- [`docs/governance.md`](docs/governance.md)
 - [`docs/orgscript-for-humans.md`](docs/orgscript-for-humans.md)
 - [`docs/orgscript-for-ai.md`](docs/orgscript-for-ai.md)
 - [`docs/roadmaps/v0.4.0.md`](docs/roadmaps/v0.4.0.md)
 - [`docs/repository-structure.md`](docs/repository-structure.md)
 - [`docs/syntax.md`](docs/syntax.md)
 - [`docs/semantics.md`](docs/semantics.md)
+- [`examples/README.md`](examples/README.md)
 - [`spec/grammar.ebnf`](spec/grammar.ebnf)
+- [`spec/language-spec.md`](spec/language-spec.md)
 - [`spec/canonical-model.md`](spec/canonical-model.md)
+- [`spec/diagnostics.md`](spec/diagnostics.md)
 - [`examples/craft-business-lead-to-order.orgs`](examples/craft-business-lead-to-order.orgs)
 - [`examples/lead-qualification.orgs`](examples/lead-qualification.orgs)
 - [`examples/order-approval.orgs`](examples/order-approval.orgs)
 - [`examples/service-escalation.orgs`](examples/service-escalation.orgs)
+- [`editors/vscode/README.md`](editors/vscode/README.md)
 - [`packages/parser/README.md`](packages/parser/README.md)
 - [`packages/cli/README.md`](packages/cli/README.md)
 - [`packages/formatter/README.md`](packages/formatter/README.md)
@@ -146,11 +151,14 @@ See the full example in [`examples/craft-business-lead-to-order.orgs`](examples/
 - Canonical format checks: `orgscript format <file> --check`
 - AST-backed linting: `orgscript lint <file>`
 - Combined quality checks: `orgscript check <file>`
+- Machine-readable combined checks: `orgscript check <file> --json`
 - Canonical JSON export: `orgscript export json <file>`
 - Mermaid export for `process` and `stateflow`: `orgscript export mermaid <file>`
-- Machine-readable diagnostics: `orgscript validate <file> --json`, `orgscript lint <file> --json`
+- Machine-readable diagnostics: `orgscript validate <file> --json`, `orgscript lint <file> --json`, `orgscript check <file> --json`
 - Golden snapshot tests for AST, canonical model, and formatter output
 - Stable lint severities: `error`, `warning`, `info`
+- Canonical master spec: [`spec/language-spec.md`](spec/language-spec.md)
+- Initial VS Code syntax-highlighting scaffold: [`editors/vscode`](editors/vscode)
 
 ## Quick start
 
@@ -159,6 +167,7 @@ npm install
 node ./bin/orgscript.js validate ./examples/craft-business-lead-to-order.orgs
 node ./bin/orgscript.js validate ./examples/craft-business-lead-to-order.orgs --json
 node ./bin/orgscript.js check ./examples/craft-business-lead-to-order.orgs
+node ./bin/orgscript.js check ./examples/craft-business-lead-to-order.orgs --json
 node ./bin/orgscript.js format ./examples/craft-business-lead-to-order.orgs
 node ./bin/orgscript.js format ./examples/craft-business-lead-to-order.orgs --check
 node ./bin/orgscript.js lint ./tests/lint/process-missing-trigger.orgs
@@ -173,19 +182,139 @@ Exit codes are CI-friendly:
 - `lint` returns `0` when findings contain only `warning` and `info`, and `1` when findings contain at least one `error`.
 - `check` returns `0` only when validation passes, lint has no `error`, and formatting is canonical. Warnings and info findings alone do not fail `check`.
 
+## JSON diagnostics
+
+OrgScript exposes stable JSON diagnostics for CI, editors, AI systems, and downstream tooling.
+
+`validate --json` on a canonical example:
+
+```json
+{
+  "command": "validate",
+  "file": "examples/craft-business-lead-to-order.orgs",
+  "ok": true,
+  "valid": true,
+  "summary": {
+    "topLevelBlocks": 4,
+    "statements": 47,
+    "diagnostics": 0,
+    "error": 0,
+    "warning": 0,
+    "info": 0
+  },
+  "diagnostics": []
+}
+```
+
+`lint --json` on a warning-only fixture:
+
+```json
+{
+  "command": "lint",
+  "file": "tests/lint/process-missing-trigger.orgs",
+  "ok": true,
+  "clean": true,
+  "summary": {
+    "diagnostics": 1,
+    "error": 0,
+    "warning": 1,
+    "info": 0
+  },
+  "diagnostics": [
+    {
+      "source": "lint",
+      "code": "process-missing-trigger",
+      "severity": "warning",
+      "line": 1,
+      "message": "Process `MissingTrigger` has no `when` trigger."
+    }
+  ]
+}
+```
+
+`check --json` on a clean file:
+
+```json
+{
+  "command": "check",
+  "file": "examples/craft-business-lead-to-order.orgs",
+  "ok": true,
+  "summary": {
+    "diagnostics": 0,
+    "error": 0,
+    "warning": 0,
+    "info": 0
+  },
+  "validate": {
+    "ok": true,
+    "valid": true,
+    "skipped": false,
+    "summary": {
+      "topLevelBlocks": 4,
+      "statements": 47,
+      "diagnostics": 0,
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    },
+    "diagnostics": []
+  },
+  "lint": {
+    "ok": true,
+    "clean": true,
+    "skipped": false,
+    "summary": {
+      "diagnostics": 0,
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    },
+    "diagnostics": []
+  },
+  "format": {
+    "ok": true,
+    "canonical": true,
+    "skipped": false,
+    "summary": {
+      "diagnostics": 0,
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    },
+    "diagnostics": []
+  }
+}
+```
+
 ## Guides
 
 - Human authoring guide: [`docs/orgscript-for-humans.md`](docs/orgscript-for-humans.md)
 - AI interpretation guide: [`docs/orgscript-for-ai.md`](docs/orgscript-for-ai.md)
 - Diagnostics contract: [`spec/diagnostics.md`](spec/diagnostics.md)
+- Canonical language spec: [`spec/language-spec.md`](spec/language-spec.md)
+- Language governance: [`docs/governance.md`](docs/governance.md)
+- Example catalog: [`examples/README.md`](examples/README.md)
+- VS Code editor scaffold: [`editors/vscode/README.md`](editors/vscode/README.md)
+
+## Editor support
+
+OrgScript now ships with a first VS Code syntax-highlighting scaffold under [`editors/vscode`](editors/vscode).
+
+It currently covers:
+
+- `.orgs` file association
+- top-level blocks and core keywords
+- strings, numbers, and operators
+
+See [`editors/vscode/README.md`](editors/vscode/README.md) for local installation and usage notes.
 
 ## Near-term plan
 
-1. Show real JSON diagnostics examples in the README and diagnostics spec.
-2. Improve diagnostics consistency across CLI commands.
-3. Add `orgscript check --json` for machine-readable combined quality output.
-4. Add an initial VS Code syntax highlighting scaffold.
-5. Add a first editor integration path that contributors can install locally.
+1. Expand diagnostics examples and integration guidance around CI and editors.
+2. Improve diagnostics consistency further across human-readable CLI output.
+3. Grow the example catalog across `simple`, `realistic`, and `advanced` scenarios.
+4. Extend editor support beyond the initial VS Code syntax-highlighting scaffold.
+5. Add additional downstream exporters and documentation views.
 
 See [`docs/roadmaps/v0.4.0.md`](docs/roadmaps/v0.4.0.md) for the current milestone plan.
 
@@ -203,6 +332,7 @@ orgscript lint file.orgs --json
 orgscript export json file.orgs
 orgscript export mermaid file.orgs
 orgscript check file.orgs
+orgscript check file.orgs --json
 ```
 
 `orgscript check` runs `validate`, `lint`, and `format --check` in that order and fails on validation errors, lint errors, or formatting drift. Warnings and info findings alone do not fail the command.
@@ -216,6 +346,8 @@ See [`docs/cli-v0.1-plan.md`](docs/cli-v0.1-plan.md) for the implementation plan
 ```text
 npm test
 npm run export:mermaid
+npm run check
+npm run check:all
 npm run format:check:all
 npm run validate:all
 npm run lint:all

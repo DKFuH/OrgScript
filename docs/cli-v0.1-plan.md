@@ -19,6 +19,7 @@ Implemented:
 - `validate --json`
 - `lint --json`
 - `check`
+- `check --json`
 
 Planned next:
 
@@ -105,6 +106,8 @@ Output:
 - compact pass/fail summary for each stage
 - clear indication of which stage failed
 - stable text output suitable for CI logs
+- optional machine-readable diagnostics via `--json`
+- easy composition into repo-level wrappers such as `npm run check:all`
 
 Exit behavior:
 
@@ -159,7 +162,7 @@ TypeScript is the fastest start:
 ## Success criteria for v0.1
 
 - One can run `orgscript validate` on example files.
-- One can run `orgscript validate --json` and `orgscript lint --json` for downstream tooling.
+- One can run `orgscript validate --json`, `orgscript lint --json`, and `orgscript check --json` for downstream tooling.
 - One can run `orgscript format` on example files without changing canonical files.
 - One can run `orgscript format --check` in CI or pre-commit workflows.
 - One can run `orgscript check` to combine validation, linting, and format checks.

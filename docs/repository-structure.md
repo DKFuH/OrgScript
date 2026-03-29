@@ -14,6 +14,7 @@ spec/
 
 ```text
 docs/
+  governance.md
   cli-v0.1-plan.md
   language-principles.md
   manifesto.md
@@ -22,10 +23,19 @@ docs/
   syntax.md
 
 examples/
+  README.md
   craft-business-lead-to-order.orgs
   lead-qualification.orgs
   order-approval.orgs
   service-escalation.orgs
+
+editors/
+  vscode/
+    README.md
+    language-configuration.json
+    package.json
+    syntaxes/
+      orgscript.tmLanguage.json
 
 scripts/
   validate-all.js
@@ -51,13 +61,16 @@ packages/
 
 spec/
   canonical-model.md
+  diagnostics.md
   grammar.ebnf
+  language-spec.md
 ```
 
 ## Structure principles
 
 - `docs/` explains purpose, language behavior, governance, and roadmap
 - `examples/` demonstrates realistic domain use cases
+- `editors/` contains language-support scaffolds and editor integrations
 - `spec/` holds normative language definitions
 - `src/` contains the current reference implementation
 - `packages/` contains implementation units

@@ -9,7 +9,11 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 - Added `orgscript format <file> --check` for canonical formatting checks without rewriting files.
 - Added `npm run format:check:all` and integrated formatting checks into CI.
 - Added `orgscript check <file>` as the combined quality command for validation, linting, and formatting checks.
+- Added `orgscript check <file> --json` for machine-readable combined quality diagnostics.
+- Added `npm run check:all` and switched CI to the combined quality path.
 - Added `orgscript export mermaid <file>` for first-pass Mermaid exports of processes and stateflows.
+- Added a canonical master language spec and lightweight governance guidance.
+- Added an example catalog and an initial VS Code syntax-highlighting scaffold.
 
 ## [0.3.0] - 2026-03-29
 

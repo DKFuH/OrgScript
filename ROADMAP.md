@@ -41,6 +41,9 @@
 
 - Open the v0.4.0 developer-experience milestone
 - Prepare issue drafts for formatter checks, diagnostics docs, combined quality checks, diagnostics consistency, and editor support
+- Publish the canonical language spec and governance notes
+- Add the first editor integration scaffold for VS Code
+- Expand diagnostics guidance and example indexing for contributors
 
 ## Later
 
