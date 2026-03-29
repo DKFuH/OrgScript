@@ -7,6 +7,7 @@ This folder contains a locally testable VS Code extension for `.orgs` files.
 - `package.json` registers the `OrgScript` language with language id `orgscript`
 - `syntaxes/orgscript.tmLanguage.json` provides TextMate-based syntax highlighting
 - `language-configuration.json` adds lightweight editor behavior for double-quoted strings
+- `.vscode/launch.json` provides an Extension Development Host launch target for F5 testing
 
 ## What is highlighted
 
@@ -30,6 +31,7 @@ OrgScript does not define an official comment syntax in the language spec yet, s
    - `examples/order-approval.orgs`
    - `examples/service-escalation.orgs`
 5. Confirm that the language mode is `OrgScript` and that blocks, statements, strings, operators, and dotted references are highlighted.
+6. If VS Code asks for a launch configuration, use `Launch OrgScript Extension` from `editors/vscode/.vscode/launch.json`.
 
 ## Good demo files
 

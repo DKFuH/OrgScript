@@ -73,6 +73,17 @@
     "control-keywords": {
       "patterns": [
         {
+          "match": "^(\\s*)(else)(\\s+)(if)\\b",
+          "captures": {
+            "2": {
+              "name": "keyword.control.orgscript"
+            },
+            "4": {
+              "name": "keyword.control.orgscript"
+            }
+          }
+        },
+        {
           "match": "^(\\s*)(if|when|then|else)\\b",
           "captures": {
             "2": {
