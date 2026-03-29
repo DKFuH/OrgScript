@@ -1,29 +1,43 @@
 # OrgScript Examples
 
-This folder shows OrgScript at three adoption levels.
+This folder is the quickest way to learn OrgScript by reading real files.
+
+## Suggested path
+
+1. Start with `simple` if you want the smallest readable process example.
+2. Move to `realistic` when you want end-to-end business flows.
+3. Use `advanced` when you want mixed block types and exporter coverage.
 
 ## Simple
 
 - [`lead-qualification.orgs`](lead-qualification.orgs)
-  A compact process example focused on trigger, branching, assignment, and transition.
+  Best first read. A compact process example focused on trigger, branching, assignment, and transition.
 
 ## Realistic
 
 - [`craft-business-lead-to-order.orgs`](craft-business-lead-to-order.orgs)
   A fuller business flow from lead intake through qualification, quote conversion, and order lifecycle.
 - [`service-escalation.orgs`](service-escalation.orgs)
-  A policy- and event-oriented example for support and response handling.
+  A policy- and event-oriented example for support handling, escalation, and role-based action.
 
 ## Advanced
 
 - [`order-approval.orgs`](order-approval.orgs)
   A mixed file showing stateflow and rule modeling together, useful for exports and downstream tooling.
 
+## Quick index
+
+- `lead-qualification.orgs` - smallest onboarding example
+- `craft-business-lead-to-order.orgs` - craft-business pipeline and qualification logic
+- `service-escalation.orgs` - support escalation, policy flow, and permissions
+- `order-approval.orgs` - stateflow plus rule modeling in one file
+
 ## How to use the examples
 
-- Start with the `Simple` example if you are learning the language.
-- Move to `Realistic` once you want to model operational flows end to end.
-- Use `Advanced` when testing exports, linting, or tooling assumptions across multiple block types.
+- Read `lead-qualification.orgs` first to learn the smallest useful pattern.
+- Read `craft-business-lead-to-order.orgs` next to see a fuller real-world process.
+- Read `service-escalation.orgs` to see policy and role behavior.
+- Read `order-approval.orgs` when you want to see stateflow and rule modeling together.
 
 ## Suggested commands
 
