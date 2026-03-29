@@ -15,6 +15,7 @@ const {
 const { toCanonicalModel } = require("./export-json");
 const { toMarkdownSummary } = require("./export-markdown");
 const { toMermaidMarkdown } = require("./export-mermaid");
+const { toHtmlDocumentation } = require("./export-html");
 const { formatDocument } = require("./formatter");
 const { lintDocument, summarizeFindings } = require("./linter");
 const { buildModel, validateFile } = require("./validate");
@@ -30,6 +31,7 @@ Usage:
   orgscript export json <file>
   orgscript export markdown <file>
   orgscript export mermaid <file>
+  orgscript export html <file>
 `);
 }
 
@@ -130,6 +132,28 @@ function run(args) {
       process.exit(0);
     } catch (error) {
       console.error(`Cannot export Mermaid from ${absolutePath}: ${error.message}`);
+      process.exit(1);
+    }
+  }
+
+  if (command === "export" && maybeSubcommand === "html") {
+    const absolutePath = resolveFile("export", maybeFile);
+    const result = buildModel(absolutePath);
+
+    if (!result.ok) {
+      printDiagnostics(
+        `EXPORT ${toDisplayPath(absolutePath)}`,
+        createValidateReport(absolutePath, result).diagnostics
+      );
+      process.exit(1);
+    }
+
+    try {
+      const title = `OrgScript Documentation: ${path.basename(absolutePath)}`;
+      process.stdout.write(toHtmlDocumentation(toCanonicalModel(result.ast), title));
+      process.exit(0);
+    } catch (error) {
+      console.error(`Cannot export HTML from ${absolutePath}: ${error.message}`);
       process.exit(1);
     }
   }

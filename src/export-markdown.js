@@ -7,7 +7,38 @@ function toMarkdownSummary(model) {
     throw new Error("No Markdown-exportable blocks found.");
   }
 
-  return `${sections.join("\n\n")}\n`;
+  const lines = ["# OrgScript Logic Summary", ""];
+
+  if (sections.length > 1) {
+    lines.push("## Contents");
+    lines.push("");
+    for (const node of model.body) {
+      const section = renderTopLevelNode(node);
+      if (section) {
+        lines.push(`- [${toKindLabel(node.type)}: ${node.name}](#${toAnchor(node)})`);
+      }
+    }
+    lines.push("");
+    lines.push("---");
+    lines.push("");
+  }
+
+  // Use H2 for individual blocks since the file has an H1
+  const bodyPart = sections
+    .map((s) => s.replace(/^# /mg, "## "))
+    .join("\n\n---\n\n");
+
+  lines.push(bodyPart);
+
+  return `${lines.join("\n")}\n`;
+}
+
+function toAnchor(node) {
+  const label = `${toKindLabel(node.type)} ${node.name}`;
+  return label
+    .toLowerCase()
+    .replace(/ /g, "-")
+    .replace(/[^a-z0-9-]/g, "");
 }
 
 function renderTopLevelNode(node) {
@@ -46,21 +77,21 @@ function renderProcess(node) {
   const triggers = (node.body || []).filter((statement) => statement.type === "when");
   const statements = (node.body || []).filter((statement) => statement.type !== "when");
   const summary = summarizeStatementSequence(statements);
-  const lines = [`# Process: ${node.name}`, "", "## Trigger"];
+  const lines = [`# Process: ${node.name}`, "", "### Trigger"];
 
   if (triggers.length === 0) {
-    lines.push("- None explicitly declared.");
+    lines.push("- No explicit trigger defined.");
   } else {
     for (const trigger of triggers) {
-      lines.push(`- \`${trigger.trigger || "unknown"}\``);
+      lines.push(`- Triggered when \`${trigger.trigger || "unknown"}\`.`);
     }
   }
 
   lines.push("");
-  lines.push("## Summary");
+  lines.push("### Flow Summary");
 
   if (summary.length === 0) {
-    lines.push("- No operational statements are defined.");
+    lines.push("- No operational behavior is defined.");
   } else {
     for (const bullet of summary) {
       lines.push(`- ${bullet}`);
@@ -71,24 +102,24 @@ function renderProcess(node) {
 }
 
 function renderStateflow(node) {
-  const lines = [`# Stateflow: ${node.name}`, "", "## States"];
+  const lines = [`# Stateflow: ${node.name}`, "", "### States"];
 
   if ((node.states || []).length === 0) {
-    lines.push("- None defined.");
+    lines.push("- No states are defined.");
   } else {
     for (const state of node.states) {
-      lines.push(`- ${state}`);
+      lines.push(`- \`${state}\``);
     }
   }
 
   lines.push("");
-  lines.push("## Allowed transitions");
+  lines.push("### Transitions");
 
   if ((node.transitions || []).length === 0) {
-    lines.push("- None defined.");
+    lines.push("- No transitions are defined.");
   } else {
     for (const edge of node.transitions) {
-      lines.push(`- \`${edge.from} -> ${edge.to}\``);
+      lines.push(`- From \`${edge.from}\` to \`${edge.to}\`.`);
     }
   }
 
@@ -100,12 +131,12 @@ function renderRule(node) {
 
   if (node.appliesTo) {
     lines.push("");
-    lines.push("## Scope");
-    lines.push(`- \`${node.appliesTo}\``);
+    lines.push("### Scope");
+    lines.push(`- Applies to \`${node.appliesTo}\`.`);
   }
 
   lines.push("");
-  lines.push("## Summary");
+  lines.push("### Rule Behavior");
 
   const summary = summarizeStatementSequence(node.body || []);
   if (summary.length === 0) {
@@ -120,24 +151,19 @@ function renderRule(node) {
 }
 
 function renderRole(node) {
-  const lines = [`# Role: ${node.name}`, "", "## Can"];
+  const lines = [`# Role: ${node.name}`, "", "### Permissions"];
 
   if ((node.can || []).length === 0) {
-    lines.push("- None.");
+    lines.push("- No assigned permissions.");
   } else {
     for (const permission of node.can) {
-      lines.push(`- \`${permission}\``);
+      lines.push(`- **Can** perform \`${permission}\`.`);
     }
   }
 
-  lines.push("");
-  lines.push("## Cannot");
-
-  if ((node.cannot || []).length === 0) {
-    lines.push("- None.");
-  } else {
+  if ((node.cannot || []).length > 0) {
     for (const permission of node.cannot) {
-      lines.push(`- \`${permission}\``);
+      lines.push(`- **Cannot** perform \`${permission}\`.`);
     }
   }
 
@@ -145,16 +171,16 @@ function renderRole(node) {
 }
 
 function renderPolicy(node) {
-  const lines = [`# Policy: ${node.name}`, "", "## Clauses"];
+  const lines = [`# Policy: ${node.name}`, "", "### Security / SLA Clauses"];
 
   if ((node.clauses || []).length === 0) {
-    lines.push("- No clauses are defined.");
+    lines.push("- No policy clauses are defined.");
     return lines.join("\n");
   }
 
   for (const clause of node.clauses) {
     lines.push(
-      `- When ${formatConditionCode(clause.condition)}, ${formatStatementSequenceInline(
+      `- If ${formatConditionCode(clause.condition)}, then ${formatStatementSequenceInline(
         clause.then || []
       )}.`
     );
@@ -164,10 +190,10 @@ function renderPolicy(node) {
 }
 
 function renderEvent(node) {
-  const lines = [`# Event: ${node.name}`, "", "## Reactions"];
+  const lines = [`# Event: ${node.name}`, "", "### Automated Reactions"];
 
   if ((node.body || []).length === 0) {
-    lines.push("- No reactions are defined.");
+    lines.push("- No automated reactions are defined.");
   } else {
     for (const bullet of summarizeStatementSequence(node.body || [])) {
       lines.push(`- ${bullet}`);
@@ -178,19 +204,11 @@ function renderEvent(node) {
 }
 
 function renderMetric(node) {
-  const lines = [`# Metric: ${node.name}`];
+  const lines = [`# Metric: ${node.name}`, "", "### Monitoring Definition"];
 
-  lines.push("");
-  lines.push("## Formula");
-  lines.push(node.formula ? `- \`${node.formula}\`` : "- None defined.");
-
-  lines.push("");
-  lines.push("## Owner");
-  lines.push(node.owner ? `- \`${node.owner}\`` : "- None defined.");
-
-  lines.push("");
-  lines.push("## Target");
-  lines.push(node.target ? `- \`${node.target}\`` : "- None defined.");
+  lines.push(node.formula ? `- **Formula**: \`${node.formula}\`` : "- No formula defined.");
+  lines.push(node.owner ? `- **Owner**: \`${node.owner}\`` : "- No owner assigned.");
+  lines.push(node.target ? `- **Target**: \`${node.target}\`` : "- No target defined.");
 
   return lines.join("\n");
 }
@@ -239,8 +257,8 @@ function formatIfBullets(statement) {
     );
   }
 
-  if (statement.else && statement.else.length !== 0) {
-    bullets.push(`Else, ${formatStatementSequenceInline(statement.else)}.`);
+  if (statement.else && (statement.else.body || []).length !== 0) {
+    bullets.push(`Otherwise, ${formatStatementSequenceInline(statement.else.body)}.`);
   }
 
   return bullets;
@@ -259,7 +277,7 @@ function formatStatementSequenceInline(statements) {
   }
 
   if (parts.length === 0) {
-    return "no actions are defined";
+    return "take no action";
   }
 
   return joinParts(parts);
@@ -280,8 +298,8 @@ function formatIfInlineParts(statement) {
     );
   }
 
-  if (statement.else && statement.else.length !== 0) {
-    parts.push(`else, ${formatStatementSequenceInline(statement.else)}`);
+  if (statement.else && (statement.else.body || []).length !== 0) {
+    parts.push(`else, ${formatStatementSequenceInline(statement.else.body)}`);
   }
 
   return parts;
@@ -309,7 +327,8 @@ function formatActionPhrase(statement) {
   }
 
   if (statement.type === "update") {
-    return `update \`${statement.target || "?"}\` to ${formatExpressionCode(statement.value)}`;
+    const val = formatExpressionCode(statement.value);
+    return `update \`${statement.target || "?"}\` to ${val}`;
   }
 
   if (statement.type === "require") {
@@ -321,10 +340,10 @@ function formatActionPhrase(statement) {
   }
 
   if (statement.type === "stop") {
-    return "stop the branch";
+    return "stop execution";
   }
 
-  return `encounter unsupported statement type \`${statement.type}\``;
+  return `handle unsupported action \`${statement.type}\``;
 }
 
 function formatConditionCode(condition) {
@@ -391,6 +410,10 @@ function joinParts(parts) {
   }
 
   return `${parts.slice(0, -1).join(", ")}, and ${parts[parts.length - 1]}`;
+}
+
+function toKindLabel(type) {
+  return type.replace(/([a-z])([A-Z])/g, "$1 $2").toLowerCase();
 }
 
 module.exports = {

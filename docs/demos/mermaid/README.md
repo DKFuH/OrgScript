@@ -17,6 +17,8 @@ npm run demo:generate
 
 | Demo | Source | Markdown artifact | Mermaid artifact |
 | --- | --- | --- | --- |
+| Craft Business: Lead to Order | [craft-business-lead-to-order.orgs](../../../examples/craft-business-lead-to-order.orgs) | [craft-business-lead-to-order.mermaid.md](./craft-business-lead-to-order.mermaid.md) | [craft-business-lead-to-order.mmd](./craft-business-lead-to-order.mmd) |
+|  |  |  | Our hero example showcasing multi-block processes, rules, and stateflows in a realistic business scenario. |
 | Lead qualification process | [lead-qualification.orgs](../../../examples/lead-qualification.orgs) | [lead-qualification.mermaid.md](./lead-qualification.mermaid.md) | [lead-qualification.mmd](./lead-qualification.mmd) |
 |  |  |  | A compact process example that shows trigger, branching, assignment, notification, and state transition. |
 | Order approval stateflow | [order-approval.orgs](../../../examples/order-approval.orgs) | [order-approval.mermaid.md](./order-approval.mermaid.md) | [order-approval.mmd](./order-approval.mmd) |

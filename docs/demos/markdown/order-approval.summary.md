@@ -1,25 +1,36 @@
-# Stateflow: OrderStatus
+# OrgScript Logic Summary
 
-## States
-- draft
-- pending_approval
-- approved
-- production
-- completed
-- cancelled
+## Contents
 
-## Allowed transitions
-- `draft -> pending_approval`
-- `pending_approval -> approved`
-- `approved -> production`
-- `production -> completed`
-- `draft -> cancelled`
-- `pending_approval -> cancelled`
+- [stateflow: OrderStatus](#stateflow-orderstatus)
+- [rule: NoProductionWithoutApproval](#rule-noproductionwithoutapproval)
 
-# Rule: NoProductionWithoutApproval
+---
 
-## Scope
-- `order`
+## Stateflow: OrderStatus
 
-## Summary
+### States
+- `draft`
+- `pending_approval`
+- `approved`
+- `production`
+- `completed`
+- `cancelled`
+
+### Transitions
+- From `draft` to `pending_approval`.
+- From `pending_approval` to `approved`.
+- From `approved` to `production`.
+- From `production` to `completed`.
+- From `draft` to `cancelled`.
+- From `pending_approval` to `cancelled`.
+
+---
+
+## Rule: NoProductionWithoutApproval
+
+### Scope
+- Applies to `order`.
+
+### Rule Behavior
 - If `order.approved = false`, require `management_approval` and notify `operations` with `"Order cannot enter production"`.

@@ -6,12 +6,21 @@ const { buildModel } = require("../src/validate");
 const { toCanonicalModel } = require("../src/export-json");
 const { toMarkdownSummary } = require("../src/export-markdown");
 const { toMermaidMarkdown } = require("../src/export-mermaid");
+const { toHtmlDocumentation } = require("../src/export-html");
 
 const repoRoot = path.resolve(__dirname, "..");
 const mermaidOutputDir = path.join(repoRoot, "docs", "demos", "mermaid");
 const markdownOutputDir = path.join(repoRoot, "docs", "demos", "markdown");
+const htmlOutputDir = path.join(repoRoot, "docs", "demos", "html");
 
 const demos = [
+  {
+    slug: "craft-business-lead-to-order",
+    title: "Craft Business: Lead to Order",
+    source: path.join(repoRoot, "examples", "craft-business-lead-to-order.orgs"),
+    description:
+      "Our hero example showcasing multi-block processes, rules, and stateflows in a realistic business scenario.",
+  },
   {
     slug: "lead-qualification",
     title: "Lead qualification process",
@@ -31,6 +40,7 @@ const demos = [
 function main() {
   fs.mkdirSync(mermaidOutputDir, { recursive: true });
   fs.mkdirSync(markdownOutputDir, { recursive: true });
+  fs.mkdirSync(htmlOutputDir, { recursive: true });
 
   for (const demo of demos) {
     const result = buildModel(demo.source);
@@ -49,10 +59,16 @@ function main() {
       toMarkdownSummary(toCanonicalModel(result.ast)),
       "utf8"
     );
+    fs.writeFileSync(
+      path.join(htmlOutputDir, `${demo.slug}.html`),
+      toHtmlDocumentation(toCanonicalModel(result.ast), `OrgScript Demo: ${demo.title}`),
+      "utf8"
+    );
   }
 
   fs.writeFileSync(path.join(mermaidOutputDir, "README.md"), renderMermaidReadme(), "utf8");
   fs.writeFileSync(path.join(markdownOutputDir, "README.md"), renderMarkdownReadme(), "utf8");
+  fs.writeFileSync(path.join(htmlOutputDir, "README.md"), renderHtmlReadme(), "utf8");
 }
 
 function extractFirstMermaidBlock(markdown) {
@@ -151,6 +167,46 @@ function renderMarkdownReadme() {
   lines.push(
     "- If you change Markdown export behavior, regenerate this folder with `npm run demo:generate` and review the diffs."
   );
+  lines.push("");
+
+  return `${lines.join("\n")}\n`;
+}
+
+function renderHtmlReadme() {
+  const lines = [
+    "# HTML documentation demos",
+    "",
+    "This folder shows the shortest path from OrgScript source to a shareable HTML documentation artifact.",
+    "",
+    "Each demo keeps the source file in `examples/` and generates one downstream artifact here:",
+    "",
+    "- `*.html`: a static HTML page with embedded logic summaries and live Mermaid diagrams",
+    "",
+    "## Generate",
+    "",
+    "```text",
+    "npm run demo:generate",
+    "```",
+    "",
+    "## Demos",
+    "",
+    "| Demo | Source | HTML artifact |",
+    "| --- | --- | --- |",
+  ];
+
+  for (const demo of demos) {
+    const sourceRelative = path.relative(htmlOutputDir, demo.source).replace(/\\/g, "/");
+    lines.push(
+      `| ${demo.title} | [${path.basename(demo.source)}](${sourceRelative}) | [${demo.slug}.html](./${demo.slug}.html) |`
+    );
+    lines.push(`|  |  | ${demo.description} |`);
+  }
+
+  lines.push("");
+  lines.push("## Notes");
+  lines.push("");
+  lines.push("- These artifacts are generated using the current HTML exporter implementation.");
+  lines.push("- The diagrams are rendered by loading `mermaid.js` from a CDN within the HTML page.");
   lines.push("");
 
   return `${lines.join("\n")}\n`;

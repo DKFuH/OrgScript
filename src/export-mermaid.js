@@ -54,6 +54,13 @@ function renderProcessSection(node, sectionIndex) {
     "```mermaid",
     "flowchart TD",
     ...graph.renderLines(),
+    "",
+    "  %% Styling",
+    "  classDef trigger fill:#f0f4ff,stroke:#5c7cfa,stroke-width:2px",
+    "  classDef decision fill:#fff9db,stroke:#fab005,stroke-width:2px",
+    "  classDef action fill:#fff,stroke:#adb5bd,stroke-width:1px",
+    "  classDef stop fill:#fff5f5,stroke:#ff8787,stroke-width:2px",
+    "  classDef success fill:#f4fce3,stroke:#94d82d,stroke-width:2px",
     "```",
   ];
 }
@@ -63,16 +70,29 @@ function renderStateflowSection(node, sectionIndex) {
   const lines = [`## Stateflow: ${node.name}`, "", "```mermaid", "stateDiagram-v2"];
   const aliases = new Map();
 
-  (node.states || []).forEach((state, index) => {
+  const states = node.states || [];
+  states.forEach((state, index) => {
     const alias = `${prefix}_state_${index + 1}`;
     aliases.set(state, alias);
     lines.push(`  state "${escapeMermaidLabel(state)}" as ${alias}`);
+    if (index === 0) {
+      lines.push(`  [*] --> ${alias}`);
+    }
   });
 
+  const outgoingCount = new Map();
   for (const edge of node.transitions || []) {
     const from = aliases.get(edge.from) || `${prefix}_${sanitizeId(edge.from)}`;
     const to = aliases.get(edge.to) || `${prefix}_${sanitizeId(edge.to)}`;
     lines.push(`  ${from} --> ${to}`);
+    outgoingCount.set(from, (outgoingCount.get(from) || 0) + 1);
+  }
+
+  // Add end markers for terminal states
+  for (const [state, alias] of aliases.entries()) {
+    if (!outgoingCount.has(alias)) {
+      lines.push(`  ${alias} --> [*]`);
+    }
   }
 
   lines.push("```");
@@ -88,6 +108,7 @@ function createFlowchartRenderer(prefix) {
     counter += 1;
     const id = `${prefix}_${kind}_${counter}`;
     nodes.push(`  ${id}${shapeNode(kind, label)}`);
+    nodes.push(`  class ${id} ${formatClass(kind)}`);
     return id;
   }
 
@@ -110,7 +131,7 @@ function createFlowchartRenderer(prefix) {
 
   function renderStatement(statement, incoming) {
     if (statement.type === "when") {
-      const id = addNode("action", `when ${statement.trigger || "unknown"}`);
+      const id = addNode("trigger", `when ${statement.trigger || "unknown"}`);
       connectIncoming(incoming, id);
       return [{ id }];
     }
@@ -132,7 +153,7 @@ function createFlowchartRenderer(prefix) {
       }
 
       if (statement.else) {
-        exits.push(...renderSequence(statement.else || [], falseConnectors));
+        exits.push(...renderSequence(statement.else.body || [], falseConnectors));
       } else {
         exits.push(...falseConnectors);
       }
@@ -164,11 +185,20 @@ function shapeNode(kind, label) {
     return `(["${safeLabel}"])`;
   }
 
+  if (kind === "trigger") {
+    return `[/ "${safeLabel}" /]`;
+  }
+
   if (kind === "decision") {
     return `{"${safeLabel}"}`;
   }
 
   return `["${safeLabel}"]`;
+}
+
+function formatClass(kind) {
+  if (kind === "start" || kind === "end") return "success";
+  return kind;
 }
 
 function formatAction(statement) {
@@ -229,7 +259,7 @@ function formatExpression(expression) {
   }
 
   if (expression.type === "string") {
-    return `"${expression.value}"`;
+    return `'${expression.value}'`;
   }
 
   if (expression.type === "boolean") {
@@ -250,7 +280,8 @@ function sanitizeId(value) {
 }
 
 function escapeMermaidLabel(value) {
-  return String(value).replace(/"/g, "&quot;");
+  // Use escaped double quotes for Mermaid labels inside double quotes
+  return String(value).replace(/"/g, "#quot;");
 }
 
 function escapeMermaidEdgeLabel(value) {

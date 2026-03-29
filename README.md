@@ -30,12 +30,13 @@ node ./bin/orgscript.js check ./examples/craft-business-lead-to-order.orgs
 # 3. Get machine-readable JSON diagnostics for editors and CI
 node ./bin/orgscript.js check ./examples/craft-business-lead-to-order.orgs --json
 
-# 4. Generate visual artifacts
+# 4. Generate visual and documentation artifacts
 node ./bin/orgscript.js export mermaid ./examples/craft-business-lead-to-order.orgs
 node ./bin/orgscript.js export markdown ./examples/craft-business-lead-to-order.orgs
+node ./bin/orgscript.js export html ./examples/craft-business-lead-to-order.orgs
 ```
 
-## The Three-Value Flow
+## The Artifact Flow
 
 Write simple text, get powerful artifacts. OrgScript transforms a single source of truth into multiple formats for different audiences.
 
@@ -67,11 +68,12 @@ node ./bin/orgscript.js export mermaid ./examples/craft-business-lead-to-order.o
 ### 3. Summary (Markdown)
 
 Export readable documentation for stakeholders.
-
-```text
-node ./bin/orgscript.js export markdown ./examples/craft-business-lead-to-order.orgs
-```
 *See generated summaries in [`docs/demos/markdown/`](docs/demos/markdown/README.md).*
+
+### 4. Documentation (HTML)
+
+Generate a self-contained, shareable HTML documentation page with live diagrams.
+*See generated pages in [`docs/demos/html/`](docs/demos/html/README.md).*
 
 ## Core building blocks in v0.1
 
@@ -139,7 +141,8 @@ node ./bin/orgscript.js export markdown ./examples/craft-business-lead-to-order.
 - Machine-readable format checks: `orgscript format <file> --check --json`
 - Canonical JSON export: `orgscript export json <file>`
 - Markdown summary export: `orgscript export markdown <file>`
-- Mermaid export for `process` and `stateflow`: `orgscript export mermaid <file>`
+- Mermaid diagram export: `orgscript export mermaid <file>`
+- HTML documentation export: `orgscript export html <file>`
 - Machine-readable diagnostics: `orgscript validate <file> --json`, `orgscript lint <file> --json`, `orgscript check <file> --json`
 - Stable diagnostic codes across syntax, semantic validation, lint, format, and CLI usage errors
 - Golden snapshot tests for AST, canonical model, and formatter output
@@ -321,6 +324,7 @@ OrgScript currently produces two human-facing output types from the same source 
 
 - Mermaid diagrams via `orgscript export mermaid <file>`
 - Markdown summaries via `orgscript export markdown <file>`
+- HTML documentation pages via `orgscript export html <file>`
 
 ## Editor support
 
@@ -361,6 +365,7 @@ orgscript lint file.orgs --json
 orgscript export json file.orgs
 orgscript export markdown file.orgs
 orgscript export mermaid file.orgs
+orgscript export html file.orgs
 orgscript check file.orgs
 orgscript check file.orgs --json
 ```
