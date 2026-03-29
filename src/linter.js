@@ -47,13 +47,13 @@ function summarizeFindings(findings) {
 
 function renderLintReport(filePath, findings) {
   if (findings.length === 0) {
-    return [`LINT ${filePath}`, "  status: ok", "  summary: 0 error(s), 0 warning(s), 0 info"];
+    return [`LINT ${filePath}`, "  status: passed", "  summary: 0 error(s), 0 warning(s), 0 info"];
   }
 
   const summary = summarizeFindings(findings);
   const lines = [
     `LINT ${filePath}`,
-    `  status: ${summary.error > 0 ? "failed" : "ok"}`,
+    `  status: ${summary.error > 0 ? "failed" : "passed"}`,
     `  summary: ${summary.error} error(s), ${summary.warning} warning(s), ${summary.info} info`,
   ];
 

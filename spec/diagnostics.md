@@ -240,16 +240,27 @@ Example:
 LINT tests/lint/process-multiple-triggers.orgs
   status: failed
   summary: 1 error(s), 0 warning(s), 1 info
-  ERROR lint.process-multiple-triggers tests/lint/process-multiple-triggers.orgs:5 Process `MultipleTriggers` declares multiple `when` triggers.
-  INFO lint.process-trigger-order tests/lint/process-multiple-triggers.orgs:5 Process `MultipleTriggers` declares a `when` trigger after operational statements.
+  ERROR   [lint.process-multiple-triggers] tests/lint/process-multiple-triggers.orgs:5 - Process `MultipleTriggers` declares multiple `when` triggers.
+  INFO    [lint.process-trigger-order] tests/lint/process-multiple-triggers.orgs:5 - Process `MultipleTriggers` declares a `when` trigger after operational statements.
+Result: FAIL
+```
+
+`format --check` uses the same structural pattern:
+
+```text
+FORMAT tests/invalid/unknown-top-level.orgs
+  status: failed
+  summary: 1 error(s), 0 warning(s), 0 info
+  stats: 1 top-level block(s), 0 statement(s)
+  ERROR   [syntax.unknown-top-level-block] tests/invalid/unknown-top-level.orgs:1 - Unknown top-level block `workflow`.
 Result: FAIL
 ```
 
 `check` uses explicit stage lines:
 
-- `validate: ok|failed`
-- `lint: ok|failed|skipped`
-- `format: ok|failed|skipped`
+- `validate: passed|failed`
+- `lint: passed|failed|skipped`
+- `format: passed|failed|skipped`
 
 ## Exit codes
 

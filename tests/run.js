@@ -210,7 +210,7 @@ function testLintFixtures() {
     } else {
       assert.strictEqual(
         reportLines[1],
-        `  status: ${summary.error > 0 ? "failed" : "ok"}`,
+        `  status: ${summary.error > 0 ? "failed" : "passed"}`,
         `Unexpected lint status line for ${entry.file}`
       );
       assert.strictEqual(
@@ -424,7 +424,7 @@ function testFormatCheckMode() {
     "Expected format --check heading"
   );
   assert.ok(
-    canonicalCheck.stdout.includes("  status: ok"),
+    canonicalCheck.stdout.includes("  status: passed"),
     "Expected format --check success status"
   );
 
@@ -498,6 +498,14 @@ function testFormatCheckMode() {
     invalidCheck.stderr.includes("FORMAT tests/invalid/unknown-top-level.orgs"),
     "Expected invalid format --check heading"
   );
+  assert.ok(
+    invalidCheck.stderr.includes("  status: failed"),
+    "Expected invalid format --check status"
+  );
+  assert.ok(
+    invalidCheck.stderr.includes("  summary: "),
+    "Expected invalid format --check summary"
+  );
 
   const invalidCheckJson = runCli([
     cliPath,
@@ -525,15 +533,15 @@ function testCheckCommand() {
     checkOk.stdout.includes("CHECK examples/craft-business-lead-to-order.orgs"),
     "Expected check header in check output"
   );
-  assert.ok(checkOk.stdout.includes("validate: ok"), "Expected validate pass in check output");
-  assert.ok(checkOk.stdout.includes("lint: ok (0 error(s), 0 warning(s), 0 info)"), "Expected lint pass in check output");
-  assert.ok(checkOk.stdout.includes("format: ok"), "Expected format pass in check output");
+  assert.ok(checkOk.stdout.includes("validate: passed"), "Expected validate pass in check output");
+  assert.ok(checkOk.stdout.includes("lint: passed (0 error(s), 0 warning(s), 0 info)"), "Expected lint pass in check output");
+  assert.ok(checkOk.stdout.includes("format: passed"), "Expected format pass in check output");
   assert.ok(checkOk.stdout.includes("Result: PASS"), "Expected passing summary in check output");
 
   const checkWarning = runCli([cliPath, "check", "./tests/lint/process-missing-trigger.orgs"]);
   assert.strictEqual(checkWarning.status, 0, "Expected warning-only check to stay non-failing");
   assert.ok(
-    checkWarning.stdout.includes("lint: ok (0 error(s), 1 warning(s), 0 info)"),
+    checkWarning.stdout.includes("lint: passed (0 error(s), 1 warning(s), 0 info)"),
     "Expected warning summary in check output"
   );
   assert.ok(

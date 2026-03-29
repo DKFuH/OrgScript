@@ -294,13 +294,14 @@ function sortDiagnostics(diagnostics) {
 }
 
 function formatDiagnosticLine(diagnostic) {
-  return `  ${diagnostic.severity.toUpperCase()} ${diagnostic.code} ${diagnostic.file}:${diagnostic.line} ${diagnostic.message}`;
+  const sev = diagnostic.severity.toUpperCase().padEnd(7);
+  return `  ${sev} [${diagnostic.code}] ${diagnostic.file}:${diagnostic.line} - ${diagnostic.message}`;
 }
 
 function renderCommandReport(title, filePath, report, options = {}) {
   const lines = [`${title} ${toDisplayPath(filePath)}`];
 
-  lines.push(`  status: ${report.ok ? "ok" : "failed"}`);
+  lines.push(`  status: ${report.ok ? "passed" : "failed"}`);
   lines.push(
     `  summary: ${report.summary.error} error(s), ${report.summary.warning} warning(s), ${report.summary.info} info`
   );

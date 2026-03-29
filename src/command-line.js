@@ -158,7 +158,10 @@ function run(args) {
       if (options.check && options.json) {
         console.log(JSON.stringify(report, null, 2));
       } else {
-        printDiagnostics(`FORMAT ${toDisplayPath(absolutePath)}`, report.diagnostics);
+        const output = renderCommandReport("FORMAT", absolutePath, report, {
+          includeStats: true,
+        });
+        console.error(output.join("\n"));
       }
       process.exit(1);
     }
@@ -367,21 +370,21 @@ function runCheck(filePath) {
 function renderCheckReport(filePath, result, report = createCheckReport(filePath, result)) {
   const lines = [`CHECK ${toDisplayPath(filePath)}`];
 
-  lines.push(`  validate: ${result.validate.ok ? "ok" : "failed"}`);
+  lines.push(`  validate: ${result.validate.ok ? "passed" : "failed"}`);
 
   if (result.lint.skipped) {
     lines.push("  lint: skipped");
   } else {
     const { error, warning, info } = result.lint.summary;
     lines.push(
-      `  lint: ${result.lint.ok ? "ok" : "failed"} (${error} error(s), ${warning} warning(s), ${info} info)`
+      `  lint: ${result.lint.ok ? "passed" : "failed"} (${error} error(s), ${warning} warning(s), ${info} info)`
     );
   }
 
   if (result.format.skipped) {
     lines.push("  format: skipped");
   } else if (result.format.ok) {
-    lines.push("  format: ok");
+    lines.push("  format: passed");
   } else {
     lines.push("  format: failed (canonical formatting changes required)");
   }
