@@ -21,17 +21,27 @@ const { lintDocument, summarizeFindings } = require("./linter");
 const { buildModel, validateFile } = require("./validate");
 
 function printUsage() {
-  console.log(`OrgScript CLI
+  console.log(`OrgScript CLI v${require("../package.json").version}
+
+A human-readable, AI-friendly description language for business logic.
 
 Usage:
-  orgscript validate <file> [--json]
-  orgscript check <file> [--json]
-  orgscript format <file> [--check] [--json]
-  orgscript lint <file> [--json]
-  orgscript export json <file>
-  orgscript export markdown <file>
-  orgscript export mermaid <file>
-  orgscript export html <file>
+  orgscript check <file> [--json]       Run all quality checks (validate, lint, format)
+  orgscript validate <file> [--json]    Check syntax and semantic validity
+  orgscript lint <file> [--json]        Run static analysis rules
+  orgscript format <file> [--check]     Auto-format or check canonical style
+  orgscript export <kind> <file>        Export to different formats
+
+Export Kinds:
+  json        Canonical JSON model
+  markdown    Stakeholder-friendly logic summary
+  mermaid     Process and stateflow diagrams (Markdown)
+  html        Self-contained documentation page
+
+Global Options:
+  --help, -h     Show this help
+  --version, -v  Show version number
+  --json         Output machine-readable JSON (where supported)
 `);
 }
 
@@ -41,6 +51,11 @@ function run(args) {
 
   if (!command || command === "--help" || command === "-h") {
     printUsage();
+    process.exit(0);
+  }
+
+  if (command === "--version" || command === "-v") {
+    console.log(require("../package.json").version);
     process.exit(0);
   }
 

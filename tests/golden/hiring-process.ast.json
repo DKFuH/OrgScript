@@ -1,0 +1,428 @@
+{
+  "type": "Document",
+  "filePath": "examples/hiring-process.orgs",
+  "body": [
+    {
+      "type": "StateflowNode",
+      "name": "ApplicationLifecycle",
+      "states": [
+        {
+          "type": "StateNode",
+          "value": "received",
+          "line": 4
+        },
+        {
+          "type": "StateNode",
+          "value": "screening",
+          "line": 5
+        },
+        {
+          "type": "StateNode",
+          "value": "interview-round-1",
+          "line": 6
+        },
+        {
+          "type": "StateNode",
+          "value": "interview-round-2",
+          "line": 7
+        },
+        {
+          "type": "StateNode",
+          "value": "offer_sent",
+          "line": 8
+        },
+        {
+          "type": "StateNode",
+          "value": "background_check",
+          "line": 9
+        },
+        {
+          "type": "StateNode",
+          "value": "hired",
+          "line": 10
+        },
+        {
+          "type": "StateNode",
+          "value": "rejected",
+          "line": 11
+        }
+      ],
+      "transitions": [
+        {
+          "type": "TransitionEdgeNode",
+          "from": "received",
+          "to": "screening",
+          "line": 14
+        },
+        {
+          "type": "TransitionEdgeNode",
+          "from": "screening",
+          "to": "interview-round-1",
+          "line": 15
+        },
+        {
+          "type": "TransitionEdgeNode",
+          "from": "screening",
+          "to": "rejected",
+          "line": 16
+        },
+        {
+          "type": "TransitionEdgeNode",
+          "from": "interview-round-1",
+          "to": "interview-round-2",
+          "line": 17
+        },
+        {
+          "type": "TransitionEdgeNode",
+          "from": "interview-round-1",
+          "to": "rejected",
+          "line": 18
+        },
+        {
+          "type": "TransitionEdgeNode",
+          "from": "interview-round-2",
+          "to": "offer_sent",
+          "line": 19
+        },
+        {
+          "type": "TransitionEdgeNode",
+          "from": "interview-round-2",
+          "to": "rejected",
+          "line": 20
+        },
+        {
+          "type": "TransitionEdgeNode",
+          "from": "offer_sent",
+          "to": "background_check",
+          "line": 21
+        },
+        {
+          "type": "TransitionEdgeNode",
+          "from": "offer_sent",
+          "to": "rejected",
+          "line": 22
+        },
+        {
+          "type": "TransitionEdgeNode",
+          "from": "background_check",
+          "to": "hired",
+          "line": 23
+        },
+        {
+          "type": "TransitionEdgeNode",
+          "from": "background_check",
+          "to": "rejected",
+          "line": 24
+        }
+      ]
+    },
+    {
+      "type": "RoleNode",
+      "name": "HiringManager",
+      "can": [
+        {
+          "type": "PermissionNode",
+          "value": "shortlist candidate",
+          "line": 29
+        },
+        {
+          "type": "PermissionNode",
+          "value": "interview candidate",
+          "line": 30
+        },
+        {
+          "type": "PermissionNode",
+          "value": "approve offer",
+          "line": 31
+        }
+      ],
+      "cannot": []
+    },
+    {
+      "type": "RoleNode",
+      "name": "HumanResources",
+      "can": [
+        {
+          "type": "PermissionNode",
+          "value": "create job posting",
+          "line": 36
+        },
+        {
+          "type": "PermissionNode",
+          "value": "schedule interview",
+          "line": 37
+        },
+        {
+          "type": "PermissionNode",
+          "value": "send offer",
+          "line": 38
+        },
+        {
+          "type": "PermissionNode",
+          "value": "verify background",
+          "line": 39
+        }
+      ],
+      "cannot": []
+    },
+    {
+      "type": "RoleNode",
+      "name": "Candidate",
+      "can": [
+        {
+          "type": "PermissionNode",
+          "value": "submit application",
+          "line": 44
+        },
+        {
+          "type": "PermissionNode",
+          "value": "accept offer",
+          "line": 45
+        }
+      ],
+      "cannot": []
+    },
+    {
+      "type": "PolicyNode",
+      "name": "GDPRCompliance",
+      "clauses": [
+        {
+          "type": "PolicyClauseNode",
+          "condition": {
+            "type": "ComparisonConditionNode",
+            "left": {
+              "type": "FieldReferenceNode",
+              "path": "candidate.data_processing_consent"
+            },
+            "operator": "=",
+            "right": {
+              "type": "LiteralNode",
+              "valueType": "boolean",
+              "value": false
+            },
+            "line": 49
+          },
+          "body": [
+            {
+              "type": "RequireNode",
+              "requirement": "data_anonymization",
+              "line": 51
+            },
+            {
+              "type": "NotifyNode",
+              "target": "dpo",
+              "message": "Non-consenting candidate record created",
+              "line": 52
+            }
+          ],
+          "line": 49
+        }
+      ]
+    },
+    {
+      "type": "RuleNode",
+      "name": "ScreeningMandatory",
+      "appliesTo": "application",
+      "body": [
+        {
+          "type": "IfNode",
+          "condition": {
+            "type": "ComparisonConditionNode",
+            "left": {
+              "type": "FieldReferenceNode",
+              "path": "application.status"
+            },
+            "operator": "=",
+            "right": {
+              "type": "LiteralNode",
+              "valueType": "string",
+              "value": "interview-round-1"
+            },
+            "line": 58
+          },
+          "then": [
+            {
+              "type": "RequireNode",
+              "requirement": "screening_notes",
+              "line": 59
+            }
+          ],
+          "elseIf": [],
+          "else": null,
+          "line": 58
+        }
+      ]
+    },
+    {
+      "type": "ProcessNode",
+      "name": "StandardHiring",
+      "body": [
+        {
+          "type": "WhenNode",
+          "trigger": {
+            "type": "FieldReferenceNode",
+            "path": "candidate.application_submitted"
+          },
+          "line": 63
+        },
+        {
+          "type": "TransitionNode",
+          "target": {
+            "type": "FieldReferenceNode",
+            "path": "application.status"
+          },
+          "value": {
+            "type": "LiteralNode",
+            "valueType": "string",
+            "value": "received"
+          },
+          "line": 65
+        },
+        {
+          "type": "NotifyNode",
+          "target": "hr_team",
+          "message": "New candidate application",
+          "line": 66
+        },
+        {
+          "type": "IfNode",
+          "condition": {
+            "type": "ComparisonConditionNode",
+            "left": {
+              "type": "FieldReferenceNode",
+              "path": "candidate.role_match_score"
+            },
+            "operator": ">",
+            "right": {
+              "type": "LiteralNode",
+              "valueType": "number",
+              "value": 70
+            },
+            "line": 68
+          },
+          "then": [
+            {
+              "type": "TransitionNode",
+              "target": {
+                "type": "FieldReferenceNode",
+                "path": "application.status"
+              },
+              "value": {
+                "type": "LiteralNode",
+                "valueType": "string",
+                "value": "screening"
+              },
+              "line": 69
+            },
+            {
+              "type": "AssignNode",
+              "target": {
+                "type": "FieldReferenceNode",
+                "path": "application.assigned_to"
+              },
+              "value": {
+                "type": "LiteralNode",
+                "valueType": "string",
+                "value": "hiring_manager"
+              },
+              "line": 70
+            }
+          ],
+          "elseIf": [],
+          "else": {
+            "type": "ElseNode",
+            "body": [
+              {
+                "type": "TransitionNode",
+                "target": {
+                  "type": "FieldReferenceNode",
+                  "path": "application.status"
+                },
+                "value": {
+                  "type": "LiteralNode",
+                  "valueType": "string",
+                  "value": "rejected"
+                },
+                "line": 73
+              },
+              {
+                "type": "NotifyNode",
+                "target": "candidate",
+                "message": "Thank you for your interest",
+                "line": 74
+              },
+              {
+                "type": "StopNode",
+                "line": 75
+              }
+            ],
+            "line": 72
+          },
+          "line": 68
+        },
+        {
+          "type": "IfNode",
+          "condition": {
+            "type": "ComparisonConditionNode",
+            "left": {
+              "type": "FieldReferenceNode",
+              "path": "application.screening_outcome"
+            },
+            "operator": "=",
+            "right": {
+              "type": "LiteralNode",
+              "valueType": "string",
+              "value": "positive"
+            },
+            "line": 77
+          },
+          "then": [
+            {
+              "type": "TransitionNode",
+              "target": {
+                "type": "FieldReferenceNode",
+                "path": "application.status"
+              },
+              "value": {
+                "type": "LiteralNode",
+                "valueType": "string",
+                "value": "interview-round-1"
+              },
+              "line": 78
+            },
+            {
+              "type": "CreateNode",
+              "entity": "interview_invite",
+              "line": 79
+            }
+          ],
+          "elseIf": [],
+          "else": {
+            "type": "ElseNode",
+            "body": [
+              {
+                "type": "TransitionNode",
+                "target": {
+                  "type": "FieldReferenceNode",
+                  "path": "application.status"
+                },
+                "value": {
+                  "type": "LiteralNode",
+                  "valueType": "string",
+                  "value": "rejected"
+                },
+                "line": 82
+              },
+              {
+                "type": "StopNode",
+                "line": 83
+              }
+            ],
+            "line": 81
+          },
+          "line": 77
+        }
+      ]
+    }
+  ]
+}

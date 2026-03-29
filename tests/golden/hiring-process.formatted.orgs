@@ -1,0 +1,83 @@
+stateflow ApplicationLifecycle
+
+  states
+    received
+    screening
+    interview-round-1
+    interview-round-2
+    offer_sent
+    background_check
+    hired
+    rejected
+
+  transitions
+    received -> screening
+    screening -> interview-round-1
+    screening -> rejected
+    interview-round-1 -> interview-round-2
+    interview-round-1 -> rejected
+    interview-round-2 -> offer_sent
+    interview-round-2 -> rejected
+    offer_sent -> background_check
+    offer_sent -> rejected
+    background_check -> hired
+    background_check -> rejected
+
+role HiringManager
+
+  can
+    shortlist candidate
+    interview candidate
+    approve offer
+
+role HumanResources
+
+  can
+    create job posting
+    schedule interview
+    send offer
+    verify background
+
+role Candidate
+
+  can
+    submit application
+    accept offer
+
+policy GDPRCompliance
+
+  when candidate.data_processing_consent = false
+  then
+    require data_anonymization
+    notify dpo with "Non-consenting candidate record created"
+
+rule ScreeningMandatory
+
+  applies to application
+
+  if application.status = "interview-round-1" then
+    require screening_notes
+
+process StandardHiring
+
+  when candidate.application_submitted
+
+  transition application.status to "received"
+  notify hr_team with "New candidate application"
+
+  if candidate.role_match_score > 70 then
+    transition application.status to "screening"
+    assign application.assigned_to = "hiring_manager"
+
+  else
+    transition application.status to "rejected"
+    notify candidate with "Thank you for your interest"
+    stop
+
+  if application.screening_outcome = "positive" then
+    transition application.status to "interview-round-1"
+    create interview_invite
+
+  else
+    transition application.status to "rejected"
+    stop

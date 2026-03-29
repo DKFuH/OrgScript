@@ -53,7 +53,7 @@
 - **Demos & Showcase Upgrade**: stronger source → artifact visual story
 - **Integration Contract Polish**: tighten and document exporter stability
 
-## v0.7 (Planned)
+## v0.7 (Completed)
 
 Theme: **Packaging, Distribution, and Trust**
 

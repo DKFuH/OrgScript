@@ -2,16 +2,20 @@
   "name": "orgscript-vscode",
   "displayName": "OrgScript",
   "description": "Minimal VS Code language support for OrgScript (.orgs) files.",
-  "version": "0.0.1",
-  "publisher": "orgscript",
+  "version": "0.7.0",
+  "publisher": "dkfuh",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DKFuH/OrgScript"
+  },
+  "bugs": {
+    "url": "https://github.com/DKFuH/OrgScript/issues"
+  },
   "engines": {
     "vscode": "^1.85.0"
   },
   "categories": [
-    "Languages"
-  ],
-  "activationEvents": [
-    "onLanguage:orgscript"
+    "Programming Languages"
   ],
   "contributes": {
     "languages": [

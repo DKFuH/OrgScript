@@ -1,0 +1,275 @@
+{
+  "version": "0.2",
+  "type": "document",
+  "body": [
+    {
+      "type": "stateflow",
+      "name": "ApplicationLifecycle",
+      "states": [
+        "received",
+        "screening",
+        "interview-round-1",
+        "interview-round-2",
+        "offer_sent",
+        "background_check",
+        "hired",
+        "rejected"
+      ],
+      "transitions": [
+        {
+          "from": "received",
+          "to": "screening"
+        },
+        {
+          "from": "screening",
+          "to": "interview-round-1"
+        },
+        {
+          "from": "screening",
+          "to": "rejected"
+        },
+        {
+          "from": "interview-round-1",
+          "to": "interview-round-2"
+        },
+        {
+          "from": "interview-round-1",
+          "to": "rejected"
+        },
+        {
+          "from": "interview-round-2",
+          "to": "offer_sent"
+        },
+        {
+          "from": "interview-round-2",
+          "to": "rejected"
+        },
+        {
+          "from": "offer_sent",
+          "to": "background_check"
+        },
+        {
+          "from": "offer_sent",
+          "to": "rejected"
+        },
+        {
+          "from": "background_check",
+          "to": "hired"
+        },
+        {
+          "from": "background_check",
+          "to": "rejected"
+        }
+      ]
+    },
+    {
+      "type": "role",
+      "name": "HiringManager",
+      "can": [
+        "shortlist candidate",
+        "interview candidate",
+        "approve offer"
+      ],
+      "cannot": []
+    },
+    {
+      "type": "role",
+      "name": "HumanResources",
+      "can": [
+        "create job posting",
+        "schedule interview",
+        "send offer",
+        "verify background"
+      ],
+      "cannot": []
+    },
+    {
+      "type": "role",
+      "name": "Candidate",
+      "can": [
+        "submit application",
+        "accept offer"
+      ],
+      "cannot": []
+    },
+    {
+      "type": "policy",
+      "name": "GDPRCompliance",
+      "clauses": [
+        {
+          "condition": {
+            "type": "comparison",
+            "left": {
+              "type": "field",
+              "path": "candidate.data_processing_consent"
+            },
+            "operator": "=",
+            "right": {
+              "type": "boolean",
+              "value": false
+            }
+          },
+          "then": [
+            {
+              "type": "require",
+              "requirement": "data_anonymization"
+            },
+            {
+              "type": "notify",
+              "target": "dpo",
+              "message": "Non-consenting candidate record created"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "rule",
+      "name": "ScreeningMandatory",
+      "appliesTo": "application",
+      "body": [
+        {
+          "type": "if",
+          "condition": {
+            "type": "comparison",
+            "left": {
+              "type": "field",
+              "path": "application.status"
+            },
+            "operator": "=",
+            "right": {
+              "type": "string",
+              "value": "interview-round-1"
+            }
+          },
+          "then": [
+            {
+              "type": "require",
+              "requirement": "screening_notes"
+            }
+          ],
+          "elseIf": [],
+          "else": null
+        }
+      ]
+    },
+    {
+      "type": "process",
+      "name": "StandardHiring",
+      "body": [
+        {
+          "type": "when",
+          "trigger": "candidate.application_submitted"
+        },
+        {
+          "type": "transition",
+          "target": "application.status",
+          "value": {
+            "type": "string",
+            "value": "received"
+          }
+        },
+        {
+          "type": "notify",
+          "target": "hr_team",
+          "message": "New candidate application"
+        },
+        {
+          "type": "if",
+          "condition": {
+            "type": "comparison",
+            "left": {
+              "type": "field",
+              "path": "candidate.role_match_score"
+            },
+            "operator": ">",
+            "right": {
+              "type": "number",
+              "value": 70
+            }
+          },
+          "then": [
+            {
+              "type": "transition",
+              "target": "application.status",
+              "value": {
+                "type": "string",
+                "value": "screening"
+              }
+            },
+            {
+              "type": "assign",
+              "target": "application.assigned_to",
+              "value": {
+                "type": "string",
+                "value": "hiring_manager"
+              }
+            }
+          ],
+          "elseIf": [],
+          "else": [
+            {
+              "type": "transition",
+              "target": "application.status",
+              "value": {
+                "type": "string",
+                "value": "rejected"
+              }
+            },
+            {
+              "type": "notify",
+              "target": "candidate",
+              "message": "Thank you for your interest"
+            },
+            {
+              "type": "stop"
+            }
+          ]
+        },
+        {
+          "type": "if",
+          "condition": {
+            "type": "comparison",
+            "left": {
+              "type": "field",
+              "path": "application.screening_outcome"
+            },
+            "operator": "=",
+            "right": {
+              "type": "string",
+              "value": "positive"
+            }
+          },
+          "then": [
+            {
+              "type": "transition",
+              "target": "application.status",
+              "value": {
+                "type": "string",
+                "value": "interview-round-1"
+              }
+            },
+            {
+              "type": "create",
+              "entity": "interview_invite"
+            }
+          ],
+          "elseIf": [],
+          "else": [
+            {
+              "type": "transition",
+              "target": "application.status",
+              "value": {
+                "type": "string",
+                "value": "rejected"
+              }
+            },
+            {
+              "type": "stop"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

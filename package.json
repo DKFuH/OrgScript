@@ -1,6 +1,6 @@
 {
   "name": "orgscript",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "A human-readable, AI-friendly description language for business logic and operational systems.",
   "license": "Apache-2.0",
   "private": true,

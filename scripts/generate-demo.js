@@ -22,6 +22,13 @@ const demos = [
       "Our hero example showcasing multi-block processes, rules, and stateflows in a realistic business scenario.",
   },
   {
+    slug: "hiring-process",
+    title: "Hiring: Standard Candidate Process",
+    source: path.join(repoRoot, "examples", "hiring-process.orgs"),
+    description:
+      "A multi-role hiring process including GDPR policies, manager permissions, and conditional rejection branches.",
+  },
+  {
     slug: "lead-qualification",
     title: "Lead qualification process",
     source: path.join(repoRoot, "examples", "lead-qualification.orgs"),

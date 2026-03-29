@@ -6,6 +6,15 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-03-29
+
+- Enhanced CLI for professional distribution: added `--version` and improved help text.
+- Enabled global installation support via `npm install -g orgscript`.
+- Prepared VS Code extension for marketplace: fixed manifest warnings and updated metadata.
+- Automated a documentation site via `scripts/build-docs.js` for GitHub Pages.
+- Added a comprehensive "Hiring Process" hero example to demonstrate advanced process modeling.
+- Stabilized the repository structure and baseline artifacts for public adoption.
+
 ## [0.6.0] - 2026-03-29
 
 - Added first HTML documentation exporter via `orgscript export html <file>`.
