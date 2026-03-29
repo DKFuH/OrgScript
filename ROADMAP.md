@@ -29,6 +29,8 @@
 
 - Add first AST-backed formatter command
 - Enforce formatter stability through parser/formatter roundtrip tests
+- Add first AST-backed linter command
+- Add lint fixtures for suspicious but syntactically valid models
 
 ## Later
 

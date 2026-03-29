@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const { toCanonicalModel } = require("./export-json");
 const { formatDocument } = require("./formatter");
+const { lintDocument } = require("./linter");
 const { buildModel, validateFile } = require("./validate");
 
 function printUsage() {
@@ -10,10 +11,9 @@ function printUsage() {
 Usage:
   orgscript validate <file>
   orgscript format <file>
+  orgscript lint <file>
   orgscript export json <file>
-
-Planned:
-  orgscript lint <file>`);
+`);
 }
 
 function run(args) {
@@ -83,7 +83,30 @@ function run(args) {
   }
 
   if (command === "lint") {
-    console.error(`\`${command}\` is planned but not implemented yet.`);
+    const absolutePath = resolveFile(maybeSubcommand);
+    const result = buildModel(absolutePath);
+
+    if (!result.ok) {
+      printIssues(`Cannot lint invalid OrgScript: ${absolutePath}`, [
+        ...result.syntaxIssues,
+        ...result.semanticIssues,
+      ]);
+      process.exit(1);
+    }
+
+    const findings = lintDocument(result.ast);
+
+    if (findings.length === 0) {
+      console.log(`No lint findings: ${absolutePath}`);
+      process.exit(0);
+    }
+
+    console.error(`Lint findings: ${absolutePath}`);
+    for (const finding of findings) {
+      console.error(
+        `  line ${finding.line}: [${finding.severity}] (${finding.code}) ${finding.message}`
+      );
+    }
     process.exit(1);
   }
 

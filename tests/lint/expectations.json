@@ -1,0 +1,33 @@
+[
+  {
+    "file": "process-missing-trigger.orgs",
+    "expectedCodes": [
+      "process-missing-trigger"
+    ]
+  },
+  {
+    "file": "process-multiple-triggers.orgs",
+    "expectedCodes": [
+      "process-multiple-triggers"
+    ]
+  },
+  {
+    "file": "unreachable-after-stop.orgs",
+    "expectedCodes": [
+      "unreachable-statement"
+    ]
+  },
+  {
+    "file": "orphan-stateflow.orgs",
+    "expectedCodes": [
+      "state-orphaned",
+      "state-no-incoming"
+    ]
+  },
+  {
+    "file": "conflicting-role-permissions.orgs",
+    "expectedCodes": [
+      "role-conflicting-permission"
+    ]
+  }
+]

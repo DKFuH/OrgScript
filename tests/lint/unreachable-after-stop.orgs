@@ -1,0 +1,5 @@
+process UnreachableAfterStop
+
+  when lead.created
+  stop
+  assign lead.status = "qualified"

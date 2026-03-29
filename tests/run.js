@@ -11,13 +11,17 @@ const repoRoot = path.resolve(__dirname, "..");
 const examplesDir = path.join(repoRoot, "examples");
 const goldenDir = path.join(repoRoot, "tests", "golden");
 const invalidDir = path.join(repoRoot, "tests", "invalid");
+const lintDir = path.join(repoRoot, "tests", "lint");
 const expectationsPath = path.join(invalidDir, "expectations.json");
+const lintExpectationsPath = path.join(lintDir, "expectations.json");
+const { lintDocument } = require("../src/linter");
 
 run();
 
 function run() {
   testGoldenSnapshots();
   testInvalidFixtures();
+  testLintFixtures();
   testFormatterStability();
   console.log("All tests passed.");
 }
@@ -116,6 +120,29 @@ function testFormatterStability() {
       if (fs.existsSync(tempPath)) {
         fs.unlinkSync(tempPath);
       }
+    }
+  }
+}
+
+function testLintFixtures() {
+  const expectations = JSON.parse(fs.readFileSync(lintExpectationsPath, "utf8"));
+
+  for (const entry of expectations) {
+    const sourcePath = path.join(lintDir, entry.file);
+    const result = buildModel(sourcePath);
+
+    if (!result.ok) {
+      throw new Error(`Expected valid lint fixture but got issues for ${entry.file}`);
+    }
+
+    const findings = lintDocument(result.ast);
+    const codes = findings.map((finding) => finding.code);
+
+    for (const expectedCode of entry.expectedCodes) {
+      assert.ok(
+        codes.includes(expectedCode),
+        `Expected lint code "${expectedCode}" in ${entry.file}`
+      );
     }
   }
 }

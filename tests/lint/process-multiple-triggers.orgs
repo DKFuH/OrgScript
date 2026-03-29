@@ -1,0 +1,5 @@
+process MultipleTriggers
+
+  when lead.created
+  when lead.updated
+  assign lead.status = "qualified"

@@ -1,0 +1,7 @@
+role Support
+
+  can
+    update ticket.status
+
+  cannot
+    update ticket.status

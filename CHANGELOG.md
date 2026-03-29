@@ -8,6 +8,8 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 - Added the first AST-backed formatter via `orgscript format <file>`.
 - Added formatter stability tests to ensure canonical example files remain idempotent.
+- Added the first AST-backed linter via `orgscript lint <file>`.
+- Added lint fixtures for process triggers, unreachable statements, orphan states, and conflicting role permissions.
 
 ## [0.2.0] - 2026-03-29
 

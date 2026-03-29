@@ -137,8 +137,9 @@ See the full example in [`examples/craft-business-lead-to-order.orgs`](examples/
 - Examples from realistic business scenarios
 - AST-backed validation: `orgscript validate <file>`
 - AST-backed formatting: `orgscript format <file>`
+- AST-backed linting: `orgscript lint <file>`
 - Canonical JSON export: `orgscript export json <file>`
-- Golden snapshot tests for AST and canonical model
+- Golden snapshot tests for AST, canonical model, and formatter output
 
 ## Quick start
 
@@ -146,6 +147,7 @@ See the full example in [`examples/craft-business-lead-to-order.orgs`](examples/
 npm install
 node ./bin/orgscript.js validate ./examples/craft-business-lead-to-order.orgs
 node ./bin/orgscript.js format ./examples/craft-business-lead-to-order.orgs
+node ./bin/orgscript.js lint ./tests/lint/process-missing-trigger.orgs
 node ./bin/orgscript.js export json ./examples/craft-business-lead-to-order.orgs
 ```
 
@@ -164,6 +166,7 @@ Available now:
 ```text
 orgscript validate file.orgs
 orgscript format file.orgs
+orgscript lint file.orgs
 orgscript export json file.orgs
 ```
 

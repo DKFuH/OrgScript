@@ -1,0 +1,11 @@
+stateflow ExampleFlow
+
+  states
+    start
+    orphan
+    disconnected_start
+    done
+
+  transitions
+    start -> done
+    disconnected_start -> done

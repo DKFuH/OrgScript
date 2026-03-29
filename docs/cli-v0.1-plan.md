@@ -12,12 +12,13 @@ Implemented:
 
 - `validate`
 - `format`
+- `lint`
 - `export json`
 
 Planned next:
 
-- `format`
-- `lint`
+- `format --check`
+- `lint --strict`
 
 ## Command behavior
 
@@ -67,6 +68,10 @@ Initial lint rules:
 - `else` without matching `if`
 - unreachable or unused states where detectable
 - duplicate top-level names in the same file
+- missing process trigger
+- multiple process triggers
+- unreachable statements after guaranteed `stop`
+- conflicting role permissions
 
 ## Suggested package structure
 
@@ -101,6 +106,7 @@ TypeScript is the fastest start:
 
 - One can run `orgscript validate` on example files.
 - One can run `orgscript format` on example files without changing canonical files.
+- One can run `orgscript lint` on valid but suspicious models and get stable findings.
 - Invalid files produce useful errors with line references.
 - Valid files can be exported to canonical JSON.
 - Formatter output is deterministic.
