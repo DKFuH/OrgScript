@@ -1,28 +1,32 @@
 # OrgScript
 
-**Describe how your business works in a way humans and machines both understand.**
+**Describe how your business works in a way that humans and machines can both interpret reliably.**
 
-OrgScript is a human-readable, AI-friendly description language for business logic, operational processes, rules, roles, and state transitions. It sits between plain-language documentation and technical execution.
+OrgScript is a human-readable, AI-friendly description language for business logic, operational processes, rules, roles, and state transitions. It sits between plain-language documentation and technical execution as a shared, text-first source of truth.
+
+OrgScript is designed for operators, team leads, analysts, and engineers who need a shared, text-first source of truth for business logic.
 
 ## What It Is
 
 - A shared text layer for business logic
 - Readable by people
 - Parseable by software
-- Stable in Git
-- Useful for AI analysis, validation, and export
+- Stable in Git and code review
+- Structured for AI analysis, validation, and export
 
 ## What It Is Not
 
 - Not a general-purpose programming language
 - Not a workflow engine
-- Not free-form prose
+- Not free-form prose or narrative documentation
 - Not a replacement for implementation code
 
-## Quickstart In 60 Seconds
+## Quickstart in 60 Seconds
+
+Assuming you have the OrgScript CLI installed:
 
 ```bash
-# 1. Check an example end to end
+# 1. Check a complete example end to end
 orgscript check ./examples/craft-business-lead-to-order.orgs
 
 # 2. Generate a diagram
@@ -37,45 +41,40 @@ If you want the fastest first read, start with:
 - [craft-business-lead-to-order.orgs](./examples/craft-business-lead-to-order.orgs)
 - [examples/README.md](./examples/README.md)
 
-## Read This In Order
+## Read This in Order
 
 If you are new to OrgScript, this is the intended reading path:
 
-1. [docs/manifesto.md](./docs/manifesto.md)  
-   Why OrgScript exists.
-2. [docs/language-principles.md](./docs/language-principles.md)  
-   The design constraints and non-negotiable rules.
-3. [spec/language-spec.md](./spec/language-spec.md)  
-   The canonical language definition.
-4. [docs/orgscript-for-humans.md](./docs/orgscript-for-humans.md)  
-   How to write maintainable OrgScript files.
-5. [docs/orgscript-for-ai.md](./docs/orgscript-for-ai.md)  
-   How tools and AI must interpret OrgScript without guessing.
+1. [docs/manifesto.md](./docs/manifesto.md) - Why OrgScript exists.
+2. [docs/language-principles.md](./docs/language-principles.md) - The design constraints and non-negotiable rules.
+3. [spec/language-spec.md](./spec/language-spec.md) - The canonical language definition.
+4. [docs/orgscript-for-humans.md](./docs/orgscript-for-humans.md) - How to write maintainable OrgScript files.
+5. [docs/orgscript-for-ai.md](./docs/orgscript-for-ai.md) - How tools and AI must interpret OrgScript without guessing.
 
-## Canonical Source Of Truth
+## Canonical Source of Truth
 
 The normative language reference is:
 
 - [spec/language-spec.md](./spec/language-spec.md)
 
-Supporting docs are there to help people adopt, use, and govern the language. If implementation and docs ever disagree, the canonical spec wins.
+Supporting docs exist to help people adopt, use, and govern the language. If implementation and docs ever disagree, the canonical spec wins.
 
-## From Source To Artifact
+## From Source to Artifact
 
 OrgScript is intentionally artifact-first. A single `.orgs` file can produce multiple useful outputs:
 
 1. Source logic in plain text
-2. Validation and linting results
+2. Validation and linting diagnostics
 3. Mermaid diagrams
 4. Markdown summaries
 5. HTML documentation
-6. AI-ready structured exports
+6. AI-ready structured JSON exports
 
 Generated examples live under:
 
 - [docs/demos](./docs/demos)
 
-## Hero Demo
+## Hero Demo: Craft Business Lead to Order
 
 The main showcase flow is:
 
@@ -110,7 +109,7 @@ orgscript analyze <file> [--json]
 
 ## Developer Path
 
-For most contributors, the best practical sequence is:
+If you want to contribute to the tooling or language, this is a practical sequence:
 
 1. Read [examples/README.md](./examples/README.md)
 2. Run `orgscript check` on a real example
