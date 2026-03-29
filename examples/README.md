@@ -1,53 +1,71 @@
 # OrgScript Examples
 
-This folder is the quickest way to learn OrgScript by reading real files.
+This catalog is designed to help you learn OrgScript quickly through real-world scenarios. We have curated these examples to focus on quality and clarity.
 
-## Suggested path
+## Suggested Learning Path
 
-1. Start with `simple` if you want the smallest readable process example.
-2. Move to `realistic` when you want end-to-end business flows.
-3. Use `advanced` when you want mixed block types and exporter coverage.
+1. Start with **Simple** to understand the basic syntax and structure.
+2. Move to **Realistic** to see how end-to-end business flows are modeled.
+3. Review **Advanced** to see mixed constructs and prepare for programmatic exports.
 
-## Simple
+---
 
-- [`lead-qualification.orgs`](lead-qualification.orgs)
-  Best first read. A compact process example focused on trigger, branching, assignment, and transition.
+## 🟢 Simple
 
-## Realistic
+### [`lead-qualification.orgs`](lead-qualification.orgs)
+The best first read. This is a compact, single-process file showing how to make decisions based on input data.
 
-- [`craft-business-lead-to-order.orgs`](craft-business-lead-to-order.orgs)
-  A fuller business flow from lead intake through qualification, quote conversion, and order lifecycle.
-- [`service-escalation.orgs`](service-escalation.orgs)
-  A policy- and event-oriented example for support handling, escalation, and role-based action.
+- **Models**: A basic sales lead qualification funnel.
+- **Demonstrates**: `process`, `when`, `if`/`else if`, `assign`, `notify`, `stop`, `transition`.
+- **Outputs available**: Mermaid diagram, Markdown summary.
 
-## Advanced
+---
 
-- [`order-approval.orgs`](order-approval.orgs)
-  A mixed file showing stateflow and rule modeling together, useful for exports and downstream tooling.
+## 🟡 Realistic
 
-## Quick index
+### [`craft-business-lead-to-order.orgs`](craft-business-lead-to-order.orgs)
+A fuller business flow demonstrating how multiple processes and rules interact with a shared state machine.
 
-- `lead-qualification.orgs` - smallest onboarding example
-- `craft-business-lead-to-order.orgs` - craft-business pipeline and qualification logic
-- `service-escalation.orgs` - support escalation, policy flow, and permissions
-- `order-approval.orgs` - stateflow plus rule modeling in one file
+- **Models**: A craft business pipeline from lead intake, through qualification, to quote conversion and production order lifecycle.
+- **Demonstrates**: Multiple `process` blocks, `stateflow`, and `rule` constructs in a unified scenario.
+- **Outputs available**: Mermaid diagram, Markdown summary.
 
-## How to use the examples
+### [`service-escalation.orgs`](service-escalation.orgs)
+A policy- and event-oriented example for support organizations, focusing on declarative rules over sequential processes.
 
-- Read `lead-qualification.orgs` first to learn the smallest useful pattern.
-- Read `craft-business-lead-to-order.orgs` next to see a fuller real-world process.
-- Read `service-escalation.orgs` to see policy and role behavior.
-- Read `order-approval.orgs` when you want to see stateflow and rule modeling together.
+- **Models**: Support ticket SLA escalations and basic role-based permissions.
+- **Demonstrates**: `policy`, `when`/`then`, `role`, `can` / `cannot`.
+- **Outputs available**: Markdown summary.
 
-## Suggested commands
+---
 
-```text
-node ./bin/orgscript.js validate ./examples/lead-qualification.orgs
-node ./bin/orgscript.js check ./examples/craft-business-lead-to-order.orgs
-node ./bin/orgscript.js export markdown ./examples/order-approval.orgs
+## 🔴 Advanced
+
+### [`order-approval.orgs`](order-approval.orgs)
+A concise, strict file showing stateflow and rule modeling together, highly useful for building downstream tooling or validators.
+
+- **Models**: The valid state transitions of an order, and a non-bypassable rule for production entry.
+- **Demonstrates**: `stateflow`, `states`, `transitions`, `rule`, `applies to`, `require`.
+- **Outputs available**: Mermaid diagram, Markdown summary.
+
+---
+
+## Generating Example Outputs
+
+OrgScript can transform these files into artifacts. You can test this locally:
+
+```bash
+# Generate a Markdown summary
+node ./bin/orgscript.js export markdown ./examples/lead-qualification.orgs
+
+# Generate a Mermaid visual workflow
 node ./bin/orgscript.js export mermaid ./examples/order-approval.orgs
 ```
 
-For generated Mermaid demo artifacts, see [`../docs/demos/mermaid/README.md`](../docs/demos/mermaid/README.md).
+You can also run validation and canonical format checks on any example:
 
-For generated Markdown summary demo artifacts, see [`../docs/demos/markdown/README.md`](../docs/demos/markdown/README.md).
+```bash
+node ./bin/orgscript.js check ./examples/craft-business-lead-to-order.orgs
+```
+
+See the generated demo artifacts in [`../docs/demos/`](../docs/demos/).
