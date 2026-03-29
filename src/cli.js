@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const {
+  createCheckReport,
   createCliErrorReport,
   createLintReport: createLintJsonReport,
   createValidateReport,
@@ -16,7 +17,7 @@ function printUsage() {
 
 Usage:
   orgscript validate <file> [--json]
-  orgscript check <file>
+  orgscript check <file> [--json]
   orgscript format <file> [--check]
   orgscript lint <file> [--json]
   orgscript export json <file>
@@ -55,8 +56,14 @@ function run(args) {
   }
 
   if (command === "check") {
-    const absolutePath = resolveFile("check", maybeSubcommand);
+    const absolutePath = resolveFile("check", maybeSubcommand, options.json);
     const result = runCheck(absolutePath);
+
+    if (options.json) {
+      console.log(JSON.stringify(createCheckReport(absolutePath, result), null, 2));
+      process.exit(result.ok ? 0 : 1);
+    }
+
     const lines = renderCheckReport(absolutePath, result);
     const stream = result.ok ? console.log : console.error;
     stream(lines.join("\n"));
@@ -235,7 +242,9 @@ function printIssues(header, issues) {
   console.error(header);
 
   for (const issue of issues) {
-    console.error(`  line ${issue.line}: ${issue.message}`);
+    const severity = (issue.severity || "error").toUpperCase();
+    const code = issue.code ? ` ${issue.code}` : "";
+    console.error(`  ${severity}${code} line ${issue.line}: ${issue.message}`);
   }
 }
 
@@ -247,7 +256,10 @@ function runCheck(filePath) {
       ok: false,
       validate: {
         ok: false,
+        syntaxIssues: validation.syntaxIssues,
+        semanticIssues: validation.semanticIssues,
         issues: validation.issues,
+        summary: validation.summary,
       },
       lint: {
         ok: false,
@@ -275,7 +287,10 @@ function runCheck(filePath) {
     ok: lintOk && formatOk,
     validate: {
       ok: true,
+      syntaxIssues: [],
+      semanticIssues: [],
       issues: [],
+      summary: validation.summary,
     },
     lint: {
       ok: lintOk,
@@ -299,7 +314,8 @@ function renderCheckReport(filePath, result) {
   } else {
     lines.push("  validate: failed");
     for (const issue of result.validate.issues) {
-      lines.push(`    line ${issue.line}: ${issue.message}`);
+      const code = issue.code ? ` ${issue.code}` : "";
+      lines.push(`    ERROR${code} line ${issue.line}: ${issue.message}`);
     }
   }
 

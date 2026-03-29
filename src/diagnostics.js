@@ -43,6 +43,63 @@ function createLintReport(filePath, findings) {
   };
 }
 
+function createCheckReport(filePath, result) {
+  const validateDiagnostics = [
+    ...mapIssues(result.validate.syntaxIssues || [], "syntax"),
+    ...mapIssues(result.validate.semanticIssues || [], "semantic"),
+  ];
+  const lintDiagnostics = (result.lint.findings || []).map((finding) => ({
+    source: "lint",
+    code: finding.code,
+    severity: finding.severity,
+    line: finding.line || 1,
+    message: finding.message,
+  }));
+  const formatDiagnostics = result.format.requiresChanges
+    ? [
+        {
+          source: "format",
+          code: "format_check_failed",
+          severity: "error",
+          line: 1,
+          message: "Canonical formatting changes required.",
+        },
+      ]
+    : [];
+
+  return {
+    command: "check",
+    file: toDisplayPath(filePath),
+    ok: result.ok,
+    summary: createSummary([
+      ...validateDiagnostics,
+      ...lintDiagnostics,
+      ...formatDiagnostics,
+    ]),
+    validate: {
+      ok: result.validate.ok,
+      valid: result.validate.ok,
+      skipped: false,
+      summary: createSummary(validateDiagnostics, result.validate.summary || {}),
+      diagnostics: validateDiagnostics,
+    },
+    lint: {
+      ok: result.lint.ok,
+      clean: result.lint.ok,
+      skipped: result.lint.skipped,
+      summary: createSummary(lintDiagnostics),
+      diagnostics: lintDiagnostics,
+    },
+    format: {
+      ok: result.format.ok,
+      canonical: result.format.ok,
+      skipped: result.format.skipped,
+      summary: createSummary(formatDiagnostics),
+      diagnostics: formatDiagnostics,
+    },
+  };
+}
+
 function createCliErrorReport(command, code, message, filePath) {
   const diagnostics = [
     {
@@ -101,6 +158,7 @@ function toDisplayPath(filePath) {
 }
 
 module.exports = {
+  createCheckReport,
   createCliErrorReport,
   createLintReport,
   createValidateReport,

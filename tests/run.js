@@ -249,6 +249,46 @@ function testCliDiagnosticsAndExitCodes() {
   assert.strictEqual(lintErrorPayload.clean, false);
   assert.ok(lintErrorPayload.summary.error > 0);
 
+  const checkOk = runCli([
+    cliPath,
+    "check",
+    "./examples/craft-business-lead-to-order.orgs",
+    "--json",
+  ]);
+  assert.strictEqual(checkOk.status, 0, "Expected check --json to succeed for canonical valid file");
+  const checkOkPayload = JSON.parse(checkOk.stdout);
+  assert.strictEqual(checkOkPayload.command, "check");
+  assert.strictEqual(checkOkPayload.ok, true);
+  assert.strictEqual(checkOkPayload.validate.valid, true);
+  assert.strictEqual(checkOkPayload.lint.clean, true);
+  assert.strictEqual(checkOkPayload.format.canonical, true);
+
+  const checkLintError = runCli([
+    cliPath,
+    "check",
+    "./tests/lint/process-multiple-triggers.orgs",
+    "--json",
+  ]);
+  assert.strictEqual(checkLintError.status, 1, "Expected check --json to fail on lint errors");
+  const checkLintErrorPayload = JSON.parse(checkLintError.stdout);
+  assert.strictEqual(checkLintErrorPayload.command, "check");
+  assert.strictEqual(checkLintErrorPayload.ok, false);
+  assert.ok(checkLintErrorPayload.lint.summary.error > 0);
+
+  const checkInvalid = runCli([
+    cliPath,
+    "check",
+    "./tests/invalid/unknown-top-level.orgs",
+    "--json",
+  ]);
+  assert.strictEqual(checkInvalid.status, 1, "Expected check --json to fail on invalid input");
+  const checkInvalidPayload = JSON.parse(checkInvalid.stdout);
+  assert.strictEqual(checkInvalidPayload.command, "check");
+  assert.strictEqual(checkInvalidPayload.ok, false);
+  assert.strictEqual(checkInvalidPayload.validate.valid, false);
+  assert.strictEqual(checkInvalidPayload.lint.skipped, true);
+  assert.strictEqual(checkInvalidPayload.format.skipped, true);
+
   const exportJson = runCli([
     cliPath,
     "export",
