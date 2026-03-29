@@ -1,0 +1,25 @@
+stateflow OrderStatus
+
+  states
+    draft
+    pending_approval
+    approved
+    production
+    completed
+    cancelled
+
+  transitions
+    draft -> pending_approval
+    pending_approval -> approved
+    approved -> production
+    production -> completed
+    draft -> cancelled
+    pending_approval -> cancelled
+
+rule NoProductionWithoutApproval
+
+  applies to order
+
+  if order.approved = false then
+    require management_approval
+    notify operations with "Order cannot enter production"

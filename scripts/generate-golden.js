@@ -2,6 +2,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const { formatDocument } = require("../src/formatter");
 const { buildModel } = require("../src/validate");
 const { toCanonicalModel } = require("../src/export-json");
 
@@ -28,6 +29,7 @@ for (const file of files) {
   const baseName = path.basename(file, ".orgs");
   const astOutputPath = path.join(goldenDir, `${baseName}.ast.json`);
   const modelOutputPath = path.join(goldenDir, `${baseName}.model.json`);
+  const formattedOutputPath = path.join(goldenDir, `${baseName}.formatted.orgs`);
 
   fs.writeFileSync(
     astOutputPath,
@@ -39,6 +41,7 @@ for (const file of files) {
     `${JSON.stringify(toCanonicalModel(result.ast), null, 2)}\n`,
     "utf8"
   );
+  fs.writeFileSync(formattedOutputPath, formatDocument(result.ast), "utf8");
 
   console.log(`Wrote golden files for ${file}`);
 }

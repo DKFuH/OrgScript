@@ -10,7 +10,7 @@ const { toCanonicalModel } = require("../src/export-json");
 const repoRoot = path.resolve(__dirname, "..");
 const examplesDir = path.join(repoRoot, "examples");
 const goldenDir = path.join(repoRoot, "tests", "golden");
-const invalidDir = path.join(repoRoot, "tests", "fixtures", "invalid");
+const invalidDir = path.join(repoRoot, "tests", "invalid");
 const expectationsPath = path.join(invalidDir, "expectations.json");
 
 run();
@@ -39,6 +39,7 @@ function testGoldenSnapshots() {
     const baseName = path.basename(file, ".orgs");
     const astPath = path.join(goldenDir, `${baseName}.ast.json`);
     const modelPath = path.join(goldenDir, `${baseName}.model.json`);
+    const formattedPath = path.join(goldenDir, `${baseName}.formatted.orgs`);
 
     const actualAst = JSON.stringify(normalizeAst(result.ast), null, 2);
     const expectedAst = fs.readFileSync(astPath, "utf8").trimEnd();
@@ -47,6 +48,14 @@ function testGoldenSnapshots() {
     const actualModel = JSON.stringify(toCanonicalModel(result.ast), null, 2);
     const expectedModel = fs.readFileSync(modelPath, "utf8").trimEnd();
     assert.strictEqual(actualModel, expectedModel, `Model snapshot mismatch for ${file}`);
+
+    const actualFormatted = formatDocument(result.ast);
+    const expectedFormatted = fs.readFileSync(formattedPath, "utf8");
+    assert.strictEqual(
+      actualFormatted,
+      expectedFormatted,
+      `Formatted snapshot mismatch for ${file}`
+    );
   }
 }
 
@@ -96,6 +105,9 @@ function testFormatterStability() {
       if (!reparsed.ok) {
         throw new Error(`Formatted output became invalid for ${file}`);
       }
+
+      const reformatted = formatDocument(reparsed.ast);
+      assert.strictEqual(reformatted, formatted, `Formatter was not idempotent for ${file}`);
 
       const initialModel = JSON.stringify(toCanonicalModel(initial.ast), null, 2);
       const reparsedModel = JSON.stringify(toCanonicalModel(reparsed.ast), null, 2);

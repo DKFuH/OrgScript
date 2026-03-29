@@ -1,0 +1,19 @@
+process LeadQualification
+
+  when lead.created
+
+  if lead.source = "referral" then
+    assign lead.priority = "high"
+    assign lead.path = "premium"
+    notify sales with "New referral lead"
+
+  else if lead.source = "ads" then
+    assign lead.priority = "normal"
+    assign lead.path = "standard"
+
+  if lead.budget < 10000 then
+    transition lead.status to "disqualified"
+    notify sales with "Budget below threshold"
+    stop
+
+  transition lead.status to "qualified"
