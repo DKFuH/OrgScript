@@ -16,6 +16,13 @@ spec/
 docs/
   governance.md
   cli-v0.1-plan.md
+  demos/
+    mermaid/
+      README.md
+      lead-qualification.mermaid.md
+      lead-qualification.mmd
+      order-approval.mermaid.md
+      order-approval.mmd
   language-principles.md
   manifesto.md
   repository-structure.md

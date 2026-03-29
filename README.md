@@ -71,6 +71,21 @@ process CraftBusinessLeadToOrder
 
 See the full example in [`examples/craft-business-lead-to-order.orgs`](examples/craft-business-lead-to-order.orgs).
 
+## From Source To Diagram
+
+OrgScript already generates visible downstream artifacts.
+
+Minimal Mermaid demos live in [`docs/demos/mermaid/README.md`](docs/demos/mermaid/README.md):
+
+- process demo from [`examples/lead-qualification.orgs`](examples/lead-qualification.orgs) to [`docs/demos/mermaid/lead-qualification.mermaid.md`](docs/demos/mermaid/lead-qualification.mermaid.md)
+- stateflow demo from [`examples/order-approval.orgs`](examples/order-approval.orgs) to [`docs/demos/mermaid/order-approval.mermaid.md`](docs/demos/mermaid/order-approval.mermaid.md)
+
+Generate the demo artifacts with:
+
+```text
+npm run demo:generate
+```
+
 ## Why this matters
 
 - Teams get a shared source of truth for operational logic.
@@ -126,6 +141,7 @@ See the full example in [`examples/craft-business-lead-to-order.orgs`](examples/
 - [`docs/repository-structure.md`](docs/repository-structure.md)
 - [`docs/syntax.md`](docs/syntax.md)
 - [`docs/semantics.md`](docs/semantics.md)
+- [`docs/demos/mermaid/README.md`](docs/demos/mermaid/README.md)
 - [`examples/README.md`](examples/README.md)
 - [`spec/grammar.ebnf`](spec/grammar.ebnf)
 - [`spec/language-spec.md`](spec/language-spec.md)
@@ -346,6 +362,7 @@ See [`docs/cli-v0.1-plan.md`](docs/cli-v0.1-plan.md) for the implementation plan
 ```text
 npm test
 npm run export:mermaid
+npm run demo:generate
 npm run check
 npm run check:all
 npm run format:check:all

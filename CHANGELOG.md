@@ -12,6 +12,7 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 - Added `orgscript check <file> --json` for machine-readable combined quality diagnostics.
 - Added `npm run check:all` and switched CI to the combined quality path.
 - Added `orgscript export mermaid <file>` for first-pass Mermaid exports of processes and stateflows.
+- Added `npm run demo:generate` plus a Mermaid demo package with generated Markdown and `.mmd` artifacts.
 - Added a canonical master language spec and lightweight governance guidance.
 - Added an example catalog and an initial VS Code syntax-highlighting scaffold.
 

@@ -32,3 +32,5 @@ node ./bin/orgscript.js validate ./examples/lead-qualification.orgs
 node ./bin/orgscript.js check ./examples/craft-business-lead-to-order.orgs
 node ./bin/orgscript.js export mermaid ./examples/order-approval.orgs
 ```
+
+For generated Mermaid demo artifacts, see [`../docs/demos/mermaid/README.md`](../docs/demos/mermaid/README.md).
