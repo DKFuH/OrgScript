@@ -3,6 +3,7 @@
 const assert = require("assert");
 const fs = require("fs");
 const path = require("path");
+const { formatDocument } = require("../src/formatter");
 const { buildModel } = require("../src/validate");
 const { toCanonicalModel } = require("../src/export-json");
 
@@ -17,6 +18,7 @@ run();
 function run() {
   testGoldenSnapshots();
   testInvalidFixtures();
+  testFormatterStability();
   console.log("All tests passed.");
 }
 
@@ -64,6 +66,44 @@ function testInvalidFixtures() {
     for (const expected of entry.expectedMessages) {
       const found = messages.some((message) => message.includes(expected));
       assert.ok(found, `Expected error containing "${expected}" in ${entry.file}`);
+    }
+  }
+}
+
+function testFormatterStability() {
+  const files = fs
+    .readdirSync(examplesDir)
+    .filter((file) => file.endsWith(".orgs"))
+    .sort();
+
+  for (const file of files) {
+    const sourcePath = path.join(examplesDir, file);
+    const originalSource = fs.readFileSync(sourcePath, "utf8");
+    const initial = buildModel(sourcePath);
+
+    if (!initial.ok) {
+      throw new Error(`Expected valid example but got issues for ${file}`);
+    }
+
+    const formatted = formatDocument(initial.ast);
+    assert.strictEqual(formatted, originalSource, `Formatter changed canonical example ${file}`);
+
+    const tempPath = path.join(repoRoot, "tests", ".tmp-format-check.orgs");
+    fs.writeFileSync(tempPath, formatted, "utf8");
+
+    try {
+      const reparsed = buildModel(tempPath);
+      if (!reparsed.ok) {
+        throw new Error(`Formatted output became invalid for ${file}`);
+      }
+
+      const initialModel = JSON.stringify(toCanonicalModel(initial.ast), null, 2);
+      const reparsedModel = JSON.stringify(toCanonicalModel(reparsed.ast), null, 2);
+      assert.strictEqual(reparsedModel, initialModel, `Formatter changed semantics for ${file}`);
+    } finally {
+      if (fs.existsSync(tempPath)) {
+        fs.unlinkSync(tempPath);
+      }
     }
   }
 }

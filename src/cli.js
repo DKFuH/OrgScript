@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const { toCanonicalModel } = require("./export-json");
+const { formatDocument } = require("./formatter");
 const { buildModel, validateFile } = require("./validate");
 
 function printUsage() {
@@ -8,10 +9,10 @@ function printUsage() {
 
 Usage:
   orgscript validate <file>
+  orgscript format <file>
   orgscript export json <file>
 
 Planned:
-  orgscript format <file>
   orgscript lint <file>`);
 }
 
@@ -56,7 +57,32 @@ function run(args) {
     process.exit(0);
   }
 
-  if (command === "format" || command === "lint") {
+  if (command === "format") {
+    const absolutePath = resolveFile(maybeSubcommand);
+    const result = buildModel(absolutePath);
+
+    if (!result.ok) {
+      printIssues(`Cannot format invalid OrgScript: ${absolutePath}`, [
+        ...result.syntaxIssues,
+        ...result.semanticIssues,
+      ]);
+      process.exit(1);
+    }
+
+    const formatted = formatDocument(result.ast);
+    const current = fs.readFileSync(absolutePath, "utf8");
+
+    if (current === formatted) {
+      console.log(`Already formatted: ${absolutePath}`);
+      process.exit(0);
+    }
+
+    fs.writeFileSync(absolutePath, formatted, "utf8");
+    console.log(`Formatted OrgScript: ${absolutePath}`);
+    process.exit(0);
+  }
+
+  if (command === "lint") {
     console.error(`\`${command}\` is planned but not implemented yet.`);
     process.exit(1);
   }

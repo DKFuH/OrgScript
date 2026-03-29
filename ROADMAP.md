@@ -21,10 +21,14 @@
 
 ## v0.3
 
-- Implement formatter
 - Implement linter rules for common modeling errors
 - Generate diagrams and documentation from the model
 - Add localization architecture for keyword packs
+
+## Unreleased
+
+- Add first AST-backed formatter command
+- Enforce formatter stability through parser/formatter roundtrip tests
 
 ## Later
 

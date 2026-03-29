@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project follows Semantic Versioning.
 
+## [Unreleased]
+
+- Added the first AST-backed formatter via `orgscript format <file>`.
+- Added formatter stability tests to ensure canonical example files remain idempotent.
+
 ## [0.2.0] - 2026-03-29
 
 - Established the OrgScript project foundation, manifesto, syntax, semantics, and canonical model drafts.

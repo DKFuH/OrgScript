@@ -11,6 +11,7 @@ Provide a small command-line interface that can parse and validate OrgScript fil
 Implemented:
 
 - `validate`
+- `format`
 - `export json`
 
 Planned next:
@@ -51,6 +52,7 @@ Normalizes:
 Output:
 
 - formatted file in place
+- idempotent output for already canonical files
 - optional `--check` mode later
 
 ### `orgscript lint <file>`
@@ -98,6 +100,7 @@ TypeScript is the fastest start:
 ## Success criteria for v0.1
 
 - One can run `orgscript validate` on example files.
+- One can run `orgscript format` on example files without changing canonical files.
 - Invalid files produce useful errors with line references.
 - Valid files can be exported to canonical JSON.
 - Formatter output is deterministic.

@@ -136,6 +136,7 @@ See the full example in [`examples/craft-business-lead-to-order.orgs`](examples/
 - Draft language specification
 - Examples from realistic business scenarios
 - AST-backed validation: `orgscript validate <file>`
+- AST-backed formatting: `orgscript format <file>`
 - Canonical JSON export: `orgscript export json <file>`
 - Golden snapshot tests for AST and canonical model
 
@@ -144,6 +145,7 @@ See the full example in [`examples/craft-business-lead-to-order.orgs`](examples/
 ```text
 npm install
 node ./bin/orgscript.js validate ./examples/craft-business-lead-to-order.orgs
+node ./bin/orgscript.js format ./examples/craft-business-lead-to-order.orgs
 node ./bin/orgscript.js export json ./examples/craft-business-lead-to-order.orgs
 ```
 
@@ -161,13 +163,13 @@ Available now:
 
 ```text
 orgscript validate file.orgs
+orgscript format file.orgs
 orgscript export json file.orgs
 ```
 
 Planned next:
 
 ```text
-orgscript format file.orgs
 orgscript lint file.orgs
 ```
 

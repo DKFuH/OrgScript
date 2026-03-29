@@ -9,6 +9,7 @@
   },
   "scripts": {
     "validate": "node ./bin/orgscript.js validate ./examples/lead-qualification.orgs",
+    "format": "node ./bin/orgscript.js format ./examples/craft-business-lead-to-order.orgs",
     "validate:all": "node ./scripts/validate-all.js",
     "export:json": "node ./bin/orgscript.js export json ./examples/craft-business-lead-to-order.orgs",
     "golden:generate": "node ./scripts/generate-golden.js",
