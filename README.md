@@ -117,6 +117,8 @@ See the full example in [`examples/craft-business-lead-to-order.orgs`](examples/
 - [`docs/ast-v0.2.md`](docs/ast-v0.2.md)
 - [`docs/cli-v0.1-plan.md`](docs/cli-v0.1-plan.md)
 - [`docs/language-principles.md`](docs/language-principles.md)
+- [`docs/orgscript-for-humans.md`](docs/orgscript-for-humans.md)
+- [`docs/orgscript-for-ai.md`](docs/orgscript-for-ai.md)
 - [`docs/repository-structure.md`](docs/repository-structure.md)
 - [`docs/syntax.md`](docs/syntax.md)
 - [`docs/semantics.md`](docs/semantics.md)
@@ -135,11 +137,13 @@ See the full example in [`examples/craft-business-lead-to-order.orgs`](examples/
 
 - Draft language specification
 - Examples from realistic business scenarios
+- Separate guides for human authors and AI/tooling
 - AST-backed validation: `orgscript validate <file>`
 - AST-backed formatting: `orgscript format <file>`
 - AST-backed linting: `orgscript lint <file>`
 - Canonical JSON export: `orgscript export json <file>`
 - Golden snapshot tests for AST, canonical model, and formatter output
+- Stable lint severities: `error`, `warning`, `info`
 
 ## Quick start
 
@@ -150,6 +154,13 @@ node ./bin/orgscript.js format ./examples/craft-business-lead-to-order.orgs
 node ./bin/orgscript.js lint ./tests/lint/process-missing-trigger.orgs
 node ./bin/orgscript.js export json ./examples/craft-business-lead-to-order.orgs
 ```
+
+Lint exits with a non-zero code when findings contain `error` or `warning` severities. `info` findings are reported without failing the command.
+
+## Guides
+
+- Human authoring guide: [`docs/orgscript-for-humans.md`](docs/orgscript-for-humans.md)
+- AI interpretation guide: [`docs/orgscript-for-ai.md`](docs/orgscript-for-ai.md)
 
 ## Near-term plan
 
@@ -168,12 +179,6 @@ orgscript validate file.orgs
 orgscript format file.orgs
 orgscript lint file.orgs
 orgscript export json file.orgs
-```
-
-Planned next:
-
-```text
-orgscript lint file.orgs
 ```
 
 See [`docs/cli-v0.1-plan.md`](docs/cli-v0.1-plan.md) for the implementation plan.

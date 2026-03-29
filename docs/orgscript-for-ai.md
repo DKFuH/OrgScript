@@ -1,0 +1,150 @@
+# OrgScript for AI
+
+How to interpret OrgScript deterministically and without guesswork.
+
+## Interpretation contract
+
+OrgScript is descriptive, not executable.
+
+It describes business logic for parsers, validators, linters, exporters, and AI systems.
+
+Do not treat it as free-form natural language.
+
+## Canonical reading rules
+
+- File order matters within blocks.
+- Indentation defines containment.
+- Top-level block type is semantically significant.
+- `when` and `if` are distinct constructs.
+- `stop` terminates the current branch.
+- `stateflow` defines legal transitions, not execution order.
+- `require` is a named gate, not a comment.
+
+## Core semantic distinctions
+
+### `when`
+
+- In a `process`, `when` is the entry trigger.
+- In a `policy`, `when` introduces a conditional situation for a `then` block.
+- `when` must not be collapsed into generic conditional logic.
+
+### `if`
+
+- `if` expresses branch logic inside a block.
+- `else if` preserves branch order.
+- `else` is the fallback branch for the immediately preceding `if`.
+
+### `require`
+
+- `require` is a first-class prerequisite node.
+- Do not reinterpret it as `assign`, `notify`, or prose.
+
+### `stop`
+
+- `stop` ends the current branch.
+- Statements after a guaranteed `stop` are unreachable in that branch.
+
+## Non-inference rules
+
+AI must not:
+
+- invent implicit transitions
+- merge `when` and `if`
+- reinterpret `require` as another action
+- assume default owners, thresholds, or approvals
+- add missing business logic silently
+- collapse distinct constructs into generic nodes for convenience
+
+## Normalization rules
+
+- Preserve block type.
+- Preserve statement order.
+- Preserve branch order.
+- Preserve canonical identifiers.
+- Preserve explicit values exactly.
+- Normalize formatting only through the formatter, not by semantic rewriting.
+
+## Transformation guidance
+
+Preferred pipeline:
+
+```text
+text
+-> lexer
+-> parser
+-> AST
+-> semantic validation
+-> canonical model
+-> downstream transforms
+```
+
+### Text to AST
+
+- Parse structure before interpretation.
+- Report syntax violations instead of repairing them silently.
+
+### AST to canonical model
+
+- Keep canonical output close to the AST.
+- Do not introduce new business semantics during export.
+
+### Canonical model to downstream targets
+
+- Translate only what is explicit.
+- Flag ambiguity instead of guessing.
+- Preserve rule and branch boundaries.
+
+## AI safety rails
+
+When interpreting OrgScript:
+
+- prefer explicit reading over helpful guessing
+- flag missing scope or ambiguous structure
+- do not auto-complete business intent
+- do not rewrite the meaning of rules
+- do not infer legality from names alone
+
+## What AI must never do
+
+- never guess missing approvals
+- never invent owners
+- never infer legal transitions from state names alone
+- never rewrite business intent into more convenient semantics
+- never turn `policy when ... then ...` into generic `if` logic without preserving block type
+- never repair invalid input without surfacing the repair
+
+## Worked example
+
+Source:
+
+```orgs
+process QuoteToOrder
+
+  when quote.accepted
+
+  if order.deposit_received = false then
+    transition order.status to "awaiting_deposit"
+    notify finance with "Deposit required before confirmation"
+    stop
+
+  transition order.status to "confirmed"
+```
+
+Deterministic reading:
+
+- block type: `process`
+- trigger: `quote.accepted`
+- first branch condition: `order.deposit_received = false`
+- branch actions:
+- transition status to `awaiting_deposit`
+- notify `finance`
+- stop branch
+- fallthrough action after the failed branch condition:
+- transition status to `confirmed`
+
+The AI must not infer:
+
+- an automatic payment retry
+- a default owner
+- a hidden approval
+- a stateflow not explicitly declared elsewhere
