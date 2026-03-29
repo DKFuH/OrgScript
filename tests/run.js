@@ -346,7 +346,7 @@ function testCheckCommand() {
     "Expected overall pass for warning-only check"
   );
 
-  const checkLintError = runCli([cliPath, "check", "./tests/lint/process-multiple-triggers.orgs"]);
+  const checkLintError = runCli([cliPath, "check", "./tests/lint/conflicting-role-permissions.orgs"]);
   assert.strictEqual(checkLintError.status, 1, "Expected check to fail on lint errors");
   assert.ok(
     checkLintError.stderr.includes("lint: failed"),
