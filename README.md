@@ -34,29 +34,29 @@ orgscript export markdown ./examples/craft-business-lead-to-order.orgs
 
 If you want the fastest first read, start with:
 
-- [craft-business-lead-to-order.orgs](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\examples\craft-business-lead-to-order.orgs)
-- [examples/README.md](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\examples\README.md)
+- [craft-business-lead-to-order.orgs](./examples/craft-business-lead-to-order.orgs)
+- [examples/README.md](./examples/README.md)
 
 ## Read This In Order
 
 If you are new to OrgScript, this is the intended reading path:
 
-1. [docs/manifesto.md](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\docs\manifesto.md)  
+1. [docs/manifesto.md](./docs/manifesto.md)  
    Why OrgScript exists.
-2. [docs/language-principles.md](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\docs\language-principles.md)  
+2. [docs/language-principles.md](./docs/language-principles.md)  
    The design constraints and non-negotiable rules.
-3. [spec/language-spec.md](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\spec\language-spec.md)  
+3. [spec/language-spec.md](./spec/language-spec.md)  
    The canonical language definition.
-4. [docs/orgscript-for-humans.md](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\docs\orgscript-for-humans.md)  
+4. [docs/orgscript-for-humans.md](./docs/orgscript-for-humans.md)  
    How to write maintainable OrgScript files.
-5. [docs/orgscript-for-ai.md](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\docs\orgscript-for-ai.md)  
+5. [docs/orgscript-for-ai.md](./docs/orgscript-for-ai.md)  
    How tools and AI must interpret OrgScript without guessing.
 
 ## Canonical Source Of Truth
 
 The normative language reference is:
 
-- [spec/language-spec.md](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\spec\language-spec.md)
+- [spec/language-spec.md](./spec/language-spec.md)
 
 Supporting docs are there to help people adopt, use, and govern the language. If implementation and docs ever disagree, the canonical spec wins.
 
@@ -73,15 +73,15 @@ OrgScript is intentionally artifact-first. A single `.orgs` file can produce mul
 
 Generated examples live under:
 
-- [docs/demos](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\docs\demos)
+- [docs/demos](./docs/demos)
 
 ## Hero Demo
 
 The main showcase flow is:
 
-- Source: [craft-business-lead-to-order.orgs](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\examples\craft-business-lead-to-order.orgs)
-- Mermaid demo: [docs/demos/mermaid/craft-business-lead-to-order.mermaid.md](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\docs\demos\mermaid\craft-business-lead-to-order.mermaid.md)
-- Markdown demo: [docs/demos/markdown/craft-business-lead-to-order.summary.md](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\docs\demos\markdown\craft-business-lead-to-order.summary.md)
+- Source: [craft-business-lead-to-order.orgs](./examples/craft-business-lead-to-order.orgs)
+- Mermaid demo: [docs/demos/mermaid/craft-business-lead-to-order.mermaid.md](./docs/demos/mermaid/craft-business-lead-to-order.mermaid.md)
+- Markdown demo: [docs/demos/markdown/craft-business-lead-to-order.summary.md](./docs/demos/markdown/craft-business-lead-to-order.summary.md)
 
 ## Core Blocks
 
@@ -112,11 +112,11 @@ orgscript analyze <file> [--json]
 
 For most contributors, the best practical sequence is:
 
-1. Read [examples/README.md](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\examples\README.md)
+1. Read [examples/README.md](./examples/README.md)
 2. Run `orgscript check` on a real example
 3. Inspect generated Mermaid or Markdown output
 4. Read the canonical spec
-5. Use [docs/governance.md](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\docs\governance.md) before proposing core language changes
+5. Use [docs/governance.md](./docs/governance.md) before proposing core language changes
 
 ## Testing
 
@@ -128,10 +128,10 @@ npm run demo:generate
 
 ## Ecosystem
 
-- VS Code extension: [editors/vscode](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\editors\vscode)
-- Governance: [docs/governance.md](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\docs\governance.md)
-- Language evolution: [docs/language-evolution.md](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\docs\language-evolution.md)
-- Changelog: [CHANGELOG.md](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\CHANGELOG.md)
+- VS Code extension: [editors/vscode](./editors/vscode)
+- Governance: [docs/governance.md](./docs/governance.md)
+- Language evolution: [docs/language-evolution.md](./docs/language-evolution.md)
+- Changelog: [CHANGELOG.md](./CHANGELOG.md)
 
 ## License
 
