@@ -1,0 +1,4 @@
+process InvalidIndentation
+
+   when lead.created
+  assign lead.status = "qualified"

@@ -1,0 +1,26 @@
+[
+  {
+    "file": "invalid-indentation.orgs",
+    "expectedMessages": [
+      "Indentation must use multiples of two spaces"
+    ]
+  },
+  {
+    "file": "invalid-policy-missing-then.orgs",
+    "expectedMessages": [
+      "Policy `when` must be followed by a `then` line"
+    ]
+  },
+  {
+    "file": "invalid-stateflow-transition.orgs",
+    "expectedMessages": [
+      "Transition target `missing` is not declared"
+    ]
+  },
+  {
+    "file": "unknown-top-level.orgs",
+    "expectedMessages": [
+      "Unknown top-level block `workflow`"
+    ]
+  }
+]

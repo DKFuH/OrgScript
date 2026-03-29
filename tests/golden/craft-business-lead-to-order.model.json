@@ -1,0 +1,346 @@
+{
+  "version": "0.2",
+  "type": "document",
+  "body": [
+    {
+      "type": "process",
+      "name": "CraftBusinessLeadToOrder",
+      "body": [
+        {
+          "type": "when",
+          "trigger": "lead.created"
+        },
+        {
+          "type": "if",
+          "condition": {
+            "type": "comparison",
+            "left": {
+              "type": "field",
+              "path": "lead.source"
+            },
+            "operator": "=",
+            "right": {
+              "type": "string",
+              "value": "referral"
+            }
+          },
+          "then": [
+            {
+              "type": "assign",
+              "target": "lead.priority",
+              "value": {
+                "type": "string",
+                "value": "high"
+              }
+            },
+            {
+              "type": "assign",
+              "target": "lead.sales_path",
+              "value": {
+                "type": "string",
+                "value": "premium"
+              }
+            },
+            {
+              "type": "notify",
+              "target": "sales",
+              "message": "Handle referral lead first"
+            }
+          ],
+          "elseIf": [
+            {
+              "condition": {
+                "type": "comparison",
+                "left": {
+                  "type": "field",
+                  "path": "lead.source"
+                },
+                "operator": "=",
+                "right": {
+                  "type": "string",
+                  "value": "aroundhome"
+                }
+              },
+              "then": [
+                {
+                  "type": "assign",
+                  "target": "lead.priority",
+                  "value": {
+                    "type": "string",
+                    "value": "low"
+                  }
+                },
+                {
+                  "type": "assign",
+                  "target": "lead.sales_path",
+                  "value": {
+                    "type": "string",
+                    "value": "standard"
+                  }
+                }
+              ]
+            }
+          ],
+          "else": null
+        },
+        {
+          "type": "if",
+          "condition": {
+            "type": "logical",
+            "operator": "and",
+            "conditions": [
+              {
+                "type": "comparison",
+                "left": {
+                  "type": "field",
+                  "path": "lead.project_type"
+                },
+                "operator": "!=",
+                "right": {
+                  "type": "string",
+                  "value": "kitchen"
+                }
+              },
+              {
+                "type": "comparison",
+                "left": {
+                  "type": "field",
+                  "path": "lead.project_type"
+                },
+                "operator": "!=",
+                "right": {
+                  "type": "string",
+                  "value": "interior"
+                }
+              }
+            ]
+          },
+          "then": [
+            {
+              "type": "transition",
+              "target": "lead.status",
+              "value": {
+                "type": "string",
+                "value": "disqualified"
+              }
+            },
+            {
+              "type": "notify",
+              "target": "sales",
+              "message": "Outside target project type"
+            },
+            {
+              "type": "stop"
+            }
+          ],
+          "elseIf": [],
+          "else": null
+        },
+        {
+          "type": "if",
+          "condition": {
+            "type": "comparison",
+            "left": {
+              "type": "field",
+              "path": "lead.estimated_value"
+            },
+            "operator": "<",
+            "right": {
+              "type": "number",
+              "value": 10000
+            }
+          },
+          "then": [
+            {
+              "type": "transition",
+              "target": "lead.status",
+              "value": {
+                "type": "string",
+                "value": "disqualified"
+              }
+            },
+            {
+              "type": "notify",
+              "target": "sales",
+              "message": "Below minimum project value"
+            },
+            {
+              "type": "stop"
+            }
+          ],
+          "elseIf": [],
+          "else": null
+        },
+        {
+          "type": "transition",
+          "target": "lead.status",
+          "value": {
+            "type": "string",
+            "value": "qualified"
+          }
+        },
+        {
+          "type": "assign",
+          "target": "lead.owner",
+          "value": {
+            "type": "string",
+            "value": "sales"
+          }
+        }
+      ]
+    },
+    {
+      "type": "process",
+      "name": "QuoteToOrder",
+      "body": [
+        {
+          "type": "when",
+          "trigger": "quote.accepted"
+        },
+        {
+          "type": "if",
+          "condition": {
+            "type": "comparison",
+            "left": {
+              "type": "field",
+              "path": "order.deposit_received"
+            },
+            "operator": "=",
+            "right": {
+              "type": "boolean",
+              "value": false
+            }
+          },
+          "then": [
+            {
+              "type": "transition",
+              "target": "order.status",
+              "value": {
+                "type": "string",
+                "value": "awaiting_deposit"
+              }
+            },
+            {
+              "type": "notify",
+              "target": "finance",
+              "message": "Deposit required before confirmation"
+            },
+            {
+              "type": "stop"
+            }
+          ],
+          "elseIf": [],
+          "else": null
+        },
+        {
+          "type": "transition",
+          "target": "order.status",
+          "value": {
+            "type": "string",
+            "value": "confirmed"
+          }
+        },
+        {
+          "type": "create",
+          "entity": "production_order"
+        },
+        {
+          "type": "notify",
+          "target": "operations",
+          "message": "Order ready for production planning"
+        }
+      ]
+    },
+    {
+      "type": "stateflow",
+      "name": "OrderLifecycle",
+      "states": [
+        "qualified",
+        "quoted",
+        "awaiting_deposit",
+        "confirmed",
+        "in_production",
+        "scheduled_for_installation",
+        "completed",
+        "cancelled"
+      ],
+      "transitions": [
+        {
+          "from": "qualified",
+          "to": "quoted"
+        },
+        {
+          "from": "quoted",
+          "to": "awaiting_deposit"
+        },
+        {
+          "from": "quoted",
+          "to": "confirmed"
+        },
+        {
+          "from": "awaiting_deposit",
+          "to": "confirmed"
+        },
+        {
+          "from": "confirmed",
+          "to": "in_production"
+        },
+        {
+          "from": "in_production",
+          "to": "scheduled_for_installation"
+        },
+        {
+          "from": "scheduled_for_installation",
+          "to": "completed"
+        },
+        {
+          "from": "qualified",
+          "to": "cancelled"
+        },
+        {
+          "from": "quoted",
+          "to": "cancelled"
+        },
+        {
+          "from": "awaiting_deposit",
+          "to": "cancelled"
+        }
+      ]
+    },
+    {
+      "type": "rule",
+      "name": "NoProductionWithoutDeposit",
+      "appliesTo": "order",
+      "body": [
+        {
+          "type": "if",
+          "condition": {
+            "type": "comparison",
+            "left": {
+              "type": "field",
+              "path": "order.deposit_received"
+            },
+            "operator": "=",
+            "right": {
+              "type": "boolean",
+              "value": false
+            }
+          },
+          "then": [
+            {
+              "type": "require",
+              "requirement": "finance_clearance"
+            },
+            {
+              "type": "notify",
+              "target": "operations",
+              "message": "Production blocked until deposit is received"
+            }
+          ],
+          "elseIf": [],
+          "else": null
+        }
+      ]
+    }
+  ]
+}

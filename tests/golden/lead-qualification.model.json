@@ -1,0 +1,132 @@
+{
+  "version": "0.2",
+  "type": "document",
+  "body": [
+    {
+      "type": "process",
+      "name": "LeadQualification",
+      "body": [
+        {
+          "type": "when",
+          "trigger": "lead.created"
+        },
+        {
+          "type": "if",
+          "condition": {
+            "type": "comparison",
+            "left": {
+              "type": "field",
+              "path": "lead.source"
+            },
+            "operator": "=",
+            "right": {
+              "type": "string",
+              "value": "referral"
+            }
+          },
+          "then": [
+            {
+              "type": "assign",
+              "target": "lead.priority",
+              "value": {
+                "type": "string",
+                "value": "high"
+              }
+            },
+            {
+              "type": "assign",
+              "target": "lead.path",
+              "value": {
+                "type": "string",
+                "value": "premium"
+              }
+            },
+            {
+              "type": "notify",
+              "target": "sales",
+              "message": "New referral lead"
+            }
+          ],
+          "elseIf": [
+            {
+              "condition": {
+                "type": "comparison",
+                "left": {
+                  "type": "field",
+                  "path": "lead.source"
+                },
+                "operator": "=",
+                "right": {
+                  "type": "string",
+                  "value": "ads"
+                }
+              },
+              "then": [
+                {
+                  "type": "assign",
+                  "target": "lead.priority",
+                  "value": {
+                    "type": "string",
+                    "value": "normal"
+                  }
+                },
+                {
+                  "type": "assign",
+                  "target": "lead.path",
+                  "value": {
+                    "type": "string",
+                    "value": "standard"
+                  }
+                }
+              ]
+            }
+          ],
+          "else": null
+        },
+        {
+          "type": "if",
+          "condition": {
+            "type": "comparison",
+            "left": {
+              "type": "field",
+              "path": "lead.budget"
+            },
+            "operator": "<",
+            "right": {
+              "type": "number",
+              "value": 10000
+            }
+          },
+          "then": [
+            {
+              "type": "transition",
+              "target": "lead.status",
+              "value": {
+                "type": "string",
+                "value": "disqualified"
+              }
+            },
+            {
+              "type": "notify",
+              "target": "sales",
+              "message": "Budget below threshold"
+            },
+            {
+              "type": "stop"
+            }
+          ],
+          "elseIf": [],
+          "else": null
+        },
+        {
+          "type": "transition",
+          "target": "lead.status",
+          "value": {
+            "type": "string",
+            "value": "qualified"
+          }
+        }
+      ]
+    }
+  ]
+}

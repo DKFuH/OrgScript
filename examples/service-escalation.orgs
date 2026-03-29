@@ -1,0 +1,20 @@
+policy LateResponseEscalation
+
+  when ticket.unanswered_for > 24h
+  then
+    notify owner with "Ticket waiting more than 24 hours"
+
+  when ticket.unanswered_for > 48h
+  then
+    assign ticket.owner = "team_lead"
+    notify team_lead with "Ticket escalated after 48 hours"
+
+role Support
+
+  can
+    view ticket
+    update ticket.status
+    create followup
+
+  cannot
+    close refund_case

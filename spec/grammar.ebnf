@@ -1,0 +1,79 @@
+(* Draft EBNF for OrgScript v0.1. Indentation handling is lexical and represented through INDENT/DEDENT tokens. *)
+
+file            = { top_block } ;
+
+top_block       = process_block
+                | stateflow_block
+                | rule_block
+                | role_block
+                | policy_block
+                | metric_block
+                | event_block ;
+
+process_block   = "process" , identifier , NEWLINE , INDENT , { process_stmt } , DEDENT ;
+stateflow_block = "stateflow" , identifier , NEWLINE , INDENT , states_section , transitions_section , DEDENT ;
+rule_block      = "rule" , identifier , NEWLINE , INDENT , applies_stmt , { rule_stmt } , DEDENT ;
+role_block      = "role" , identifier , NEWLINE , INDENT , can_section , [ cannot_section ] , DEDENT ;
+policy_block    = "policy" , identifier , NEWLINE , INDENT , { policy_clause } , DEDENT ;
+metric_block    = "metric" , identifier , NEWLINE , INDENT , formula_stmt , owner_stmt , target_stmt , DEDENT ;
+event_block     = "event" , dotted_identifier , NEWLINE , INDENT , { action_stmt } , DEDENT ;
+
+states_section      = "states" , NEWLINE , INDENT , { identifier , NEWLINE } , DEDENT ;
+transitions_section = "transitions" , NEWLINE , INDENT , { identifier , "->" , identifier , NEWLINE } , DEDENT ;
+can_section         = "can" , NEWLINE , INDENT , { permission_stmt } , DEDENT ;
+cannot_section      = "cannot" , NEWLINE , INDENT , { permission_stmt } , DEDENT ;
+
+process_stmt    = when_stmt
+                | if_block
+                | action_stmt ;
+
+rule_stmt       = if_block
+                | action_stmt ;
+
+policy_clause   = when_condition_stmt , then_block ;
+
+if_block        = "if" , condition , "then" , NEWLINE , INDENT , { action_stmt } , DEDENT ,
+                  { "else" , "if" , condition , "then" , NEWLINE , INDENT , { action_stmt } , DEDENT } ,
+                  [ "else" , NEWLINE , INDENT , { action_stmt } , DEDENT ] ;
+
+then_block      = "then" , NEWLINE , INDENT , { action_stmt } , DEDENT ;
+
+action_stmt     = assign_stmt
+                | transition_stmt
+                | notify_stmt
+                | create_stmt
+                | update_stmt
+                | require_stmt
+                | stop_stmt ;
+
+when_stmt               = "when" , dotted_identifier , NEWLINE ;
+when_condition_stmt     = "when" , condition , NEWLINE ;
+applies_stmt            = "applies" , "to" , identifier , NEWLINE ;
+formula_stmt            = "formula" , expression , NEWLINE ;
+owner_stmt              = "owner" , identifier , NEWLINE ;
+target_stmt             = "target" , comparator , value , NEWLINE ;
+permission_stmt         = verb , noun_phrase , NEWLINE ;
+assign_stmt             = "assign" , dotted_identifier , "=" , value , NEWLINE ;
+transition_stmt         = "transition" , dotted_identifier , "to" , value , NEWLINE ;
+notify_stmt             = "notify" , identifier , "with" , string , NEWLINE ;
+create_stmt             = "create" , identifier , NEWLINE ;
+update_stmt             = "update" , dotted_identifier , "=" , value , NEWLINE ;
+require_stmt            = "require" , identifier , NEWLINE ;
+stop_stmt               = "stop" , NEWLINE ;
+
+condition       = expression , comparator , expression , { logical_op , expression , comparator , expression } ;
+expression      = value | dotted_identifier ;
+value           = string | number | boolean | identifier ;
+
+logical_op      = "and" | "or" ;
+comparator      = "=" | "!=" | "<" | "<=" | ">" | ">=" ;
+boolean         = "true" | "false" ;
+identifier      = letter , { letter | digit | "_" } ;
+dotted_identifier = identifier , { "." , identifier } ;
+noun_phrase     = identifier , { identifier | "." | "_" } ;
+verb            = identifier ;
+string          = "\"" , { character } , "\"" ;
+number          = digit , { digit } , [ "." , digit , { digit } ] ;
+letter          = "A".."Z" | "a".."z" ;
+digit           = "0".."9" ;
+character       = ? any character except double quote and line break ? ;

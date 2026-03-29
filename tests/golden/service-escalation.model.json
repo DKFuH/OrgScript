@@ -1,0 +1,74 @@
+{
+  "version": "0.2",
+  "type": "document",
+  "body": [
+    {
+      "type": "policy",
+      "name": "LateResponseEscalation",
+      "clauses": [
+        {
+          "condition": {
+            "type": "comparison",
+            "left": {
+              "type": "field",
+              "path": "ticket.unanswered_for"
+            },
+            "operator": ">",
+            "right": {
+              "type": "raw",
+              "value": "24h"
+            }
+          },
+          "then": [
+            {
+              "type": "notify",
+              "target": "owner",
+              "message": "Ticket waiting more than 24 hours"
+            }
+          ]
+        },
+        {
+          "condition": {
+            "type": "comparison",
+            "left": {
+              "type": "field",
+              "path": "ticket.unanswered_for"
+            },
+            "operator": ">",
+            "right": {
+              "type": "raw",
+              "value": "48h"
+            }
+          },
+          "then": [
+            {
+              "type": "assign",
+              "target": "ticket.owner",
+              "value": {
+                "type": "string",
+                "value": "team_lead"
+              }
+            },
+            {
+              "type": "notify",
+              "target": "team_lead",
+              "message": "Ticket escalated after 48 hours"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "role",
+      "name": "Support",
+      "can": [
+        "view ticket",
+        "update ticket.status",
+        "create followup"
+      ],
+      "cannot": [
+        "close refund_case"
+      ]
+    }
+  ]
+}

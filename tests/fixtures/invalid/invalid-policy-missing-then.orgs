@@ -1,0 +1,4 @@
+policy MissingThen
+
+  when ticket.unanswered_for > 24h
+    notify owner with "This should fail"

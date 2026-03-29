@@ -1,0 +1,489 @@
+{
+  "type": "Document",
+  "filePath": "examples/craft-business-lead-to-order.orgs",
+  "body": [
+    {
+      "type": "ProcessNode",
+      "name": "CraftBusinessLeadToOrder",
+      "body": [
+        {
+          "type": "WhenNode",
+          "trigger": {
+            "type": "FieldReferenceNode",
+            "path": "lead.created"
+          },
+          "line": 3
+        },
+        {
+          "type": "IfNode",
+          "condition": {
+            "type": "ComparisonConditionNode",
+            "left": {
+              "type": "FieldReferenceNode",
+              "path": "lead.source"
+            },
+            "operator": "=",
+            "right": {
+              "type": "LiteralNode",
+              "valueType": "string",
+              "value": "referral"
+            },
+            "line": 5
+          },
+          "then": [
+            {
+              "type": "AssignNode",
+              "target": {
+                "type": "FieldReferenceNode",
+                "path": "lead.priority"
+              },
+              "value": {
+                "type": "LiteralNode",
+                "valueType": "string",
+                "value": "high"
+              },
+              "line": 6
+            },
+            {
+              "type": "AssignNode",
+              "target": {
+                "type": "FieldReferenceNode",
+                "path": "lead.sales_path"
+              },
+              "value": {
+                "type": "LiteralNode",
+                "valueType": "string",
+                "value": "premium"
+              },
+              "line": 7
+            },
+            {
+              "type": "NotifyNode",
+              "target": "sales",
+              "message": "Handle referral lead first",
+              "line": 8
+            }
+          ],
+          "elseIf": [
+            {
+              "type": "ElseIfNode",
+              "condition": {
+                "type": "ComparisonConditionNode",
+                "left": {
+                  "type": "FieldReferenceNode",
+                  "path": "lead.source"
+                },
+                "operator": "=",
+                "right": {
+                  "type": "LiteralNode",
+                  "valueType": "string",
+                  "value": "aroundhome"
+                },
+                "line": 10
+              },
+              "then": [
+                {
+                  "type": "AssignNode",
+                  "target": {
+                    "type": "FieldReferenceNode",
+                    "path": "lead.priority"
+                  },
+                  "value": {
+                    "type": "LiteralNode",
+                    "valueType": "string",
+                    "value": "low"
+                  },
+                  "line": 11
+                },
+                {
+                  "type": "AssignNode",
+                  "target": {
+                    "type": "FieldReferenceNode",
+                    "path": "lead.sales_path"
+                  },
+                  "value": {
+                    "type": "LiteralNode",
+                    "valueType": "string",
+                    "value": "standard"
+                  },
+                  "line": 12
+                }
+              ],
+              "line": 10
+            }
+          ],
+          "else": null,
+          "line": 5
+        },
+        {
+          "type": "IfNode",
+          "condition": {
+            "type": "LogicalConditionNode",
+            "operator": "and",
+            "conditions": [
+              {
+                "type": "ComparisonConditionNode",
+                "left": {
+                  "type": "FieldReferenceNode",
+                  "path": "lead.project_type"
+                },
+                "operator": "!=",
+                "right": {
+                  "type": "LiteralNode",
+                  "valueType": "string",
+                  "value": "kitchen"
+                },
+                "line": 14
+              },
+              {
+                "type": "ComparisonConditionNode",
+                "left": {
+                  "type": "FieldReferenceNode",
+                  "path": "lead.project_type"
+                },
+                "operator": "!=",
+                "right": {
+                  "type": "LiteralNode",
+                  "valueType": "string",
+                  "value": "interior"
+                },
+                "line": 14
+              }
+            ],
+            "line": 14
+          },
+          "then": [
+            {
+              "type": "TransitionNode",
+              "target": {
+                "type": "FieldReferenceNode",
+                "path": "lead.status"
+              },
+              "value": {
+                "type": "LiteralNode",
+                "valueType": "string",
+                "value": "disqualified"
+              },
+              "line": 15
+            },
+            {
+              "type": "NotifyNode",
+              "target": "sales",
+              "message": "Outside target project type",
+              "line": 16
+            },
+            {
+              "type": "StopNode",
+              "line": 17
+            }
+          ],
+          "elseIf": [],
+          "else": null,
+          "line": 14
+        },
+        {
+          "type": "IfNode",
+          "condition": {
+            "type": "ComparisonConditionNode",
+            "left": {
+              "type": "FieldReferenceNode",
+              "path": "lead.estimated_value"
+            },
+            "operator": "<",
+            "right": {
+              "type": "LiteralNode",
+              "valueType": "number",
+              "value": 10000
+            },
+            "line": 19
+          },
+          "then": [
+            {
+              "type": "TransitionNode",
+              "target": {
+                "type": "FieldReferenceNode",
+                "path": "lead.status"
+              },
+              "value": {
+                "type": "LiteralNode",
+                "valueType": "string",
+                "value": "disqualified"
+              },
+              "line": 20
+            },
+            {
+              "type": "NotifyNode",
+              "target": "sales",
+              "message": "Below minimum project value",
+              "line": 21
+            },
+            {
+              "type": "StopNode",
+              "line": 22
+            }
+          ],
+          "elseIf": [],
+          "else": null,
+          "line": 19
+        },
+        {
+          "type": "TransitionNode",
+          "target": {
+            "type": "FieldReferenceNode",
+            "path": "lead.status"
+          },
+          "value": {
+            "type": "LiteralNode",
+            "valueType": "string",
+            "value": "qualified"
+          },
+          "line": 24
+        },
+        {
+          "type": "AssignNode",
+          "target": {
+            "type": "FieldReferenceNode",
+            "path": "lead.owner"
+          },
+          "value": {
+            "type": "LiteralNode",
+            "valueType": "string",
+            "value": "sales"
+          },
+          "line": 25
+        }
+      ]
+    },
+    {
+      "type": "ProcessNode",
+      "name": "QuoteToOrder",
+      "body": [
+        {
+          "type": "WhenNode",
+          "trigger": {
+            "type": "FieldReferenceNode",
+            "path": "quote.accepted"
+          },
+          "line": 29
+        },
+        {
+          "type": "IfNode",
+          "condition": {
+            "type": "ComparisonConditionNode",
+            "left": {
+              "type": "FieldReferenceNode",
+              "path": "order.deposit_received"
+            },
+            "operator": "=",
+            "right": {
+              "type": "LiteralNode",
+              "valueType": "boolean",
+              "value": false
+            },
+            "line": 31
+          },
+          "then": [
+            {
+              "type": "TransitionNode",
+              "target": {
+                "type": "FieldReferenceNode",
+                "path": "order.status"
+              },
+              "value": {
+                "type": "LiteralNode",
+                "valueType": "string",
+                "value": "awaiting_deposit"
+              },
+              "line": 32
+            },
+            {
+              "type": "NotifyNode",
+              "target": "finance",
+              "message": "Deposit required before confirmation",
+              "line": 33
+            },
+            {
+              "type": "StopNode",
+              "line": 34
+            }
+          ],
+          "elseIf": [],
+          "else": null,
+          "line": 31
+        },
+        {
+          "type": "TransitionNode",
+          "target": {
+            "type": "FieldReferenceNode",
+            "path": "order.status"
+          },
+          "value": {
+            "type": "LiteralNode",
+            "valueType": "string",
+            "value": "confirmed"
+          },
+          "line": 36
+        },
+        {
+          "type": "CreateNode",
+          "entity": "production_order",
+          "line": 37
+        },
+        {
+          "type": "NotifyNode",
+          "target": "operations",
+          "message": "Order ready for production planning",
+          "line": 38
+        }
+      ]
+    },
+    {
+      "type": "StateflowNode",
+      "name": "OrderLifecycle",
+      "states": [
+        {
+          "type": "StateNode",
+          "value": "qualified",
+          "line": 43
+        },
+        {
+          "type": "StateNode",
+          "value": "quoted",
+          "line": 44
+        },
+        {
+          "type": "StateNode",
+          "value": "awaiting_deposit",
+          "line": 45
+        },
+        {
+          "type": "StateNode",
+          "value": "confirmed",
+          "line": 46
+        },
+        {
+          "type": "StateNode",
+          "value": "in_production",
+          "line": 47
+        },
+        {
+          "type": "StateNode",
+          "value": "scheduled_for_installation",
+          "line": 48
+        },
+        {
+          "type": "StateNode",
+          "value": "completed",
+          "line": 49
+        },
+        {
+          "type": "StateNode",
+          "value": "cancelled",
+          "line": 50
+        }
+      ],
+      "transitions": [
+        {
+          "type": "TransitionEdgeNode",
+          "from": "qualified",
+          "to": "quoted",
+          "line": 53
+        },
+        {
+          "type": "TransitionEdgeNode",
+          "from": "quoted",
+          "to": "awaiting_deposit",
+          "line": 54
+        },
+        {
+          "type": "TransitionEdgeNode",
+          "from": "quoted",
+          "to": "confirmed",
+          "line": 55
+        },
+        {
+          "type": "TransitionEdgeNode",
+          "from": "awaiting_deposit",
+          "to": "confirmed",
+          "line": 56
+        },
+        {
+          "type": "TransitionEdgeNode",
+          "from": "confirmed",
+          "to": "in_production",
+          "line": 57
+        },
+        {
+          "type": "TransitionEdgeNode",
+          "from": "in_production",
+          "to": "scheduled_for_installation",
+          "line": 58
+        },
+        {
+          "type": "TransitionEdgeNode",
+          "from": "scheduled_for_installation",
+          "to": "completed",
+          "line": 59
+        },
+        {
+          "type": "TransitionEdgeNode",
+          "from": "qualified",
+          "to": "cancelled",
+          "line": 60
+        },
+        {
+          "type": "TransitionEdgeNode",
+          "from": "quoted",
+          "to": "cancelled",
+          "line": 61
+        },
+        {
+          "type": "TransitionEdgeNode",
+          "from": "awaiting_deposit",
+          "to": "cancelled",
+          "line": 62
+        }
+      ]
+    },
+    {
+      "type": "RuleNode",
+      "name": "NoProductionWithoutDeposit",
+      "appliesTo": "order",
+      "body": [
+        {
+          "type": "IfNode",
+          "condition": {
+            "type": "ComparisonConditionNode",
+            "left": {
+              "type": "FieldReferenceNode",
+              "path": "order.deposit_received"
+            },
+            "operator": "=",
+            "right": {
+              "type": "LiteralNode",
+              "valueType": "boolean",
+              "value": false
+            },
+            "line": 68
+          },
+          "then": [
+            {
+              "type": "RequireNode",
+              "requirement": "finance_clearance",
+              "line": 69
+            },
+            {
+              "type": "NotifyNode",
+              "target": "operations",
+              "message": "Production blocked until deposit is received",
+              "line": 70
+            }
+          ],
+          "elseIf": [],
+          "else": null,
+          "line": 68
+        }
+      ]
+    }
+  ]
+}

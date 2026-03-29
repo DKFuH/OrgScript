@@ -1,0 +1,105 @@
+{
+  "type": "Document",
+  "filePath": "examples/service-escalation.orgs",
+  "body": [
+    {
+      "type": "PolicyNode",
+      "name": "LateResponseEscalation",
+      "clauses": [
+        {
+          "type": "PolicyClauseNode",
+          "condition": {
+            "type": "ComparisonConditionNode",
+            "left": {
+              "type": "FieldReferenceNode",
+              "path": "ticket.unanswered_for"
+            },
+            "operator": ">",
+            "right": {
+              "type": "LiteralNode",
+              "valueType": "raw",
+              "value": "24h"
+            },
+            "line": 3
+          },
+          "body": [
+            {
+              "type": "NotifyNode",
+              "target": "owner",
+              "message": "Ticket waiting more than 24 hours",
+              "line": 5
+            }
+          ],
+          "line": 3
+        },
+        {
+          "type": "PolicyClauseNode",
+          "condition": {
+            "type": "ComparisonConditionNode",
+            "left": {
+              "type": "FieldReferenceNode",
+              "path": "ticket.unanswered_for"
+            },
+            "operator": ">",
+            "right": {
+              "type": "LiteralNode",
+              "valueType": "raw",
+              "value": "48h"
+            },
+            "line": 7
+          },
+          "body": [
+            {
+              "type": "AssignNode",
+              "target": {
+                "type": "FieldReferenceNode",
+                "path": "ticket.owner"
+              },
+              "value": {
+                "type": "LiteralNode",
+                "valueType": "string",
+                "value": "team_lead"
+              },
+              "line": 9
+            },
+            {
+              "type": "NotifyNode",
+              "target": "team_lead",
+              "message": "Ticket escalated after 48 hours",
+              "line": 10
+            }
+          ],
+          "line": 7
+        }
+      ]
+    },
+    {
+      "type": "RoleNode",
+      "name": "Support",
+      "can": [
+        {
+          "type": "PermissionNode",
+          "value": "view ticket",
+          "line": 15
+        },
+        {
+          "type": "PermissionNode",
+          "value": "update ticket.status",
+          "line": 16
+        },
+        {
+          "type": "PermissionNode",
+          "value": "create followup",
+          "line": 17
+        }
+      ],
+      "cannot": [
+        {
+          "type": "PermissionNode",
+          "value": "close refund_case",
+          "line": 20
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,120 @@
+{
+  "type": "Document",
+  "filePath": "examples/order-approval.orgs",
+  "body": [
+    {
+      "type": "StateflowNode",
+      "name": "OrderStatus",
+      "states": [
+        {
+          "type": "StateNode",
+          "value": "draft",
+          "line": 4
+        },
+        {
+          "type": "StateNode",
+          "value": "pending_approval",
+          "line": 5
+        },
+        {
+          "type": "StateNode",
+          "value": "approved",
+          "line": 6
+        },
+        {
+          "type": "StateNode",
+          "value": "production",
+          "line": 7
+        },
+        {
+          "type": "StateNode",
+          "value": "completed",
+          "line": 8
+        },
+        {
+          "type": "StateNode",
+          "value": "cancelled",
+          "line": 9
+        }
+      ],
+      "transitions": [
+        {
+          "type": "TransitionEdgeNode",
+          "from": "draft",
+          "to": "pending_approval",
+          "line": 12
+        },
+        {
+          "type": "TransitionEdgeNode",
+          "from": "pending_approval",
+          "to": "approved",
+          "line": 13
+        },
+        {
+          "type": "TransitionEdgeNode",
+          "from": "approved",
+          "to": "production",
+          "line": 14
+        },
+        {
+          "type": "TransitionEdgeNode",
+          "from": "production",
+          "to": "completed",
+          "line": 15
+        },
+        {
+          "type": "TransitionEdgeNode",
+          "from": "draft",
+          "to": "cancelled",
+          "line": 16
+        },
+        {
+          "type": "TransitionEdgeNode",
+          "from": "pending_approval",
+          "to": "cancelled",
+          "line": 17
+        }
+      ]
+    },
+    {
+      "type": "RuleNode",
+      "name": "NoProductionWithoutApproval",
+      "appliesTo": "order",
+      "body": [
+        {
+          "type": "IfNode",
+          "condition": {
+            "type": "ComparisonConditionNode",
+            "left": {
+              "type": "FieldReferenceNode",
+              "path": "order.approved"
+            },
+            "operator": "=",
+            "right": {
+              "type": "LiteralNode",
+              "valueType": "boolean",
+              "value": false
+            },
+            "line": 23
+          },
+          "then": [
+            {
+              "type": "RequireNode",
+              "requirement": "management_approval",
+              "line": 24
+            },
+            {
+              "type": "NotifyNode",
+              "target": "operations",
+              "message": "Order cannot enter production",
+              "line": 25
+            }
+          ],
+          "elseIf": [],
+          "else": null,
+          "line": 23
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+stateflow BrokenFlow
+
+  states
+    new
+    done
+
+  transitions
+    new -> missing

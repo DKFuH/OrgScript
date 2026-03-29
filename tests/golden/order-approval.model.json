@@ -1,0 +1,79 @@
+{
+  "version": "0.2",
+  "type": "document",
+  "body": [
+    {
+      "type": "stateflow",
+      "name": "OrderStatus",
+      "states": [
+        "draft",
+        "pending_approval",
+        "approved",
+        "production",
+        "completed",
+        "cancelled"
+      ],
+      "transitions": [
+        {
+          "from": "draft",
+          "to": "pending_approval"
+        },
+        {
+          "from": "pending_approval",
+          "to": "approved"
+        },
+        {
+          "from": "approved",
+          "to": "production"
+        },
+        {
+          "from": "production",
+          "to": "completed"
+        },
+        {
+          "from": "draft",
+          "to": "cancelled"
+        },
+        {
+          "from": "pending_approval",
+          "to": "cancelled"
+        }
+      ]
+    },
+    {
+      "type": "rule",
+      "name": "NoProductionWithoutApproval",
+      "appliesTo": "order",
+      "body": [
+        {
+          "type": "if",
+          "condition": {
+            "type": "comparison",
+            "left": {
+              "type": "field",
+              "path": "order.approved"
+            },
+            "operator": "=",
+            "right": {
+              "type": "boolean",
+              "value": false
+            }
+          },
+          "then": [
+            {
+              "type": "require",
+              "requirement": "management_approval"
+            },
+            {
+              "type": "notify",
+              "target": "operations",
+              "message": "Order cannot enter production"
+            }
+          ],
+          "elseIf": [],
+          "else": null
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+process CraftBusinessLeadToOrder
+
+  when lead.created
+
+  if lead.source = "referral" then
+    assign lead.priority = "high"
+    assign lead.sales_path = "premium"
+    notify sales with "Handle referral lead first"
+
+  else if lead.source = "aroundhome" then
+    assign lead.priority = "low"
+    assign lead.sales_path = "standard"
+
+  if lead.project_type != "kitchen" and lead.project_type != "interior" then
+    transition lead.status to "disqualified"
+    notify sales with "Outside target project type"
+    stop
+
+  if lead.estimated_value < 10000 then
+    transition lead.status to "disqualified"
+    notify sales with "Below minimum project value"
+    stop
+
+  transition lead.status to "qualified"
+  assign lead.owner = "sales"
+
+process QuoteToOrder
+
+  when quote.accepted
+
+  if order.deposit_received = false then
+    transition order.status to "awaiting_deposit"
+    notify finance with "Deposit required before confirmation"
+    stop
+
+  transition order.status to "confirmed"
+  create production_order
+  notify operations with "Order ready for production planning"
+
+stateflow OrderLifecycle
+
+  states
+    qualified
+    quoted
+    awaiting_deposit
+    confirmed
+    in_production
+    scheduled_for_installation
+    completed
+    cancelled
+
+  transitions
+    qualified -> quoted
+    quoted -> awaiting_deposit
+    quoted -> confirmed
+    awaiting_deposit -> confirmed
+    confirmed -> in_production
+    in_production -> scheduled_for_installation
+    scheduled_for_installation -> completed
+    qualified -> cancelled
+    quoted -> cancelled
+    awaiting_deposit -> cancelled
+
+rule NoProductionWithoutDeposit
+
+  applies to order
+
+  if order.deposit_received = false then
+    require finance_clearance
+    notify operations with "Production blocked until deposit is received"

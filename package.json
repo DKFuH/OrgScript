@@ -1,0 +1,20 @@
+{
+  "name": "orgscript",
+  "version": "0.2.0",
+  "description": "A human-readable, AI-friendly description language for business logic and operational systems.",
+  "license": "Apache-2.0",
+  "private": true,
+  "bin": {
+    "orgscript": "./bin/orgscript.js"
+  },
+  "scripts": {
+    "validate": "node ./bin/orgscript.js validate ./examples/lead-qualification.orgs",
+    "validate:all": "node ./scripts/validate-all.js",
+    "export:json": "node ./bin/orgscript.js export json ./examples/craft-business-lead-to-order.orgs",
+    "golden:generate": "node ./scripts/generate-golden.js",
+    "test": "node ./tests/run.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

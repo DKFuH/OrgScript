@@ -1,0 +1,179 @@
+{
+  "type": "Document",
+  "filePath": "examples/lead-qualification.orgs",
+  "body": [
+    {
+      "type": "ProcessNode",
+      "name": "LeadQualification",
+      "body": [
+        {
+          "type": "WhenNode",
+          "trigger": {
+            "type": "FieldReferenceNode",
+            "path": "lead.created"
+          },
+          "line": 3
+        },
+        {
+          "type": "IfNode",
+          "condition": {
+            "type": "ComparisonConditionNode",
+            "left": {
+              "type": "FieldReferenceNode",
+              "path": "lead.source"
+            },
+            "operator": "=",
+            "right": {
+              "type": "LiteralNode",
+              "valueType": "string",
+              "value": "referral"
+            },
+            "line": 5
+          },
+          "then": [
+            {
+              "type": "AssignNode",
+              "target": {
+                "type": "FieldReferenceNode",
+                "path": "lead.priority"
+              },
+              "value": {
+                "type": "LiteralNode",
+                "valueType": "string",
+                "value": "high"
+              },
+              "line": 6
+            },
+            {
+              "type": "AssignNode",
+              "target": {
+                "type": "FieldReferenceNode",
+                "path": "lead.path"
+              },
+              "value": {
+                "type": "LiteralNode",
+                "valueType": "string",
+                "value": "premium"
+              },
+              "line": 7
+            },
+            {
+              "type": "NotifyNode",
+              "target": "sales",
+              "message": "New referral lead",
+              "line": 8
+            }
+          ],
+          "elseIf": [
+            {
+              "type": "ElseIfNode",
+              "condition": {
+                "type": "ComparisonConditionNode",
+                "left": {
+                  "type": "FieldReferenceNode",
+                  "path": "lead.source"
+                },
+                "operator": "=",
+                "right": {
+                  "type": "LiteralNode",
+                  "valueType": "string",
+                  "value": "ads"
+                },
+                "line": 10
+              },
+              "then": [
+                {
+                  "type": "AssignNode",
+                  "target": {
+                    "type": "FieldReferenceNode",
+                    "path": "lead.priority"
+                  },
+                  "value": {
+                    "type": "LiteralNode",
+                    "valueType": "string",
+                    "value": "normal"
+                  },
+                  "line": 11
+                },
+                {
+                  "type": "AssignNode",
+                  "target": {
+                    "type": "FieldReferenceNode",
+                    "path": "lead.path"
+                  },
+                  "value": {
+                    "type": "LiteralNode",
+                    "valueType": "string",
+                    "value": "standard"
+                  },
+                  "line": 12
+                }
+              ],
+              "line": 10
+            }
+          ],
+          "else": null,
+          "line": 5
+        },
+        {
+          "type": "IfNode",
+          "condition": {
+            "type": "ComparisonConditionNode",
+            "left": {
+              "type": "FieldReferenceNode",
+              "path": "lead.budget"
+            },
+            "operator": "<",
+            "right": {
+              "type": "LiteralNode",
+              "valueType": "number",
+              "value": 10000
+            },
+            "line": 14
+          },
+          "then": [
+            {
+              "type": "TransitionNode",
+              "target": {
+                "type": "FieldReferenceNode",
+                "path": "lead.status"
+              },
+              "value": {
+                "type": "LiteralNode",
+                "valueType": "string",
+                "value": "disqualified"
+              },
+              "line": 15
+            },
+            {
+              "type": "NotifyNode",
+              "target": "sales",
+              "message": "Budget below threshold",
+              "line": 16
+            },
+            {
+              "type": "StopNode",
+              "line": 17
+            }
+          ],
+          "elseIf": [],
+          "else": null,
+          "line": 14
+        },
+        {
+          "type": "TransitionNode",
+          "target": {
+            "type": "FieldReferenceNode",
+            "path": "lead.status"
+          },
+          "value": {
+            "type": "LiteralNode",
+            "valueType": "string",
+            "value": "qualified"
+          },
+          "line": 19
+        }
+      ]
+    }
+  ]
+}
