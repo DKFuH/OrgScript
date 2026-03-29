@@ -6,40 +6,42 @@ OrgScript is a human-readable, AI-friendly description language for business log
 
 It is not a programming language. It is a text-first layer between plain-language documentation and technical execution.
 
-## Why OrgScript exists
+## Why OrgScript?
 
 Organizations usually describe their logic in a mix of SOPs, tickets, spreadsheets, chat messages, CRM fields, and tribal knowledge. That makes processes hard to review, automate, validate, and improve.
 
-OrgScript aims to provide one shared layer between plain-language documentation and technical execution.
+OrgScript provides one shared, structured layer between plain-language documentation and technical execution:
+- **Teams** get a shared source of truth they can read and review directly.
+- **AI** can analyze process gaps without guessing from unstructured prose.
+- **Automation** can be derived from predictable, typed text.
+- **Developers** get Git diffs, pull request reviews, and CI-ready checks for business logic.
+
+## Quickstart
+
+Validate, format, and export business logic in under 60 seconds:
 
 ```text
-OrgScript text
--> parser
--> AST
--> canonical model
--> exports, validation, documentation, automation, AI analysis
+# 1. Install CLI
+npm install
+
+# 2. Check a file (runs validate, lint, and format --check in one step)
+node ./bin/orgscript.js check ./examples/craft-business-lead-to-order.orgs
+
+# 3. Get machine-readable JSON diagnostics for editors and CI
+node ./bin/orgscript.js check ./examples/craft-business-lead-to-order.orgs --json
+
+# 4. Generate visual artifacts
+node ./bin/orgscript.js export mermaid ./examples/craft-business-lead-to-order.orgs
+node ./bin/orgscript.js export markdown ./examples/craft-business-lead-to-order.orgs
 ```
 
-## Design goals
+## The Three-Value Flow
 
-- Human-readable and easy to author
-- Strict enough for parsers and algorithms
-- AI-friendly by default
-- Text-first and diff-friendly
-- Focused on business logic, not software implementation
-- English-first, with localization as a later extension
+Write simple text, get powerful artifacts. OrgScript transforms a single source of truth into multiple formats for different audiences.
 
-## Non-goals
+### 1. Source (`.orgs`)
 
-- General-purpose programming
-- Turing-complete logic
-- Workflow execution in the core language
-- Replacing BPMN, CRMs, or task tools directly
-- Free-form natural language without structure
-
-## Example
-
-Hero example: a craft business flow from lead intake to production approval.
+A descriptive, diff-friendly source of truth.
 
 ```orgs
 process CraftBusinessLeadToOrder
@@ -48,69 +50,28 @@ process CraftBusinessLeadToOrder
 
   if lead.source = "referral" then
     assign lead.priority = "high"
-    assign lead.sales_path = "premium"
     notify sales with "Handle referral lead first"
 
-  else if lead.source = "aroundhome" then
-    assign lead.priority = "low"
-    assign lead.sales_path = "standard"
-
-  if lead.project_type != "kitchen" and lead.project_type != "interior" then
-    transition lead.status to "disqualified"
-    notify sales with "Outside target project type"
-    stop
-
-  if lead.estimated_value < 10000 then
-    transition lead.status to "disqualified"
-    notify sales with "Below minimum project value"
-    stop
-
   transition lead.status to "qualified"
-  assign lead.owner = "sales"
 ```
 
-See the full example in [`examples/craft-business-lead-to-order.orgs`](examples/craft-business-lead-to-order.orgs).
+### 2. Diagram (Mermaid)
 
-## From Source To Output
-
-OrgScript already generates visible downstream artifacts.
-
-Mermaid demos live in [`docs/demos/mermaid/README.md`](docs/demos/mermaid/README.md):
-
-- process demo from [`examples/lead-qualification.orgs`](examples/lead-qualification.orgs) to [`docs/demos/mermaid/lead-qualification.mermaid.md`](docs/demos/mermaid/lead-qualification.mermaid.md)
-- stateflow demo from [`examples/order-approval.orgs`](examples/order-approval.orgs) to [`docs/demos/mermaid/order-approval.mermaid.md`](docs/demos/mermaid/order-approval.mermaid.md)
-
-Markdown summary demos live in [`docs/demos/markdown/README.md`](docs/demos/markdown/README.md):
-
-- process summary from [`examples/lead-qualification.orgs`](examples/lead-qualification.orgs) to [`docs/demos/markdown/lead-qualification.summary.md`](docs/demos/markdown/lead-qualification.summary.md)
-- mixed summary from [`examples/order-approval.orgs`](examples/order-approval.orgs) to [`docs/demos/markdown/order-approval.summary.md`](docs/demos/markdown/order-approval.summary.md)
-
-Generate both demo sets with:
+Directly generate clear workflow diagrams.
 
 ```text
-npm run demo:generate
+node ./bin/orgscript.js export mermaid ./examples/craft-business-lead-to-order.orgs
 ```
+*See generated examples in [`docs/demos/mermaid/`](docs/demos/mermaid/README.md).*
 
-## Why this matters
+### 3. Summary (Markdown)
 
-- Teams get a shared source of truth for operational logic.
-- AI can analyze process gaps without guessing from prose.
-- Automation can be derived from structured text instead of tribal knowledge.
-- Git diffs and code review become possible for business logic.
+Export readable documentation for stakeholders.
 
-## What OrgScript is
-
-- A description language for processes, rules, roles, policies, events, and stateflows
-- Human-readable enough for operators and managers
-- Structured enough for parsers, validators, and AI systems
-- English-first in its canonical syntax
-
-## What OrgScript is not
-
-- A general-purpose programming language
-- A workflow engine
-- A replacement for BPMN, CRMs, or ERP systems
-- Free-form natural language
+```text
+node ./bin/orgscript.js export markdown ./examples/craft-business-lead-to-order.orgs
+```
+*See generated summaries in [`docs/demos/markdown/`](docs/demos/markdown/README.md).*
 
 ## Core building blocks in v0.1
 
