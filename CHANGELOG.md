@@ -6,6 +6,16 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-03-29
+
+- Added first HTML documentation exporter via `orgscript export html <file>`.
+- Refined Mermaid export with improved styling, parallelogram shapes for triggers, and semantic markers for state diagrams.
+- Upgraded Markdown summary export (v2) with Table of Contents (TOC), inter-block separators, and better header hierarchy.
+- Reorganized and expanded the demo suite under `docs/demos/` to include HTML, Markdown, and Mermaid artifacts for all hero examples.
+- Stabilized the canonical JSON model (v0.2) and updated its specification in `spec/canonical-model.md`.
+- Improved business-level phrasing in all summary exporters for better stakeholder readability.
+- Consolidated "Artiflow Flow" in documentation to show the path from `.orgs` to visual/structured outputs.
+
 ## [0.5.0] - 2026-03-29
 
 - Refined VS Code TextMate grammar to support inline keywords and dotted properties correctly.
