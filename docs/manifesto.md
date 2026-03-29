@@ -47,3 +47,20 @@ If organizations can describe their logic clearly:
 - onboarding becomes easier
 - hidden rules become visible
 - AI can support analysis and transformation without guessing
+
+## First 10 minutes with OrgScript
+
+Start with one real example and one real command path:
+
+1. Open `examples/craft-business-lead-to-order.orgs`
+2. Run `orgscript check ./examples/craft-business-lead-to-order.orgs`
+3. Run `orgscript export mermaid ./examples/craft-business-lead-to-order.orgs`
+4. Run `orgscript export markdown ./examples/craft-business-lead-to-order.orgs`
+
+That gives you the shortest path from idea to validation to visible output.
+
+Then continue with:
+
+- `examples/README.md` for the example catalog
+- `spec/language-spec.md` for the canonical definition
+- `docs/orgscript-for-humans.md` for authoring guidance

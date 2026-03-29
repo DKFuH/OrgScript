@@ -2,79 +2,136 @@
 
 **Describe how your business works in a way humans and machines both understand.**
 
-OrgScript is a human-readable, AI-friendly description language for business logic, operational processes, rules, roles, and state transitions. It provides a shared, structured layer between plain-language documentation and technical execution.
+OrgScript is a human-readable, AI-friendly description language for business logic, operational processes, rules, roles, and state transitions. It sits between plain-language documentation and technical execution.
 
----
+## What It Is
 
-## Why OrgScript?
+- A shared text layer for business logic
+- Readable by people
+- Parseable by software
+- Stable in Git
+- Useful for AI analysis, validation, and export
 
-- **Shared Truth**: Teams get logic they can read and review directly in Git.
-- **AI-Ready**: Reliable context for LLMs and agents without guessing from unstructured prose.
-- **Artifact-First**: Generate diagrams, summaries, and HTML docs from a single source.
-- **CI/CD Ready**: Validate, lint, and check logic integrity in your pipeline.
+## What It Is Not
 
-## Quick Start
+- Not a general-purpose programming language
+- Not a workflow engine
+- Not free-form prose
+- Not a replacement for implementation code
 
-### Installation
-
-```bash
-# Global installation
-npm install -g .
-
-# Or run via npx
-npx orgscript --help
-```
-
-### Usage
+## Quickstart In 60 Seconds
 
 ```bash
-# 1. Comprehensive health check (validate + lint + format-check)
-orgscript check ./examples/hiring-process.orgs
+# 1. Check an example end to end
+orgscript check ./examples/craft-business-lead-to-order.orgs
 
-# 2. Structural Metrics & Analysis (WP1)
-orgscript analyze ./examples/hiring-process.orgs
-
-# 3. Export AI Context (WP2)
-orgscript export context ./examples/hiring-process.orgs > logic-context.json
-
-# 4. Generate Visual Support
+# 2. Generate a diagram
 orgscript export mermaid ./examples/craft-business-lead-to-order.orgs
-orgscript export html ./examples/order-approval.orgs
+
+# 3. Generate a stakeholder-friendly summary
+orgscript export markdown ./examples/craft-business-lead-to-order.orgs
 ```
 
-## The Artifact Flow
+If you want the fastest first read, start with:
 
-OrgScript transforms simple text into powerful operational assets:
+- [craft-business-lead-to-order.orgs](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\examples\craft-business-lead-to-order.orgs)
+- [examples/README.md](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\examples\README.md)
 
-1.  **Source (`.orgs`)**: A diff-friendly, indentation-based logic source.
-2.  **Analysis**: Numerical metrics and complexity hints for your processes.
-3.  **Diagram (Mermaid)**: Automatic workflow and state-diagram generation.
-4.  **Summary (Markdown)**: Concise, stakeholder-ready documentation.
-5.  **Docs (HTML)**: Professional-grade static documentation site.
-6.  **AI Context**: Bundled logic package optimized for agent ingest.
+## Read This In Order
+
+If you are new to OrgScript, this is the intended reading path:
+
+1. [docs/manifesto.md](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\docs\manifesto.md)  
+   Why OrgScript exists.
+2. [docs/language-principles.md](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\docs\language-principles.md)  
+   The design constraints and non-negotiable rules.
+3. [spec/language-spec.md](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\spec\language-spec.md)  
+   The canonical language definition.
+4. [docs/orgscript-for-humans.md](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\docs\orgscript-for-humans.md)  
+   How to write maintainable OrgScript files.
+5. [docs/orgscript-for-ai.md](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\docs\orgscript-for-ai.md)  
+   How tools and AI must interpret OrgScript without guessing.
+
+## Canonical Source Of Truth
+
+The normative language reference is:
+
+- [spec/language-spec.md](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\spec\language-spec.md)
+
+Supporting docs are there to help people adopt, use, and govern the language. If implementation and docs ever disagree, the canonical spec wins.
+
+## From Source To Artifact
+
+OrgScript is intentionally artifact-first. A single `.orgs` file can produce multiple useful outputs:
+
+1. Source logic in plain text
+2. Validation and linting results
+3. Mermaid diagrams
+4. Markdown summaries
+5. HTML documentation
+6. AI-ready structured exports
+
+Generated examples live under:
+
+- [docs/demos](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\docs\demos)
+
+## Hero Demo
+
+The main showcase flow is:
+
+- Source: [craft-business-lead-to-order.orgs](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\examples\craft-business-lead-to-order.orgs)
+- Mermaid demo: [docs/demos/mermaid/craft-business-lead-to-order.mermaid.md](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\docs\demos\mermaid\craft-business-lead-to-order.mermaid.md)
+- Markdown demo: [docs/demos/markdown/craft-business-lead-to-order.summary.md](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\docs\demos\markdown\craft-business-lead-to-order.summary.md)
 
 ## Core Blocks
 
-- `process`: Step-by-step operational workflows.
-- `stateflow`: State transitions and lifecycle management.
-- `rule`: Cross-cutting guardrails and validation.
-- `role`: Permission boundaries (`can`, `cannot`).
-- `policy`: Governance and SLA requirements.
-- `metric`: Performance and data tracking definitions.
+- `process`: step-by-step operational workflows
+- `stateflow`: legal states and transitions
+- `rule`: cross-cutting constraints and requirements
+- `role`: permission boundaries
+- `policy`: context-driven or time-driven behavior
+- `event`: named triggers with reactions
+- `metric`: tracked business measures
 
-## Integration & Ecosystem
+## CLI Quick Reference
 
-- **VS Code Extension**: Official highlighting and language support under `editors/vscode`.
-- **Quality Automation**: CI checks for tests and example validation live in `.github/workflows`.
-- **Showcase**: Generated demo artifacts live in `docs/demos` and can be rebuilt locally with `npm run demo:generate`.
+```bash
+orgscript validate <file> [--json]
+orgscript lint <file> [--json]
+orgscript check <file> [--json]
+orgscript format <file> [--check]
+orgscript export json <file>
+orgscript export markdown <file>
+orgscript export mermaid <file>
+orgscript export html <file>
+orgscript export context <file>
+orgscript analyze <file> [--json]
+```
+
+## Developer Path
+
+For most contributors, the best practical sequence is:
+
+1. Read [examples/README.md](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\examples\README.md)
+2. Run `orgscript check` on a real example
+3. Inspect generated Mermaid or Markdown output
+4. Read the canonical spec
+5. Use [docs/governance.md](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\docs\governance.md) before proposing core language changes
 
 ## Testing
 
 ```bash
-npm test                # Run core logic tests
-npm run check:all        # Verify all examples
-npm run demo:generate    # Regenerate all showcase artifacts
+npm test
+npm run check:all
+npm run demo:generate
 ```
+
+## Ecosystem
+
+- VS Code extension: [editors/vscode](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\editors\vscode)
+- Governance: [docs/governance.md](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\docs\governance.md)
+- Language evolution: [docs/language-evolution.md](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\docs\language-evolution.md)
+- Changelog: [CHANGELOG.md](c:\Users\DanielKlas\OneDrive - Tischlermeister Daniel Klas\All Company - Dokumente\2_AREAS\AREA_IT_Infrastruktur\Entwicklung\OrgScript\CHANGELOG.md)
 
 ## License
 
