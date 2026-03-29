@@ -1,0 +1,79 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "OrgScript",
+  "scopeName": "source.orgscript",
+  "patterns": [
+    {
+      "include": "#top-level-block"
+    },
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#numbers"
+    },
+    {
+      "include": "#operators"
+    }
+  ],
+  "repository": {
+    "top-level-block": {
+      "patterns": [
+        {
+          "match": "^(\\s*)(process|stateflow|rule|role|policy|metric|event)\\b(?:\\s+([A-Za-z_][\\w.-]*))?",
+          "name": "meta.block.orgscript",
+          "captures": {
+            "2": {
+              "name": "keyword.control.orgscript"
+            },
+            "3": {
+              "name": "entity.name.type.orgscript"
+            }
+          }
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "match": "\\b(?:when|if|then|else|assign|transition|notify|create|update|require|stop|applies to|states|transitions|can|cannot|formula|owner|target|with|to|and|or)\\b",
+          "name": "keyword.control.orgscript"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.orgscript",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.orgscript",
+              "match": "\\\\."
+            }
+          ]
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.orgscript",
+          "match": "\\b\\d+(?:\\.\\d+)?(?:[smhd])?\\b"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.operator.orgscript",
+          "match": "(?:!=|<=|>=|->|=|<|>)"
+        }
+      ]
+    }
+  }
+}

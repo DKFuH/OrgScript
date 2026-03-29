@@ -1,0 +1,38 @@
+{
+  "name": "orgscript-vscode",
+  "displayName": "OrgScript",
+  "description": "Minimal VS Code language support for OrgScript (.orgs) files.",
+  "version": "0.0.1",
+  "publisher": "orgscript",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Languages"
+  ],
+  "activationEvents": [
+    "onLanguage:orgscript"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "orgscript",
+        "aliases": [
+          "OrgScript",
+          "orgscript"
+        ],
+        "extensions": [
+          ".orgs"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "orgscript",
+        "scopeName": "source.orgscript",
+        "path": "./syntaxes/orgscript.tmLanguage.json"
+      }
+    ]
+  }
+}
