@@ -34,5 +34,41 @@
     "expectedMessages": [
       "Unknown top-level block `workflow`"
     ]
+  },
+  {
+    "file": "invalid-annotation-syntax.orgs",
+    "expectedCodes": [
+      "syntax.invalid-annotation"
+    ],
+    "expectedMessages": [
+      "Annotations must use the form"
+    ]
+  },
+  {
+    "file": "invalid-annotation-key.orgs",
+    "expectedCodes": [
+      "semantic.unsupported-annotation-key"
+    ],
+    "expectedMessages": [
+      "Unsupported annotation key `@priority`"
+    ]
+  },
+  {
+    "file": "invalid-annotation-target.orgs",
+    "expectedCodes": [
+      "syntax.annotation-target-not-supported"
+    ],
+    "expectedMessages": [
+      "Annotations may only attach to top-level blocks and statement lines"
+    ]
+  },
+  {
+    "file": "invalid-inline-comment.orgs",
+    "expectedCodes": [
+      "syntax.inline-comments-not-supported"
+    ],
+    "expectedMessages": [
+      "Inline `#` comments are not supported in v1"
+    ]
   }
 ]

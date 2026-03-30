@@ -1,0 +1,4 @@
+@owner sales_ops
+process InvalidAnnotationSyntax
+
+  when lead.created

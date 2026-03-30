@@ -1,10 +1,11 @@
 {
-  "version": "0.2",
+  "version": "0.3",
   "type": "document",
   "body": [
     {
       "type": "stateflow",
       "name": "IncidentLifecycle",
+      "annotations": [],
       "states": [
         "open",
         "triaged",
@@ -43,6 +44,7 @@
     {
       "type": "role",
       "name": "OnCallEngineer",
+      "annotations": [],
       "can": [
         "triage incident",
         "assign responder",
@@ -54,6 +56,7 @@
     {
       "type": "role",
       "name": "IncidentManager",
+      "annotations": [],
       "can": [
         "escalate incident",
         "declare major incident",
@@ -64,8 +67,10 @@
     {
       "type": "policy",
       "name": "EscalationPolicy",
+      "annotations": [],
       "clauses": [
         {
+          "annotations": [],
           "condition": {
             "type": "logical",
             "operator": "and",
@@ -99,16 +104,19 @@
           "then": [
             {
               "type": "require",
+              "annotations": [],
               "requirement": "triage_sla"
             },
             {
               "type": "notify",
+              "annotations": [],
               "target": "on_call_manager",
               "message": "SLA Warning: High severity incident untriaged"
             }
           ]
         },
         {
+          "annotations": [],
           "condition": {
             "type": "comparison",
             "left": {
@@ -124,6 +132,7 @@
           "then": [
             {
               "type": "require",
+              "annotations": [],
               "requirement": "regular_status_updates"
             }
           ]
@@ -133,17 +142,21 @@
     {
       "type": "process",
       "name": "IncidentHandling",
+      "annotations": [],
       "body": [
         {
           "type": "when",
+          "annotations": [],
           "trigger": "system.alert_received"
         },
         {
           "type": "create",
+          "annotations": [],
           "entity": "incident"
         },
         {
           "type": "assign",
+          "annotations": [],
           "target": "incident.severity",
           "value": {
             "type": "string",
@@ -152,6 +165,7 @@
         },
         {
           "type": "transition",
+          "annotations": [],
           "target": "incident.status",
           "value": {
             "type": "string",
@@ -160,6 +174,7 @@
         },
         {
           "type": "if",
+          "annotations": [],
           "condition": {
             "type": "comparison",
             "left": {
@@ -175,6 +190,7 @@
           "then": [
             {
               "type": "assign",
+              "annotations": [],
               "target": "incident.severity",
               "value": {
                 "type": "string",
@@ -183,6 +199,7 @@
             },
             {
               "type": "notify",
+              "annotations": [],
               "target": "on_call_team",
               "message": "Critical alert detected"
             }
@@ -192,6 +209,7 @@
         },
         {
           "type": "if",
+          "annotations": [],
           "condition": {
             "type": "comparison",
             "left": {
@@ -207,6 +225,7 @@
           "then": [
             {
               "type": "assign",
+              "annotations": [],
               "target": "incident.primary_responder",
               "value": {
                 "type": "string",
@@ -215,6 +234,7 @@
             },
             {
               "type": "transition",
+              "annotations": [],
               "target": "incident.status",
               "value": {
                 "type": "string",
@@ -223,13 +243,17 @@
             }
           ],
           "elseIf": [],
-          "else": [
-            {
-              "type": "notify",
-              "target": "incident_manager",
-              "message": "Incident requiring triage"
-            }
-          ]
+          "else": {
+            "annotations": [],
+            "body": [
+              {
+                "type": "notify",
+                "annotations": [],
+                "target": "incident_manager",
+                "message": "Incident requiring triage"
+              }
+            ]
+          }
         }
       ]
     }

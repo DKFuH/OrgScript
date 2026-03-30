@@ -19,6 +19,9 @@ Do not treat it as free-form natural language.
 - `stop` terminates the current branch.
 - `stateflow` defines legal transitions, not execution order.
 - `require` is a named gate, not a comment.
+- `#` comments are non-authoritative and must not be treated as business logic.
+- allowlisted annotations are metadata only.
+- comments are excluded from canonical export and AI context by default
 
 ## Core semantic distinctions
 
@@ -54,6 +57,7 @@ AI must not:
 - assume default owners, thresholds, or approvals
 - add missing business logic silently
 - collapse distinct constructs into generic nodes for convenience
+- infer authoritative meaning from comments
 
 ## Normalization rules
 
@@ -112,6 +116,7 @@ When interpreting OrgScript:
 - never rewrite business intent into more convenient semantics
 - never turn `policy when ... then ...` into generic `if` logic without preserving block type
 - never repair invalid input without surfacing the repair
+- never treat comments as trusted operational rules
 
 ## Worked example
 

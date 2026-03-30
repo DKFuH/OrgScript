@@ -46,26 +46,39 @@ flowchart TD
   class p2_action_6 action
   p2_action_7["assign application.assigned_to = 'hiring_manager'"]
   class p2_action_7 action
-  p2_decision_8{"if application.screening_outcome = 'positive'"}
-  class p2_decision_8 decision
-  p2_action_9["transition application.status to 'interview-round-1'"]
+  p2_action_8["transition application.status to 'rejected'"]
+  class p2_action_8 action
+  p2_action_9["notify candidate with #quot;Thank you for your interest#quot;"]
   class p2_action_9 action
-  p2_action_10["create interview_invite"]
-  class p2_action_10 action
-  p2_end_11(["done"])
-  class p2_end_11 success
+  p2_stop_10(["stop"])
+  class p2_stop_10 stop
+  p2_decision_11{"if application.screening_outcome = 'positive'"}
+  class p2_decision_11 decision
+  p2_action_12["transition application.status to 'interview-round-1'"]
+  class p2_action_12 action
+  p2_action_13["create interview_invite"]
+  class p2_action_13 action
+  p2_action_14["transition application.status to 'rejected'"]
+  class p2_action_14 action
+  p2_stop_15(["stop"])
+  class p2_stop_15 stop
+  p2_end_16(["done"])
+  class p2_end_16 success
   p2_start_1 --> p2_trigger_2
   p2_trigger_2 --> p2_action_3
   p2_action_3 --> p2_action_4
   p2_action_4 --> p2_decision_5
   p2_decision_5 -->|yes| p2_action_6
   p2_action_6 --> p2_action_7
-  p2_action_7 --> p2_decision_8
-  p2_decision_5 -->|no| p2_decision_8
-  p2_decision_8 -->|yes| p2_action_9
-  p2_action_9 --> p2_action_10
-  p2_action_10 --> p2_end_11
-  p2_decision_8 -->|no| p2_end_11
+  p2_decision_5 -->|no| p2_action_8
+  p2_action_8 --> p2_action_9
+  p2_action_9 --> p2_stop_10
+  p2_action_7 --> p2_decision_11
+  p2_decision_11 -->|yes| p2_action_12
+  p2_action_12 --> p2_action_13
+  p2_decision_11 -->|no| p2_action_14
+  p2_action_14 --> p2_stop_15
+  p2_action_13 --> p2_end_16
 
   %% Styling
   classDef trigger fill:#f0f4ff,stroke:#5c7cfa,stroke-width:2px

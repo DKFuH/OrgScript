@@ -1,0 +1,12 @@
+process HiddenCommentLogic
+
+  # Always require deposit before confirmation.
+  when quote.accepted
+
+  # Only managers may approve this.
+  if order.approved = false then
+    require management_approval
+    stop
+
+  # This branch must notify legal.
+  transition order.status to "confirmed"

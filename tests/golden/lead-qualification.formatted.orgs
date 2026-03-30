@@ -1,7 +1,13 @@
+# Shared lead qualification path for inbound leads.
+@owner "sales_ops"
+@status "active"
 process LeadQualification
 
+  # New leads enter the qualification flow when created.
   when lead.created
 
+  # Referral leads follow the premium qualification path.
+  @note "Track referral lead handling separately."
   if lead.source = "referral" then
     assign lead.priority = "high"
     assign lead.path = "premium"
@@ -11,9 +17,12 @@ process LeadQualification
     assign lead.priority = "normal"
     assign lead.path = "standard"
 
+  @review "Revisit the budget threshold each quarter."
   if lead.budget < 10000 then
     transition lead.status to "disqualified"
     notify sales with "Budget below threshold"
     stop
 
   transition lead.status to "qualified"
+
+  # Sales can continue with the qualified lead.

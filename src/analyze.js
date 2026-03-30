@@ -76,7 +76,7 @@ function flattenStatements(body) {
         result = result.concat(flattenStatements(branch.then));
       }
       if (stmt.else) {
-        result = result.concat(flattenStatements(stmt.else));
+        result = result.concat(flattenStatements(stmt.else.body || []));
       }
     }
   }

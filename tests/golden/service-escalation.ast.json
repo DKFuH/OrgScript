@@ -5,6 +5,10 @@
     {
       "type": "PolicyNode",
       "name": "LateResponseEscalation",
+      "line": 1,
+      "annotations": [],
+      "leadingComments": [],
+      "trailingComments": [],
       "clauses": [
         {
           "type": "PolicyClauseNode",
@@ -25,12 +29,18 @@
           "body": [
             {
               "type": "NotifyNode",
+              "line": 5,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
               "target": "owner",
-              "message": "Ticket waiting more than 24 hours",
-              "line": 5
+              "message": "Ticket waiting more than 24 hours"
             }
           ],
-          "line": 3
+          "line": 3,
+          "annotations": [],
+          "leadingComments": [],
+          "trailingComments": []
         },
         {
           "type": "PolicyClauseNode",
@@ -51,6 +61,10 @@
           "body": [
             {
               "type": "AssignNode",
+              "line": 9,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
               "target": {
                 "type": "FieldReferenceNode",
                 "path": "ticket.owner"
@@ -59,23 +73,32 @@
                 "type": "LiteralNode",
                 "valueType": "string",
                 "value": "team_lead"
-              },
-              "line": 9
+              }
             },
             {
               "type": "NotifyNode",
+              "line": 10,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
               "target": "team_lead",
-              "message": "Ticket escalated after 48 hours",
-              "line": 10
+              "message": "Ticket escalated after 48 hours"
             }
           ],
-          "line": 7
+          "line": 7,
+          "annotations": [],
+          "leadingComments": [],
+          "trailingComments": []
         }
       ]
     },
     {
       "type": "RoleNode",
       "name": "Support",
+      "line": 12,
+      "annotations": [],
+      "leadingComments": [],
+      "trailingComments": [],
       "can": [
         {
           "type": "PermissionNode",
@@ -101,5 +124,6 @@
         }
       ]
     }
-  ]
+  ],
+  "trailingComments": []
 }

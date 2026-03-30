@@ -1,12 +1,14 @@
 {
-  "version": "0.2",
+  "version": "0.3",
   "type": "document",
   "body": [
     {
       "type": "policy",
       "name": "LateResponseEscalation",
+      "annotations": [],
       "clauses": [
         {
+          "annotations": [],
           "condition": {
             "type": "comparison",
             "left": {
@@ -22,12 +24,14 @@
           "then": [
             {
               "type": "notify",
+              "annotations": [],
               "target": "owner",
               "message": "Ticket waiting more than 24 hours"
             }
           ]
         },
         {
+          "annotations": [],
           "condition": {
             "type": "comparison",
             "left": {
@@ -43,6 +47,7 @@
           "then": [
             {
               "type": "assign",
+              "annotations": [],
               "target": "ticket.owner",
               "value": {
                 "type": "string",
@@ -51,6 +56,7 @@
             },
             {
               "type": "notify",
+              "annotations": [],
               "target": "team_lead",
               "message": "Ticket escalated after 48 hours"
             }
@@ -61,6 +67,7 @@
     {
       "type": "role",
       "name": "Support",
+      "annotations": [],
       "can": [
         "view ticket",
         "update ticket.status",

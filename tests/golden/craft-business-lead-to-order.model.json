@@ -1,17 +1,20 @@
 {
-  "version": "0.2",
+  "version": "0.3",
   "type": "document",
   "body": [
     {
       "type": "process",
       "name": "CraftBusinessLeadToOrder",
+      "annotations": [],
       "body": [
         {
           "type": "when",
+          "annotations": [],
           "trigger": "lead.created"
         },
         {
           "type": "if",
+          "annotations": [],
           "condition": {
             "type": "comparison",
             "left": {
@@ -27,6 +30,7 @@
           "then": [
             {
               "type": "assign",
+              "annotations": [],
               "target": "lead.priority",
               "value": {
                 "type": "string",
@@ -35,6 +39,7 @@
             },
             {
               "type": "assign",
+              "annotations": [],
               "target": "lead.sales_path",
               "value": {
                 "type": "string",
@@ -43,12 +48,14 @@
             },
             {
               "type": "notify",
+              "annotations": [],
               "target": "sales",
               "message": "Handle referral lead first"
             }
           ],
           "elseIf": [
             {
+              "annotations": [],
               "condition": {
                 "type": "comparison",
                 "left": {
@@ -64,6 +71,7 @@
               "then": [
                 {
                   "type": "assign",
+                  "annotations": [],
                   "target": "lead.priority",
                   "value": {
                     "type": "string",
@@ -72,6 +80,7 @@
                 },
                 {
                   "type": "assign",
+                  "annotations": [],
                   "target": "lead.sales_path",
                   "value": {
                     "type": "string",
@@ -85,6 +94,7 @@
         },
         {
           "type": "if",
+          "annotations": [],
           "condition": {
             "type": "logical",
             "operator": "and",
@@ -118,6 +128,7 @@
           "then": [
             {
               "type": "transition",
+              "annotations": [],
               "target": "lead.status",
               "value": {
                 "type": "string",
@@ -126,11 +137,13 @@
             },
             {
               "type": "notify",
+              "annotations": [],
               "target": "sales",
               "message": "Outside target project type"
             },
             {
-              "type": "stop"
+              "type": "stop",
+              "annotations": []
             }
           ],
           "elseIf": [],
@@ -138,6 +151,7 @@
         },
         {
           "type": "if",
+          "annotations": [],
           "condition": {
             "type": "comparison",
             "left": {
@@ -153,6 +167,7 @@
           "then": [
             {
               "type": "transition",
+              "annotations": [],
               "target": "lead.status",
               "value": {
                 "type": "string",
@@ -161,11 +176,13 @@
             },
             {
               "type": "notify",
+              "annotations": [],
               "target": "sales",
               "message": "Below minimum project value"
             },
             {
-              "type": "stop"
+              "type": "stop",
+              "annotations": []
             }
           ],
           "elseIf": [],
@@ -173,6 +190,7 @@
         },
         {
           "type": "transition",
+          "annotations": [],
           "target": "lead.status",
           "value": {
             "type": "string",
@@ -181,6 +199,7 @@
         },
         {
           "type": "assign",
+          "annotations": [],
           "target": "lead.owner",
           "value": {
             "type": "string",
@@ -192,13 +211,16 @@
     {
       "type": "process",
       "name": "QuoteToOrder",
+      "annotations": [],
       "body": [
         {
           "type": "when",
+          "annotations": [],
           "trigger": "quote.accepted"
         },
         {
           "type": "if",
+          "annotations": [],
           "condition": {
             "type": "comparison",
             "left": {
@@ -214,6 +236,7 @@
           "then": [
             {
               "type": "transition",
+              "annotations": [],
               "target": "order.status",
               "value": {
                 "type": "string",
@@ -222,11 +245,13 @@
             },
             {
               "type": "notify",
+              "annotations": [],
               "target": "finance",
               "message": "Deposit required before confirmation"
             },
             {
-              "type": "stop"
+              "type": "stop",
+              "annotations": []
             }
           ],
           "elseIf": [],
@@ -234,6 +259,7 @@
         },
         {
           "type": "transition",
+          "annotations": [],
           "target": "order.status",
           "value": {
             "type": "string",
@@ -242,10 +268,12 @@
         },
         {
           "type": "create",
+          "annotations": [],
           "entity": "production_order"
         },
         {
           "type": "notify",
+          "annotations": [],
           "target": "operations",
           "message": "Order ready for production planning"
         }
@@ -254,6 +282,7 @@
     {
       "type": "stateflow",
       "name": "OrderLifecycle",
+      "annotations": [],
       "states": [
         "qualified",
         "quoted",
@@ -310,10 +339,12 @@
     {
       "type": "rule",
       "name": "NoProductionWithoutDeposit",
+      "annotations": [],
       "appliesTo": "order",
       "body": [
         {
           "type": "if",
+          "annotations": [],
           "condition": {
             "type": "comparison",
             "left": {
@@ -329,10 +360,12 @@
           "then": [
             {
               "type": "require",
+              "annotations": [],
               "requirement": "finance_clearance"
             },
             {
               "type": "notify",
+              "annotations": [],
               "target": "operations",
               "message": "Production blocked until deposit is received"
             }

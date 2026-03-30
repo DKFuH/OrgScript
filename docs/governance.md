@@ -9,6 +9,7 @@ This note defines how the language evolves without losing its canonical shape.
 - Preserve backward compatibility where possible.
 - Treat keyword meaning as stable once documented.
 - Keep the language readable for humans and deterministic for machines.
+- Keep comments non-authoritative and annotations non-semantic unless the spec explicitly changes.
 
 ## Stability levels
 

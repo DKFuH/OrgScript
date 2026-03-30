@@ -5,6 +5,10 @@
     {
       "type": "StateflowNode",
       "name": "OrderStatus",
+      "line": 1,
+      "annotations": [],
+      "leadingComments": [],
+      "trailingComments": [],
       "states": [
         {
           "type": "StateNode",
@@ -79,10 +83,18 @@
     {
       "type": "RuleNode",
       "name": "NoProductionWithoutApproval",
+      "line": 19,
+      "annotations": [],
+      "leadingComments": [],
+      "trailingComments": [],
       "appliesTo": "order",
       "body": [
         {
           "type": "IfNode",
+          "line": 23,
+          "annotations": [],
+          "leadingComments": [],
+          "trailingComments": [],
           "condition": {
             "type": "ComparisonConditionNode",
             "left": {
@@ -100,21 +112,27 @@
           "then": [
             {
               "type": "RequireNode",
-              "requirement": "management_approval",
-              "line": 24
+              "line": 24,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
+              "requirement": "management_approval"
             },
             {
               "type": "NotifyNode",
+              "line": 25,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
               "target": "operations",
-              "message": "Order cannot enter production",
-              "line": 25
+              "message": "Order cannot enter production"
             }
           ],
           "elseIf": [],
-          "else": null,
-          "line": 23
+          "else": null
         }
       ]
     }
-  ]
+  ],
+  "trailingComments": []
 }

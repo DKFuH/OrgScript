@@ -2,6 +2,15 @@ function createSemanticIssue(line, code, message) {
   return { line, code, message };
 }
 
+const ALLOWED_ANNOTATION_KEYS = new Set([
+  "note",
+  "owner",
+  "todo",
+  "source",
+  "status",
+  "review",
+]);
+
 function validateDocument(ast) {
   const issues = [];
   const seenTopLevel = new Map();
@@ -11,7 +20,7 @@ function validateDocument(ast) {
     if (seenTopLevel.has(key)) {
       issues.push(
         createSemanticIssue(
-          1,
+          node.line || 1,
           "semantic.duplicate-top-level-name",
           `Duplicate top-level ${node.type} name \`${node.name}\`.`
         )
@@ -20,6 +29,7 @@ function validateDocument(ast) {
       seenTopLevel.set(key, true);
     }
 
+    validateAnnotations(node, issues, `top-level ${node.type.replace("Node", "").toLowerCase()} \`${node.name}\``);
     validateNode(node, issues);
   }
 
@@ -31,7 +41,7 @@ function validateNode(node, issues) {
     if (!node.body || node.body.length === 0) {
       issues.push(
         createSemanticIssue(
-          1,
+          node.line || 1,
           "semantic.empty-block",
           `${node.type.replace("Node", "")} \`${node.name}\` must not be empty.`
         )
@@ -51,7 +61,7 @@ function validateNode(node, issues) {
     if (!node.clauses || node.clauses.length === 0) {
       issues.push(
         createSemanticIssue(
-          1,
+          node.line || 1,
           "semantic.empty-policy",
           `Policy \`${node.name}\` must contain at least one clause.`
         )
@@ -59,6 +69,7 @@ function validateNode(node, issues) {
     }
 
     for (const clause of node.clauses || []) {
+      validateAnnotations(clause, issues, `policy clause in \`${node.name}\``);
       if (!clause.body || clause.body.length === 0) {
         issues.push(
           createSemanticIssue(
@@ -77,7 +88,7 @@ function validateNode(node, issues) {
     if ((node.can || []).length === 0 && (node.cannot || []).length === 0) {
       issues.push(
         createSemanticIssue(
-          1,
+          node.line || 1,
           "semantic.empty-role",
           `Role \`${node.name}\` must define at least one permission.`
         )
@@ -90,7 +101,7 @@ function validateNode(node, issues) {
     if (!node.formula || !node.owner || !node.target) {
       issues.push(
         createSemanticIssue(
-          1,
+          node.line || 1,
           "semantic.incomplete-metric",
           `Metric \`${node.name}\` must define formula, owner, and target.`
         )
@@ -103,7 +114,7 @@ function validateStateflow(node, issues) {
   if ((node.states || []).length === 0) {
     issues.push(
       createSemanticIssue(
-        1,
+        node.line || 1,
         "semantic.empty-stateflow",
         `Stateflow \`${node.name}\` must define at least one state.`
       )
@@ -162,6 +173,8 @@ function validateStateflow(node, issues) {
 
 function validateStatements(statements, issues) {
   for (const statement of statements) {
+    validateAnnotations(statement, issues, `${statement.type.replace("Node", "")} statement`);
+
     if (statement.type !== "IfNode") {
       continue;
     }
@@ -179,6 +192,7 @@ function validateStatements(statements, issues) {
     validateStatements(statement.then || [], issues);
 
     for (const branch of statement.elseIf || []) {
+      validateAnnotations(branch, issues, "`else if` branch");
       if (!branch.then || branch.then.length === 0) {
         issues.push(
           createSemanticIssue(
@@ -192,6 +206,7 @@ function validateStatements(statements, issues) {
     }
 
     if (statement.else) {
+      validateAnnotations(statement.else, issues, "`else` branch");
       if (!statement.else.body || statement.else.body.length === 0) {
         issues.push(
           createSemanticIssue(
@@ -212,10 +227,43 @@ function validateActionStatements(statements, issues) {
       issues.push(
         createSemanticIssue(1, "semantic.invalid-action-statement", "Invalid action statement.")
       );
+      continue;
+    }
+
+    validateAnnotations(statement, issues, `${statement.type.replace("Node", "")} statement`);
+  }
+}
+
+function validateAnnotations(node, issues, targetLabel) {
+  const annotations = node.annotations || [];
+  const seen = new Set();
+
+  for (const annotation of annotations) {
+    if (!ALLOWED_ANNOTATION_KEYS.has(annotation.key)) {
+      issues.push(
+        createSemanticIssue(
+          annotation.line || node.line || 1,
+          "semantic.unsupported-annotation-key",
+          `Unsupported annotation key \`@${annotation.key}\` on ${targetLabel}.`
+        )
+      );
+    }
+
+    if (seen.has(annotation.key)) {
+      issues.push(
+        createSemanticIssue(
+          annotation.line || node.line || 1,
+          "semantic.duplicate-annotation-key",
+          `Duplicate annotation key \`@${annotation.key}\` on ${targetLabel}.`
+        )
+      );
+    } else {
+      seen.add(annotation.key);
     }
   }
 }
 
 module.exports = {
+  ALLOWED_ANNOTATION_KEYS,
   validateDocument,
 };

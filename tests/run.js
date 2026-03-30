@@ -9,6 +9,8 @@ const { buildModel } = require("../src/validate");
 const { toCanonicalModel } = require("../src/export-json");
 const { toMarkdownSummary } = require("../src/export-markdown");
 const { toMermaidMarkdown } = require("../src/export-mermaid");
+const { toAiContext } = require("../src/export-context");
+const { analyzeDocument } = require("../src/analyze");
 const { lintDocument, renderLintReport, summarizeFindings } = require("../src/linter");
 
 const repoRoot = path.resolve(__dirname, "..");
@@ -31,6 +33,7 @@ function run() {
   testMermaidExport();
   testMarkdownExport();
   testMarkdownExporterAdditionalBlockKinds();
+  testCommentsAndAnnotations();
   console.log("All tests passed.");
 }
 
@@ -350,6 +353,7 @@ function testCliDiagnosticsAndExitCodes() {
   assert.strictEqual(exportJson.status, 0, "Expected export json to succeed");
   const exportPayload = JSON.parse(exportJson.stdout);
   assert.strictEqual(exportPayload.type, "document");
+  assert.strictEqual(exportPayload.version, "0.3");
 
   const exportMarkdown = runCli([
     cliPath,
@@ -374,6 +378,35 @@ function testCliDiagnosticsAndExitCodes() {
     exportMermaid.stdout.includes("# OrgScript Mermaid Export"),
     "Expected Mermaid export heading"
   );
+
+  const exportContext = runCli([
+    cliPath,
+    "export",
+    "context",
+    "./examples/lead-qualification.orgs",
+  ]);
+  assert.strictEqual(exportContext.status, 0, "Expected export context to succeed");
+  const exportContextPayload = JSON.parse(exportContext.stdout);
+  assert.strictEqual(exportContextPayload.source.model.version, "0.3");
+  assert.ok(
+    JSON.stringify(exportContextPayload).includes('"status"'),
+    "Expected annotations to survive in AI context via canonical model"
+  );
+  assert.ok(
+    !JSON.stringify(exportContextPayload).includes("Shared lead qualification path"),
+    "Expected comments to stay out of AI context by default"
+  );
+
+  const analyzeCommand = runCli([
+    cliPath,
+    "analyze",
+    "./examples/lead-qualification.orgs",
+    "--json",
+  ]);
+  assert.strictEqual(analyzeCommand.status, 0, "Expected analyze --json to succeed");
+  const analyzePayload = JSON.parse(analyzeCommand.stdout);
+  assert.strictEqual(analyzePayload.command, "analyze");
+  assert.ok(analyzePayload.analysis.summary.totalBlocks > 0);
 
   const exportMermaidUnsupported = runCli([
     cliPath,
@@ -647,7 +680,7 @@ function testMarkdownExport() {
 
 function testMarkdownExporterAdditionalBlockKinds() {
   const model = {
-    version: "0.2",
+    version: "0.3",
     type: "document",
     body: [
       {
@@ -680,6 +713,47 @@ function testMarkdownExporterAdditionalBlockKinds() {
   assert.ok(output.includes("notify `finance` with `\"Payment received\"`"), "Expected event action");
   assert.ok(output.includes("# Metric: CloseRate"), "Expected metric summary heading");
   assert.ok(output.includes("`won_quotes / total_quotes`"), "Expected metric formula");
+}
+
+function testCommentsAndAnnotations() {
+  const sourcePath = path.join(examplesDir, "lead-qualification.orgs");
+  const result = buildModel(sourcePath);
+
+  assert.ok(result.ok, "Expected annotated example to stay valid");
+
+  const processNode = result.ast.body[0];
+  assert.strictEqual(processNode.annotations.length, 2, "Expected process annotations");
+  assert.strictEqual(processNode.leadingComments.length, 1, "Expected process leading comment");
+  assert.strictEqual(processNode.body[0].leadingComments.length, 1, "Expected statement leading comment");
+  assert.strictEqual(processNode.body[1].annotations.length, 1, "Expected statement annotation");
+  assert.strictEqual(processNode.trailingComments.length, 1, "Expected trailing process comment");
+
+  const canonical = toCanonicalModel(result.ast);
+  const serialized = JSON.stringify(canonical);
+  assert.ok(
+    serialized.includes('"annotations"'),
+    "Expected canonical model to contain annotations"
+  );
+  assert.ok(
+    !serialized.includes("Shared lead qualification path"),
+    "Expected canonical model to exclude comments"
+  );
+
+  const context = toAiContext(canonical, []);
+  const contextSerialized = JSON.stringify(context);
+  assert.ok(contextSerialized.includes('"status"'), "Expected annotations in AI context");
+  assert.ok(
+    !contextSerialized.includes("Shared lead qualification path"),
+    "Expected comments to stay out of AI context"
+  );
+
+  const analysis = analyzeDocument(canonical);
+  assert.strictEqual(analysis.summary.totalBlocks, 1, "Expected analysis block count to stay stable");
+  assert.strictEqual(
+    analysis.blocks[0].metrics.triggers,
+    1,
+    "Expected analysis metrics to ignore annotations/comments"
+  );
 }
 
 function runCli(args) {

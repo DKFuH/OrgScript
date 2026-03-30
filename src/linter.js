@@ -19,10 +19,15 @@ const RULES = {
   "lint.state-no-incoming": { severity: SEVERITY.info },
   "lint.role-conflicting-permission": { severity: SEVERITY.error },
   "lint.unreachable-statement": { severity: SEVERITY.warning },
+  "lint.comment-hidden-business-rule": { severity: SEVERITY.warning },
+  "lint.comment-hidden-requirement": { severity: SEVERITY.warning },
+  "lint.comment-hidden-permission": { severity: SEVERITY.warning },
 };
 
 function lintDocument(ast) {
   const findings = [];
+
+  lintComments(ast.trailingComments || [], findings);
 
   for (const node of ast.body) {
     lintNode(node, findings);
@@ -67,6 +72,9 @@ function renderLintReport(filePath, findings) {
 }
 
 function lintNode(node, findings) {
+  lintComments(node.leadingComments || [], findings);
+  lintComments(node.trailingComments || [], findings);
+
   if (node.type === "ProcessNode") {
     lintProcess(node, findings);
     return;
@@ -95,6 +103,8 @@ function lintNode(node, findings) {
 
   if (node.type === "PolicyNode") {
     for (const clause of node.clauses || []) {
+      lintComments(clause.leadingComments || [], findings);
+      lintComments(clause.trailingComments || [], findings);
       lintActionBlock(clause.body || [], findings);
     }
   }
@@ -108,7 +118,7 @@ function lintProcess(node, findings) {
     findings.push(
       createLintIssue(
         "lint.process-missing-trigger",
-        1,
+        node.line || 1,
         `Process \`${node.name}\` has no \`when\` trigger.`
       )
     );
@@ -147,7 +157,7 @@ function lintRule(node, findings) {
     findings.push(
       createLintIssue(
         "lint.rule-missing-scope",
-        1,
+        node.line || 1,
         `Rule \`${node.name}\` does not declare an \`applies to\` scope.`
       )
     );
@@ -221,6 +231,9 @@ function lintStatementBlock(statements, findings) {
   let terminated = false;
 
   for (const statement of statements) {
+    lintComments(statement.leadingComments || [], findings);
+    lintComments(statement.trailingComments || [], findings);
+
     if (terminated) {
       findings.push(
         createLintIssue(
@@ -235,10 +248,14 @@ function lintStatementBlock(statements, findings) {
       lintStatementBlock(statement.then || [], findings);
 
       for (const branch of statement.elseIf || []) {
+        lintComments(branch.leadingComments || [], findings);
+        lintComments(branch.trailingComments || [], findings);
         lintStatementBlock(branch.then || [], findings);
       }
 
       if (statement.else) {
+        lintComments(statement.else.leadingComments || [], findings);
+        lintComments(statement.else.trailingComments || [], findings);
         lintStatementBlock(statement.else.body || [], findings);
       }
     }
@@ -251,6 +268,9 @@ function lintActionBlock(statements, findings) {
   let terminated = false;
 
   for (const statement of statements) {
+    lintComments(statement.leadingComments || [], findings);
+    lintComments(statement.trailingComments || [], findings);
+
     if (terminated) {
       findings.push(
         createLintIssue(
@@ -291,6 +311,59 @@ function blockAlwaysStops(statements) {
   }
 
   return statementAlwaysStops(statements[statements.length - 1]);
+}
+
+function lintComments(comments, findings) {
+  for (const comment of comments || []) {
+    const rule = classifyComment(comment.text || "");
+    if (!rule) {
+      continue;
+    }
+
+    findings.push(createLintIssue(rule.code, comment.line || 1, rule.message));
+  }
+}
+
+function classifyComment(text) {
+  const normalized = text.trim().toLowerCase();
+  if (!normalized) {
+    return null;
+  }
+
+  if (
+    /^(only|managers?\b.*may|only .* may|may only|cannot|must not)\b/.test(normalized) ||
+    /\b(approve|approval|manager|role|permission)\b/.test(normalized) && /\b(only|may|cannot|must)\b/.test(normalized)
+  ) {
+    return {
+      code: "lint.comment-hidden-permission",
+      message:
+        "This comment looks like a permission or approval rule. Move it into explicit OrgScript constructs.",
+    };
+  }
+
+  if (
+    /^(must|require|required|always require|never approve|never confirm)\b/.test(normalized) ||
+    /\b(require|required|deposit|approval|review|clearance)\b/.test(normalized) && /\b(before|must|always|only)\b/.test(normalized)
+  ) {
+    return {
+      code: "lint.comment-hidden-requirement",
+      message:
+        "This comment looks like a hidden requirement. Express the requirement in OrgScript instead of a comment.",
+    };
+  }
+
+  if (
+    /^(always|never|if|skip|must|only)\b/.test(normalized) ||
+    /\b(notify|transition|assign|update|create|stop)\b/.test(normalized) && /\b(always|must|if|never|only|skip)\b/.test(normalized)
+  ) {
+    return {
+      code: "lint.comment-hidden-business-rule",
+      message:
+        "This comment looks like normative business logic. Move it into explicit OrgScript statements or rules.",
+    };
+  }
+
+  return null;
 }
 
 function sortFindings(findings) {

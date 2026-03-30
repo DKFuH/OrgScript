@@ -1,10 +1,11 @@
 {
-  "version": "0.2",
+  "version": "0.3",
   "type": "document",
   "body": [
     {
       "type": "stateflow",
       "name": "OrderStatus",
+      "annotations": [],
       "states": [
         "draft",
         "pending_approval",
@@ -43,10 +44,12 @@
     {
       "type": "rule",
       "name": "NoProductionWithoutApproval",
+      "annotations": [],
       "appliesTo": "order",
       "body": [
         {
           "type": "if",
+          "annotations": [],
           "condition": {
             "type": "comparison",
             "left": {
@@ -62,10 +65,12 @@
           "then": [
             {
               "type": "require",
+              "annotations": [],
               "requirement": "management_approval"
             },
             {
               "type": "notify",
+              "annotations": [],
               "target": "operations",
               "message": "Order cannot enter production"
             }

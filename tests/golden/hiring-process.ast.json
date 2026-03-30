@@ -5,6 +5,10 @@
     {
       "type": "StateflowNode",
       "name": "ApplicationLifecycle",
+      "line": 1,
+      "annotations": [],
+      "leadingComments": [],
+      "trailingComments": [],
       "states": [
         {
           "type": "StateNode",
@@ -119,6 +123,10 @@
     {
       "type": "RoleNode",
       "name": "HiringManager",
+      "line": 26,
+      "annotations": [],
+      "leadingComments": [],
+      "trailingComments": [],
       "can": [
         {
           "type": "PermissionNode",
@@ -141,6 +149,10 @@
     {
       "type": "RoleNode",
       "name": "HumanResources",
+      "line": 33,
+      "annotations": [],
+      "leadingComments": [],
+      "trailingComments": [],
       "can": [
         {
           "type": "PermissionNode",
@@ -168,6 +180,10 @@
     {
       "type": "RoleNode",
       "name": "Candidate",
+      "line": 41,
+      "annotations": [],
+      "leadingComments": [],
+      "trailingComments": [],
       "can": [
         {
           "type": "PermissionNode",
@@ -185,6 +201,10 @@
     {
       "type": "PolicyNode",
       "name": "GDPRCompliance",
+      "line": 47,
+      "annotations": [],
+      "leadingComments": [],
+      "trailingComments": [],
       "clauses": [
         {
           "type": "PolicyClauseNode",
@@ -205,27 +225,44 @@
           "body": [
             {
               "type": "RequireNode",
-              "requirement": "data_anonymization",
-              "line": 51
+              "line": 51,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
+              "requirement": "data_anonymization"
             },
             {
               "type": "NotifyNode",
+              "line": 52,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
               "target": "dpo",
-              "message": "Non-consenting candidate record created",
-              "line": 52
+              "message": "Non-consenting candidate record created"
             }
           ],
-          "line": 49
+          "line": 49,
+          "annotations": [],
+          "leadingComments": [],
+          "trailingComments": []
         }
       ]
     },
     {
       "type": "RuleNode",
       "name": "ScreeningMandatory",
+      "line": 54,
+      "annotations": [],
+      "leadingComments": [],
+      "trailingComments": [],
       "appliesTo": "application",
       "body": [
         {
           "type": "IfNode",
+          "line": 58,
+          "annotations": [],
+          "leadingComments": [],
+          "trailingComments": [],
           "condition": {
             "type": "ComparisonConditionNode",
             "left": {
@@ -243,30 +280,43 @@
           "then": [
             {
               "type": "RequireNode",
-              "requirement": "screening_notes",
-              "line": 59
+              "line": 59,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
+              "requirement": "screening_notes"
             }
           ],
           "elseIf": [],
-          "else": null,
-          "line": 58
+          "else": null
         }
       ]
     },
     {
       "type": "ProcessNode",
       "name": "StandardHiring",
+      "line": 61,
+      "annotations": [],
+      "leadingComments": [],
+      "trailingComments": [],
       "body": [
         {
           "type": "WhenNode",
+          "line": 63,
+          "annotations": [],
+          "leadingComments": [],
+          "trailingComments": [],
           "trigger": {
             "type": "FieldReferenceNode",
             "path": "candidate.application_submitted"
-          },
-          "line": 63
+          }
         },
         {
           "type": "TransitionNode",
+          "line": 65,
+          "annotations": [],
+          "leadingComments": [],
+          "trailingComments": [],
           "target": {
             "type": "FieldReferenceNode",
             "path": "application.status"
@@ -275,17 +325,23 @@
             "type": "LiteralNode",
             "valueType": "string",
             "value": "received"
-          },
-          "line": 65
+          }
         },
         {
           "type": "NotifyNode",
+          "line": 66,
+          "annotations": [],
+          "leadingComments": [],
+          "trailingComments": [],
           "target": "hr_team",
-          "message": "New candidate application",
-          "line": 66
+          "message": "New candidate application"
         },
         {
           "type": "IfNode",
+          "line": 68,
+          "annotations": [],
+          "leadingComments": [],
+          "trailingComments": [],
           "condition": {
             "type": "ComparisonConditionNode",
             "left": {
@@ -303,6 +359,10 @@
           "then": [
             {
               "type": "TransitionNode",
+              "line": 69,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
               "target": {
                 "type": "FieldReferenceNode",
                 "path": "application.status"
@@ -311,11 +371,14 @@
                 "type": "LiteralNode",
                 "valueType": "string",
                 "value": "screening"
-              },
-              "line": 69
+              }
             },
             {
               "type": "AssignNode",
+              "line": 70,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
               "target": {
                 "type": "FieldReferenceNode",
                 "path": "application.assigned_to"
@@ -324,8 +387,7 @@
                 "type": "LiteralNode",
                 "valueType": "string",
                 "value": "hiring_manager"
-              },
-              "line": 70
+              }
             }
           ],
           "elseIf": [],
@@ -334,6 +396,10 @@
             "body": [
               {
                 "type": "TransitionNode",
+                "line": 73,
+                "annotations": [],
+                "leadingComments": [],
+                "trailingComments": [],
                 "target": {
                   "type": "FieldReferenceNode",
                   "path": "application.status"
@@ -342,26 +408,37 @@
                   "type": "LiteralNode",
                   "valueType": "string",
                   "value": "rejected"
-                },
-                "line": 73
+                }
               },
               {
                 "type": "NotifyNode",
+                "line": 74,
+                "annotations": [],
+                "leadingComments": [],
+                "trailingComments": [],
                 "target": "candidate",
-                "message": "Thank you for your interest",
-                "line": 74
+                "message": "Thank you for your interest"
               },
               {
                 "type": "StopNode",
-                "line": 75
+                "line": 75,
+                "annotations": [],
+                "leadingComments": [],
+                "trailingComments": []
               }
             ],
-            "line": 72
-          },
-          "line": 68
+            "line": 72,
+            "annotations": [],
+            "leadingComments": [],
+            "trailingComments": []
+          }
         },
         {
           "type": "IfNode",
+          "line": 77,
+          "annotations": [],
+          "leadingComments": [],
+          "trailingComments": [],
           "condition": {
             "type": "ComparisonConditionNode",
             "left": {
@@ -379,6 +456,10 @@
           "then": [
             {
               "type": "TransitionNode",
+              "line": 78,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
               "target": {
                 "type": "FieldReferenceNode",
                 "path": "application.status"
@@ -387,13 +468,15 @@
                 "type": "LiteralNode",
                 "valueType": "string",
                 "value": "interview-round-1"
-              },
-              "line": 78
+              }
             },
             {
               "type": "CreateNode",
-              "entity": "interview_invite",
-              "line": 79
+              "line": 79,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
+              "entity": "interview_invite"
             }
           ],
           "elseIf": [],
@@ -402,6 +485,10 @@
             "body": [
               {
                 "type": "TransitionNode",
+                "line": 82,
+                "annotations": [],
+                "leadingComments": [],
+                "trailingComments": [],
                 "target": {
                   "type": "FieldReferenceNode",
                   "path": "application.status"
@@ -410,19 +497,24 @@
                   "type": "LiteralNode",
                   "valueType": "string",
                   "value": "rejected"
-                },
-                "line": 82
+                }
               },
               {
                 "type": "StopNode",
-                "line": 83
+                "line": 83,
+                "annotations": [],
+                "leadingComments": [],
+                "trailingComments": []
               }
             ],
-            "line": 81
-          },
-          "line": 77
+            "line": 81,
+            "annotations": [],
+            "leadingComments": [],
+            "trailingComments": []
+          }
         }
       ]
     }
-  ]
+  ],
+  "trailingComments": []
 }

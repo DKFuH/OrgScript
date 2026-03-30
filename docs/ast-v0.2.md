@@ -53,6 +53,8 @@ source text
 - `when` is modeled separately from `if`
 - policy `when ... then ...` becomes a trigger-response clause, not a generic `ThenNode`
 - `require` remains a first-class semantic node
+- allowlisted annotations attach directly to supported nodes
+- comments are preserved as AST trivia on supported nodes but remain non-semantic
 - the AST stays close to the authoring language for easier debugging
 
 ## Example shape

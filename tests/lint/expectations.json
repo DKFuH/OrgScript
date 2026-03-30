@@ -56,5 +56,18 @@
     "expectedCodes": [
       "lint.rule-missing-scope"
     ]
+  },
+  {
+    "file": "comment-hidden-logic.orgs",
+    "expectedSeverities": {
+      "lint.comment-hidden-business-rule": "warning",
+      "lint.comment-hidden-requirement": "warning",
+      "lint.comment-hidden-permission": "warning"
+    },
+    "expectedCodes": [
+      "lint.comment-hidden-business-rule",
+      "lint.comment-hidden-requirement",
+      "lint.comment-hidden-permission"
+    ]
   }
 ]

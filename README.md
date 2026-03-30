@@ -92,6 +92,36 @@ The main showcase flow is:
 - `event`: named triggers with reactions
 - `metric`: tracked business measures
 
+## Comments and Annotations
+
+OrgScript supports two documentation layers:
+
+- `# comment` for human-only notes
+- `@key "value"` for allowlisted structured metadata
+
+Comments are non-authoritative and excluded from canonical export, AI context, analysis, and machine-facing evaluation by default.
+
+Annotations are parseable metadata. In v1 the allowlist is:
+
+- `@note`
+- `@owner`
+- `@todo`
+- `@source`
+- `@status`
+- `@review`
+
+Example:
+
+```orgs
+# Shared lead qualification path for inbound leads.
+@owner "sales_ops"
+@status "active"
+process LeadQualification
+
+  # New leads enter the qualification flow when created.
+  when lead.created
+```
+
 ## CLI Quick Reference
 
 ```bash

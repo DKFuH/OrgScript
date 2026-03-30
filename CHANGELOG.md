@@ -6,6 +6,11 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 ## [Unreleased]
 
+- Added safe whole-line `#` comments for human-readable notes on supported blocks and statement lines.
+- Added allowlisted structured annotations via `@key "value"` with AST and canonical-model support.
+- Added lint protection for suspicious business-logic-like comments to keep comments non-authoritative.
+- Updated the formatter, diagnostics, specs, editor grammar, and tests for comments and annotations.
+
 ## [0.9.0-rc1] - 2026-03-29
 
 - Prepared OrgScript for public distribution as a release candidate with npm/package metadata aligned to `0.9.0-rc1`.

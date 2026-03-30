@@ -4,6 +4,12 @@
   "scopeName": "source.orgscript",
   "patterns": [
     {
+      "include": "#comments"
+    },
+    {
+      "include": "#annotations"
+    },
+    {
       "include": "#strings"
     },
     {
@@ -32,6 +38,34 @@
     }
   ],
   "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "match": "^(\\s*)(#).*$",
+          "captures": {
+            "2": {
+              "name": "punctuation.definition.comment.orgscript"
+            }
+          },
+          "name": "comment.line.number-sign.orgscript"
+        }
+      ]
+    },
+    "annotations": {
+      "patterns": [
+        {
+          "match": "^(\\s*)(@[a-z][a-z0-9_]*)(\\s+)(\"(?:[^\"\\\\]|\\\\.)*\")",
+          "captures": {
+            "2": {
+              "name": "storage.type.annotation.orgscript"
+            },
+            "4": {
+              "name": "string.quoted.double.orgscript"
+            }
+          }
+        }
+      ]
+    },
     "top-level-blocks": {
       "patterns": [
         {

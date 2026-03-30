@@ -186,7 +186,7 @@ function run(args) {
     // We package context even if not perfectly valid, so AI can help fix.
     // However, if we can't parse, we can only report diagnostics.
     if (!result.ok) {
-        console.log(JSON.stringify(toAiContext({ version: "0.2", body: [] }, validateReport.diagnostics), null, 2));
+        console.log(JSON.stringify(toAiContext({ version: "0.3", body: [] }, validateReport.diagnostics), null, 2));
         process.exit(1);
     }
 

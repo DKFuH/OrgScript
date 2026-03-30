@@ -75,6 +75,37 @@ Use `metric` to define a tracked business measure.
 - Use stable names.
 - Use English for public OrgScript files.
 - Avoid prose paragraphs inside OrgScript.
+- Use `#` comments for human notes only.
+- Use annotations for structured metadata such as `@owner "sales_ops"`.
+
+## Comments and annotations
+
+Use comments to help a reader orient themselves:
+
+```orgs
+# Shared lead qualification path for inbound leads.
+@owner "sales_ops"
+@status "active"
+process LeadQualification
+```
+
+In v1, comments and annotations must live on their own line and are intended for top-level blocks and statement lines.
+
+Do not hide rules in comments.
+
+Bad:
+
+```orgs
+# Always require deposit before confirmation.
+```
+
+Good:
+
+```orgs
+if order.deposit_received = false then
+  require finance_clearance
+  stop
+```
 
 ## Common authoring patterns
 

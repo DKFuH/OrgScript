@@ -33,6 +33,12 @@ Most new features do *not* belong in the language core. They belong in:
 
 If business logic can already be mapped deterministically into an exporter, the core language is doing its job and does not need to change.
 
+Comments and annotations follow the same rule:
+
+- comments are for human orientation only
+- annotations are metadata only unless the canonical spec says otherwise
+- neither may become a hidden second language for operational logic
+
 ## Handling breaking changes
 
 OrgScript follows a strict protocol for backwards-incompatible breaks:

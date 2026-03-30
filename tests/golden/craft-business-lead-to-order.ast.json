@@ -5,17 +5,28 @@
     {
       "type": "ProcessNode",
       "name": "CraftBusinessLeadToOrder",
+      "line": 1,
+      "annotations": [],
+      "leadingComments": [],
+      "trailingComments": [],
       "body": [
         {
           "type": "WhenNode",
+          "line": 3,
+          "annotations": [],
+          "leadingComments": [],
+          "trailingComments": [],
           "trigger": {
             "type": "FieldReferenceNode",
             "path": "lead.created"
-          },
-          "line": 3
+          }
         },
         {
           "type": "IfNode",
+          "line": 5,
+          "annotations": [],
+          "leadingComments": [],
+          "trailingComments": [],
           "condition": {
             "type": "ComparisonConditionNode",
             "left": {
@@ -33,6 +44,10 @@
           "then": [
             {
               "type": "AssignNode",
+              "line": 6,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
               "target": {
                 "type": "FieldReferenceNode",
                 "path": "lead.priority"
@@ -41,11 +56,14 @@
                 "type": "LiteralNode",
                 "valueType": "string",
                 "value": "high"
-              },
-              "line": 6
+              }
             },
             {
               "type": "AssignNode",
+              "line": 7,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
               "target": {
                 "type": "FieldReferenceNode",
                 "path": "lead.sales_path"
@@ -54,14 +72,16 @@
                 "type": "LiteralNode",
                 "valueType": "string",
                 "value": "premium"
-              },
-              "line": 7
+              }
             },
             {
               "type": "NotifyNode",
+              "line": 8,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
               "target": "sales",
-              "message": "Handle referral lead first",
-              "line": 8
+              "message": "Handle referral lead first"
             }
           ],
           "elseIf": [
@@ -84,6 +104,10 @@
               "then": [
                 {
                   "type": "AssignNode",
+                  "line": 11,
+                  "annotations": [],
+                  "leadingComments": [],
+                  "trailingComments": [],
                   "target": {
                     "type": "FieldReferenceNode",
                     "path": "lead.priority"
@@ -92,11 +116,14 @@
                     "type": "LiteralNode",
                     "valueType": "string",
                     "value": "low"
-                  },
-                  "line": 11
+                  }
                 },
                 {
                   "type": "AssignNode",
+                  "line": 12,
+                  "annotations": [],
+                  "leadingComments": [],
+                  "trailingComments": [],
                   "target": {
                     "type": "FieldReferenceNode",
                     "path": "lead.sales_path"
@@ -105,18 +132,23 @@
                     "type": "LiteralNode",
                     "valueType": "string",
                     "value": "standard"
-                  },
-                  "line": 12
+                  }
                 }
               ],
-              "line": 10
+              "line": 10,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": []
             }
           ],
-          "else": null,
-          "line": 5
+          "else": null
         },
         {
           "type": "IfNode",
+          "line": 14,
+          "annotations": [],
+          "leadingComments": [],
+          "trailingComments": [],
           "condition": {
             "type": "LogicalConditionNode",
             "operator": "and",
@@ -155,6 +187,10 @@
           "then": [
             {
               "type": "TransitionNode",
+              "line": 15,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
               "target": {
                 "type": "FieldReferenceNode",
                 "path": "lead.status"
@@ -163,26 +199,34 @@
                 "type": "LiteralNode",
                 "valueType": "string",
                 "value": "disqualified"
-              },
-              "line": 15
+              }
             },
             {
               "type": "NotifyNode",
+              "line": 16,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
               "target": "sales",
-              "message": "Outside target project type",
-              "line": 16
+              "message": "Outside target project type"
             },
             {
               "type": "StopNode",
-              "line": 17
+              "line": 17,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": []
             }
           ],
           "elseIf": [],
-          "else": null,
-          "line": 14
+          "else": null
         },
         {
           "type": "IfNode",
+          "line": 19,
+          "annotations": [],
+          "leadingComments": [],
+          "trailingComments": [],
           "condition": {
             "type": "ComparisonConditionNode",
             "left": {
@@ -200,6 +244,10 @@
           "then": [
             {
               "type": "TransitionNode",
+              "line": 20,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
               "target": {
                 "type": "FieldReferenceNode",
                 "path": "lead.status"
@@ -208,26 +256,34 @@
                 "type": "LiteralNode",
                 "valueType": "string",
                 "value": "disqualified"
-              },
-              "line": 20
+              }
             },
             {
               "type": "NotifyNode",
+              "line": 21,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
               "target": "sales",
-              "message": "Below minimum project value",
-              "line": 21
+              "message": "Below minimum project value"
             },
             {
               "type": "StopNode",
-              "line": 22
+              "line": 22,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": []
             }
           ],
           "elseIf": [],
-          "else": null,
-          "line": 19
+          "else": null
         },
         {
           "type": "TransitionNode",
+          "line": 24,
+          "annotations": [],
+          "leadingComments": [],
+          "trailingComments": [],
           "target": {
             "type": "FieldReferenceNode",
             "path": "lead.status"
@@ -236,11 +292,14 @@
             "type": "LiteralNode",
             "valueType": "string",
             "value": "qualified"
-          },
-          "line": 24
+          }
         },
         {
           "type": "AssignNode",
+          "line": 25,
+          "annotations": [],
+          "leadingComments": [],
+          "trailingComments": [],
           "target": {
             "type": "FieldReferenceNode",
             "path": "lead.owner"
@@ -249,25 +308,35 @@
             "type": "LiteralNode",
             "valueType": "string",
             "value": "sales"
-          },
-          "line": 25
+          }
         }
       ]
     },
     {
       "type": "ProcessNode",
       "name": "QuoteToOrder",
+      "line": 27,
+      "annotations": [],
+      "leadingComments": [],
+      "trailingComments": [],
       "body": [
         {
           "type": "WhenNode",
+          "line": 29,
+          "annotations": [],
+          "leadingComments": [],
+          "trailingComments": [],
           "trigger": {
             "type": "FieldReferenceNode",
             "path": "quote.accepted"
-          },
-          "line": 29
+          }
         },
         {
           "type": "IfNode",
+          "line": 31,
+          "annotations": [],
+          "leadingComments": [],
+          "trailingComments": [],
           "condition": {
             "type": "ComparisonConditionNode",
             "left": {
@@ -285,6 +354,10 @@
           "then": [
             {
               "type": "TransitionNode",
+              "line": 32,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
               "target": {
                 "type": "FieldReferenceNode",
                 "path": "order.status"
@@ -293,26 +366,34 @@
                 "type": "LiteralNode",
                 "valueType": "string",
                 "value": "awaiting_deposit"
-              },
-              "line": 32
+              }
             },
             {
               "type": "NotifyNode",
+              "line": 33,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
               "target": "finance",
-              "message": "Deposit required before confirmation",
-              "line": 33
+              "message": "Deposit required before confirmation"
             },
             {
               "type": "StopNode",
-              "line": 34
+              "line": 34,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": []
             }
           ],
           "elseIf": [],
-          "else": null,
-          "line": 31
+          "else": null
         },
         {
           "type": "TransitionNode",
+          "line": 36,
+          "annotations": [],
+          "leadingComments": [],
+          "trailingComments": [],
           "target": {
             "type": "FieldReferenceNode",
             "path": "order.status"
@@ -321,25 +402,34 @@
             "type": "LiteralNode",
             "valueType": "string",
             "value": "confirmed"
-          },
-          "line": 36
+          }
         },
         {
           "type": "CreateNode",
-          "entity": "production_order",
-          "line": 37
+          "line": 37,
+          "annotations": [],
+          "leadingComments": [],
+          "trailingComments": [],
+          "entity": "production_order"
         },
         {
           "type": "NotifyNode",
+          "line": 38,
+          "annotations": [],
+          "leadingComments": [],
+          "trailingComments": [],
           "target": "operations",
-          "message": "Order ready for production planning",
-          "line": 38
+          "message": "Order ready for production planning"
         }
       ]
     },
     {
       "type": "StateflowNode",
       "name": "OrderLifecycle",
+      "line": 40,
+      "annotations": [],
+      "leadingComments": [],
+      "trailingComments": [],
       "states": [
         {
           "type": "StateNode",
@@ -448,10 +538,18 @@
     {
       "type": "RuleNode",
       "name": "NoProductionWithoutDeposit",
+      "line": 64,
+      "annotations": [],
+      "leadingComments": [],
+      "trailingComments": [],
       "appliesTo": "order",
       "body": [
         {
           "type": "IfNode",
+          "line": 68,
+          "annotations": [],
+          "leadingComments": [],
+          "trailingComments": [],
           "condition": {
             "type": "ComparisonConditionNode",
             "left": {
@@ -469,21 +567,27 @@
           "then": [
             {
               "type": "RequireNode",
-              "requirement": "finance_clearance",
-              "line": 69
+              "line": 69,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
+              "requirement": "finance_clearance"
             },
             {
               "type": "NotifyNode",
+              "line": 70,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
               "target": "operations",
-              "message": "Production blocked until deposit is received",
-              "line": 70
+              "message": "Production blocked until deposit is received"
             }
           ],
           "elseIf": [],
-          "else": null,
-          "line": 68
+          "else": null
         }
       ]
     }
-  ]
+  ],
+  "trailingComments": []
 }

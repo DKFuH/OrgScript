@@ -22,6 +22,10 @@ function lex(source) {
     }
 
     if (!raw.trim()) {
+      lines.push({
+        type: "BlankLineToken",
+        line: lineNumber,
+      });
       continue;
     }
 
@@ -40,12 +44,69 @@ function lex(source) {
       );
     }
 
+    const trimmed = raw.trim();
+    const level = Math.floor(indent / 2);
+
+    if (trimmed.startsWith("#")) {
+      lines.push({
+        type: "CommentToken",
+        line: lineNumber,
+        indent,
+        level,
+        text: trimmed.slice(1).trimStart(),
+      });
+      continue;
+    }
+
+    if (trimmed.startsWith("@")) {
+      const match = trimmed.match(/^@([a-z][a-z0-9_]*)\s+"((?:[^"\\]|\\.)*)"$/);
+
+      if (!match) {
+        lines.push({
+          type: "InvalidLineToken",
+          line: lineNumber,
+          indent,
+          level,
+          code: "syntax.invalid-annotation",
+          message:
+            "Annotations must use the form `@key \"value\"` with a lowercase allowlisted key.",
+          text: trimmed,
+        });
+        continue;
+      }
+
+      lines.push({
+        type: "AnnotationToken",
+        line: lineNumber,
+        indent,
+        level,
+        key: match[1],
+        value: unescapeString(match[2]),
+      });
+      continue;
+    }
+
+    const inlineCommentIndex = findInlineCommentIndex(raw.slice(indent));
+    if (inlineCommentIndex >= 0) {
+      lines.push({
+        type: "InvalidLineToken",
+        line: lineNumber,
+        indent,
+        level,
+        code: "syntax.inline-comments-not-supported",
+        message:
+          "Inline `#` comments are not supported in v1. Place comments on their own line.",
+        text: trimmed,
+      });
+      continue;
+    }
+
     lines.push({
       type: "LineToken",
       line: lineNumber,
       indent,
-      level: Math.floor(indent / 2),
-      text: raw.trim(),
+      level,
+      text: trimmed,
     });
   }
 
@@ -53,6 +114,40 @@ function lex(source) {
     lines,
     issues,
   };
+}
+
+function findInlineCommentIndex(text) {
+  let inString = false;
+  let escaped = false;
+
+  for (let index = 0; index < text.length; index += 1) {
+    const character = text[index];
+
+    if (escaped) {
+      escaped = false;
+      continue;
+    }
+
+    if (character === "\\") {
+      escaped = true;
+      continue;
+    }
+
+    if (character === '"') {
+      inString = !inString;
+      continue;
+    }
+
+    if (character === "#" && !inString) {
+      return index;
+    }
+  }
+
+  return -1;
+}
+
+function unescapeString(text) {
+  return text.replace(/\\"/g, '"').replace(/\\\\/g, "\\");
 }
 
 module.exports = {

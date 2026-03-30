@@ -1,4 +1,6 @@
-(* Draft EBNF for OrgScript v0.1. Indentation handling is lexical and represented through INDENT/DEDENT tokens. *)
+(* Draft EBNF for OrgScript v0.1. Indentation handling is lexical and represented through INDENT/DEDENT tokens.
+   Whole-line comments use "#" and are treated as trivia.
+   Whole-line annotations use @key "value" and attach to the following supported block or statement. *)
 
 file            = { top_block } ;
 

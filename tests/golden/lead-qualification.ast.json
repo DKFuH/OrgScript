@@ -5,17 +5,72 @@
     {
       "type": "ProcessNode",
       "name": "LeadQualification",
+      "line": 4,
+      "annotations": [
+        {
+          "type": "AnnotationNode",
+          "key": "owner",
+          "value": "sales_ops",
+          "line": 2
+        },
+        {
+          "type": "AnnotationNode",
+          "key": "status",
+          "value": "active",
+          "line": 3
+        }
+      ],
+      "leadingComments": [
+        {
+          "type": "CommentNode",
+          "text": "Shared lead qualification path for inbound leads.",
+          "line": 1
+        }
+      ],
+      "trailingComments": [
+        {
+          "type": "CommentNode",
+          "text": "Sales can continue with the qualified lead.",
+          "line": 28
+        }
+      ],
       "body": [
         {
           "type": "WhenNode",
+          "line": 7,
+          "annotations": [],
+          "leadingComments": [
+            {
+              "type": "CommentNode",
+              "text": "New leads enter the qualification flow when created.",
+              "line": 6
+            }
+          ],
+          "trailingComments": [],
           "trigger": {
             "type": "FieldReferenceNode",
             "path": "lead.created"
-          },
-          "line": 3
+          }
         },
         {
           "type": "IfNode",
+          "line": 11,
+          "annotations": [
+            {
+              "type": "AnnotationNode",
+              "key": "note",
+              "value": "Track referral lead handling separately.",
+              "line": 10
+            }
+          ],
+          "leadingComments": [
+            {
+              "type": "CommentNode",
+              "text": "Referral leads follow the premium qualification path.",
+              "line": 9
+            }
+          ],
+          "trailingComments": [],
           "condition": {
             "type": "ComparisonConditionNode",
             "left": {
@@ -28,11 +83,15 @@
               "valueType": "string",
               "value": "referral"
             },
-            "line": 5
+            "line": 11
           },
           "then": [
             {
               "type": "AssignNode",
+              "line": 12,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
               "target": {
                 "type": "FieldReferenceNode",
                 "path": "lead.priority"
@@ -41,11 +100,14 @@
                 "type": "LiteralNode",
                 "valueType": "string",
                 "value": "high"
-              },
-              "line": 6
+              }
             },
             {
               "type": "AssignNode",
+              "line": 13,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
               "target": {
                 "type": "FieldReferenceNode",
                 "path": "lead.path"
@@ -54,14 +116,16 @@
                 "type": "LiteralNode",
                 "valueType": "string",
                 "value": "premium"
-              },
-              "line": 7
+              }
             },
             {
               "type": "NotifyNode",
+              "line": 14,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
               "target": "sales",
-              "message": "New referral lead",
-              "line": 8
+              "message": "New referral lead"
             }
           ],
           "elseIf": [
@@ -79,11 +143,15 @@
                   "valueType": "string",
                   "value": "ads"
                 },
-                "line": 10
+                "line": 16
               },
               "then": [
                 {
                   "type": "AssignNode",
+                  "line": 17,
+                  "annotations": [],
+                  "leadingComments": [],
+                  "trailingComments": [],
                   "target": {
                     "type": "FieldReferenceNode",
                     "path": "lead.priority"
@@ -92,11 +160,14 @@
                     "type": "LiteralNode",
                     "valueType": "string",
                     "value": "normal"
-                  },
-                  "line": 11
+                  }
                 },
                 {
                   "type": "AssignNode",
+                  "line": 18,
+                  "annotations": [],
+                  "leadingComments": [],
+                  "trailingComments": [],
                   "target": {
                     "type": "FieldReferenceNode",
                     "path": "lead.path"
@@ -105,18 +176,30 @@
                     "type": "LiteralNode",
                     "valueType": "string",
                     "value": "standard"
-                  },
-                  "line": 12
+                  }
                 }
               ],
-              "line": 10
+              "line": 16,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": []
             }
           ],
-          "else": null,
-          "line": 5
+          "else": null
         },
         {
           "type": "IfNode",
+          "line": 21,
+          "annotations": [
+            {
+              "type": "AnnotationNode",
+              "key": "review",
+              "value": "Revisit the budget threshold each quarter.",
+              "line": 20
+            }
+          ],
+          "leadingComments": [],
+          "trailingComments": [],
           "condition": {
             "type": "ComparisonConditionNode",
             "left": {
@@ -129,11 +212,15 @@
               "valueType": "number",
               "value": 10000
             },
-            "line": 14
+            "line": 21
           },
           "then": [
             {
               "type": "TransitionNode",
+              "line": 22,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
               "target": {
                 "type": "FieldReferenceNode",
                 "path": "lead.status"
@@ -142,26 +229,34 @@
                 "type": "LiteralNode",
                 "valueType": "string",
                 "value": "disqualified"
-              },
-              "line": 15
+              }
             },
             {
               "type": "NotifyNode",
+              "line": 23,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
               "target": "sales",
-              "message": "Budget below threshold",
-              "line": 16
+              "message": "Budget below threshold"
             },
             {
               "type": "StopNode",
-              "line": 17
+              "line": 24,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": []
             }
           ],
           "elseIf": [],
-          "else": null,
-          "line": 14
+          "else": null
         },
         {
           "type": "TransitionNode",
+          "line": 26,
+          "annotations": [],
+          "leadingComments": [],
+          "trailingComments": [],
           "target": {
             "type": "FieldReferenceNode",
             "path": "lead.status"
@@ -170,10 +265,10 @@
             "type": "LiteralNode",
             "valueType": "string",
             "value": "qualified"
-          },
-          "line": 19
+          }
         }
       ]
     }
-  ]
+  ],
+  "trailingComments": []
 }

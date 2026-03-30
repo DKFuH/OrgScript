@@ -1,0 +1,5 @@
+stateflow InvalidAnnotationTarget
+
+  @owner "ops"
+  states
+    draft

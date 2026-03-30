@@ -23,6 +23,8 @@ OrgScript is not a general-purpose programming language. It describes business l
 - Keywords are lowercase
 - Strings use double quotes
 - Suggested extension: `.orgs`
+- Comments use whole-line `# ...` form in v1
+- Structured annotations use whole-line `@key "value"` form in v1
 
 ## 3. Top-level blocks
 
@@ -69,6 +71,47 @@ The same keyword must keep the same primary meaning across the language.
 ## 6. Syntax contract
 
 OrgScript uses indentation-based blocks and lexical keywords. The reference grammar is defined in `spec/grammar.ebnf`.
+
+### 6.0 Comments and annotations
+
+OrgScript supports two non-executable documentation forms:
+
+- comments
+- annotations
+
+Comments:
+
+- begin with `#`
+- must occupy their own logical line in v1
+- are human-oriented only
+- are not authoritative business logic
+- do not change parsing semantics, semantic validation, analysis, or transition legality
+
+Annotations:
+
+- use `@key "value"`
+- attach to the immediately following supported block or statement
+- are parseable metadata
+- are non-semantic
+- are included in the AST and canonical model
+
+Supported annotation keys in v1:
+
+- `@note`
+- `@owner`
+- `@todo`
+- `@source`
+- `@status`
+- `@review`
+
+In v1, comments and annotations are supported on:
+
+- top-level block declarations
+- `when`
+- `if`
+- action statements such as `assign`, `transition`, `notify`, `create`, `update`, `require`, and `stop`
+
+They are not supported on list sections such as `states`, `transitions`, `can`, `cannot`, or raw field lines such as `formula`, `owner`, `target`, and `applies to`.
 
 ### 6.1 Processes
 
@@ -120,8 +163,12 @@ The canonical reading rules are:
 - `require` is a first-class prerequisite reference, not prose
 - `stop` ends the current branch
 - explicit values and branch order must be preserved
+- comments are ignored by semantic interpretation
+- annotations are metadata only and do not alter semantics
 
 OrgScript prefers explicit description over inference. If a statement is ambiguous, the language should favor a more explicit form rather than hidden defaults or shorthand.
+
+If business logic matters, it must be modeled in OrgScript constructs, not hidden in comments.
 
 ## 8. Canonical model
 
@@ -140,6 +187,8 @@ Canonical model guidelines:
 - preserve explicit identifiers and values exactly
 - keep the model close to the source AST
 - do not invent business semantics during export
+- include annotations on supported nodes
+- exclude comments
 
 Canonical node families include:
 
@@ -190,6 +239,10 @@ At minimum, validation should reject or flag:
 - undefined or illegal state transitions
 - empty blocks where content is required
 - duplicate top-level names within the same namespace, according to policy
+- malformed annotation syntax
+- unsupported annotation keys
+- misplaced annotations
+- inline `#` comments after code, which are intentionally unsupported in v1
 
 ## 11. Evolution policy
 

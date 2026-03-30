@@ -1,17 +1,34 @@
 {
-  "version": "0.2",
+  "version": "0.3",
   "type": "document",
   "body": [
     {
       "type": "process",
       "name": "LeadQualification",
+      "annotations": [
+        {
+          "key": "owner",
+          "value": "sales_ops"
+        },
+        {
+          "key": "status",
+          "value": "active"
+        }
+      ],
       "body": [
         {
           "type": "when",
+          "annotations": [],
           "trigger": "lead.created"
         },
         {
           "type": "if",
+          "annotations": [
+            {
+              "key": "note",
+              "value": "Track referral lead handling separately."
+            }
+          ],
           "condition": {
             "type": "comparison",
             "left": {
@@ -27,6 +44,7 @@
           "then": [
             {
               "type": "assign",
+              "annotations": [],
               "target": "lead.priority",
               "value": {
                 "type": "string",
@@ -35,6 +53,7 @@
             },
             {
               "type": "assign",
+              "annotations": [],
               "target": "lead.path",
               "value": {
                 "type": "string",
@@ -43,12 +62,14 @@
             },
             {
               "type": "notify",
+              "annotations": [],
               "target": "sales",
               "message": "New referral lead"
             }
           ],
           "elseIf": [
             {
+              "annotations": [],
               "condition": {
                 "type": "comparison",
                 "left": {
@@ -64,6 +85,7 @@
               "then": [
                 {
                   "type": "assign",
+                  "annotations": [],
                   "target": "lead.priority",
                   "value": {
                     "type": "string",
@@ -72,6 +94,7 @@
                 },
                 {
                   "type": "assign",
+                  "annotations": [],
                   "target": "lead.path",
                   "value": {
                     "type": "string",
@@ -85,6 +108,12 @@
         },
         {
           "type": "if",
+          "annotations": [
+            {
+              "key": "review",
+              "value": "Revisit the budget threshold each quarter."
+            }
+          ],
           "condition": {
             "type": "comparison",
             "left": {
@@ -100,6 +129,7 @@
           "then": [
             {
               "type": "transition",
+              "annotations": [],
               "target": "lead.status",
               "value": {
                 "type": "string",
@@ -108,11 +138,13 @@
             },
             {
               "type": "notify",
+              "annotations": [],
               "target": "sales",
               "message": "Budget below threshold"
             },
             {
-              "type": "stop"
+              "type": "stop",
+              "annotations": []
             }
           ],
           "elseIf": [],
@@ -120,6 +152,7 @@
         },
         {
           "type": "transition",
+          "annotations": [],
           "target": "lead.status",
           "value": {
             "type": "string",

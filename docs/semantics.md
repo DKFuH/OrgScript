@@ -36,6 +36,16 @@ The canonical model is the source for:
 - `require`: declares a prerequisite or approval requirement
 - `stop`: ends the current process branch
 
+## Comments and annotations
+
+- `#` comments are non-authoritative human notes.
+- Comments do not affect parsing semantics, semantic validation, analysis, canonical export, or transition legality.
+- `@key "value"` annotations are parseable metadata.
+- Annotations are included in the AST and canonical model.
+- Annotations are explicitly non-semantic in v1.
+
+If business logic matters, it must be modeled in OrgScript constructs instead of comments.
+
 ## `when`, `if`, and `then`
 
 - In a `process`, `when` names the entry trigger for the process.

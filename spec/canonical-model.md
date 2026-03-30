@@ -1,4 +1,4 @@
-# Canonical Model v0.2
+# Canonical Model v0.3
 
 OrgScript text compiles into a language-neutral canonical model. This model is the intermediate representation used by all exporters (JSON, Markdown, Mermaid, HTML) and analysis tools.
 
@@ -21,19 +21,27 @@ The top-level object represents an OrgScript document.
 
 ```json
 {
-  "version": "0.2",
+  "version": "0.3",
   "type": "document",
   "body": [
     {
       "type": "process",
       "name": "LeadQualification",
+      "annotations": [
+        {
+          "key": "owner",
+          "value": "sales_ops"
+        }
+      ],
       "body": [
         {
           "type": "when",
+          "annotations": [],
           "trigger": "lead.created"
         },
         {
           "type": "if",
+          "annotations": [],
           "condition": {
             "type": "comparison",
             "left": { "type": "field", "path": "lead.source" },
@@ -43,6 +51,7 @@ The top-level object represents an OrgScript document.
           "then": [
             {
               "type": "assign",
+              "annotations": [],
               "target": "lead.priority",
               "value": { "type": "string", "value": "high" }
             }
@@ -78,6 +87,13 @@ The top-level object represents an OrgScript document.
 - `require`: Declares a dependency or mandatory check.
 - `stop`: Terminates execution of the current branch/block.
 
+## Comments and annotations
+
+- Comments are excluded from the canonical model.
+- Supported nodes may expose an `annotations` array.
+- Annotations are metadata only. They do not affect execution semantics, transition legality, or analysis metrics.
+- Exporters may choose whether to render annotations in human-facing artifacts, but comments remain excluded by default.
+
 ## Stability Policy
 
-As of v0.6.0, the canonical model structure is considered stable for the current feature set. Breaking changes to the JSON schema will trigger a minor version bump (e.g., v0.2 to v0.3). Tooling developers should check the `version` field.
+As of v0.9.0-rc1, the canonical model structure is considered stable for the current feature set. Breaking changes to the JSON schema will trigger a minor version bump (e.g., v0.3 to v0.4). Tooling developers should check the `version` field.

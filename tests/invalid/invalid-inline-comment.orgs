@@ -1,0 +1,3 @@
+process InvalidInlineComment
+
+  when lead.created # not supported

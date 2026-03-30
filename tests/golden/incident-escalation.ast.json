@@ -5,6 +5,10 @@
     {
       "type": "StateflowNode",
       "name": "IncidentLifecycle",
+      "line": 1,
+      "annotations": [],
+      "leadingComments": [],
+      "trailingComments": [],
       "states": [
         {
           "type": "StateNode",
@@ -79,6 +83,10 @@
     {
       "type": "RoleNode",
       "name": "OnCallEngineer",
+      "line": 19,
+      "annotations": [],
+      "leadingComments": [],
+      "trailingComments": [],
       "can": [
         {
           "type": "PermissionNode",
@@ -106,6 +114,10 @@
     {
       "type": "RoleNode",
       "name": "IncidentManager",
+      "line": 27,
+      "annotations": [],
+      "leadingComments": [],
+      "trailingComments": [],
       "can": [
         {
           "type": "PermissionNode",
@@ -128,6 +140,10 @@
     {
       "type": "PolicyNode",
       "name": "EscalationPolicy",
+      "line": 34,
+      "annotations": [],
+      "leadingComments": [],
+      "trailingComments": [],
       "clauses": [
         {
           "type": "PolicyClauseNode",
@@ -169,17 +185,26 @@
           "body": [
             {
               "type": "RequireNode",
-              "requirement": "triage_sla",
-              "line": 38
+              "line": 38,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
+              "requirement": "triage_sla"
             },
             {
               "type": "NotifyNode",
+              "line": 39,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
               "target": "on_call_manager",
-              "message": "SLA Warning: High severity incident untriaged",
-              "line": 39
+              "message": "SLA Warning: High severity incident untriaged"
             }
           ],
-          "line": 36
+          "line": 36,
+          "annotations": [],
+          "leadingComments": [],
+          "trailingComments": []
         },
         {
           "type": "PolicyClauseNode",
@@ -200,33 +225,53 @@
           "body": [
             {
               "type": "RequireNode",
-              "requirement": "regular_status_updates",
-              "line": 43
+              "line": 43,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
+              "requirement": "regular_status_updates"
             }
           ],
-          "line": 41
+          "line": 41,
+          "annotations": [],
+          "leadingComments": [],
+          "trailingComments": []
         }
       ]
     },
     {
       "type": "ProcessNode",
       "name": "IncidentHandling",
+      "line": 45,
+      "annotations": [],
+      "leadingComments": [],
+      "trailingComments": [],
       "body": [
         {
           "type": "WhenNode",
+          "line": 47,
+          "annotations": [],
+          "leadingComments": [],
+          "trailingComments": [],
           "trigger": {
             "type": "FieldReferenceNode",
             "path": "system.alert_received"
-          },
-          "line": 47
+          }
         },
         {
           "type": "CreateNode",
-          "entity": "incident",
-          "line": 49
+          "line": 49,
+          "annotations": [],
+          "leadingComments": [],
+          "trailingComments": [],
+          "entity": "incident"
         },
         {
           "type": "AssignNode",
+          "line": 50,
+          "annotations": [],
+          "leadingComments": [],
+          "trailingComments": [],
           "target": {
             "type": "FieldReferenceNode",
             "path": "incident.severity"
@@ -235,11 +280,14 @@
             "type": "LiteralNode",
             "valueType": "string",
             "value": "medium"
-          },
-          "line": 50
+          }
         },
         {
           "type": "TransitionNode",
+          "line": 51,
+          "annotations": [],
+          "leadingComments": [],
+          "trailingComments": [],
           "target": {
             "type": "FieldReferenceNode",
             "path": "incident.status"
@@ -248,11 +296,14 @@
             "type": "LiteralNode",
             "valueType": "string",
             "value": "open"
-          },
-          "line": 51
+          }
         },
         {
           "type": "IfNode",
+          "line": 53,
+          "annotations": [],
+          "leadingComments": [],
+          "trailingComments": [],
           "condition": {
             "type": "ComparisonConditionNode",
             "left": {
@@ -270,6 +321,10 @@
           "then": [
             {
               "type": "AssignNode",
+              "line": 54,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
               "target": {
                 "type": "FieldReferenceNode",
                 "path": "incident.severity"
@@ -278,22 +333,27 @@
                 "type": "LiteralNode",
                 "valueType": "string",
                 "value": "high"
-              },
-              "line": 54
+              }
             },
             {
               "type": "NotifyNode",
+              "line": 55,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
               "target": "on_call_team",
-              "message": "Critical alert detected",
-              "line": 55
+              "message": "Critical alert detected"
             }
           ],
           "elseIf": [],
-          "else": null,
-          "line": 53
+          "else": null
         },
         {
           "type": "IfNode",
+          "line": 57,
+          "annotations": [],
+          "leadingComments": [],
+          "trailingComments": [],
           "condition": {
             "type": "ComparisonConditionNode",
             "left": {
@@ -311,6 +371,10 @@
           "then": [
             {
               "type": "AssignNode",
+              "line": 58,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
               "target": {
                 "type": "FieldReferenceNode",
                 "path": "incident.primary_responder"
@@ -319,11 +383,14 @@
                 "type": "LiteralNode",
                 "valueType": "string",
                 "value": "on_call_engineer"
-              },
-              "line": 58
+              }
             },
             {
               "type": "TransitionNode",
+              "line": 59,
+              "annotations": [],
+              "leadingComments": [],
+              "trailingComments": [],
               "target": {
                 "type": "FieldReferenceNode",
                 "path": "incident.status"
@@ -332,8 +399,7 @@
                 "type": "LiteralNode",
                 "valueType": "string",
                 "value": "investigating"
-              },
-              "line": 59
+              }
             }
           ],
           "elseIf": [],
@@ -342,16 +408,22 @@
             "body": [
               {
                 "type": "NotifyNode",
+                "line": 62,
+                "annotations": [],
+                "leadingComments": [],
+                "trailingComments": [],
                 "target": "incident_manager",
-                "message": "Incident requiring triage",
-                "line": 62
+                "message": "Incident requiring triage"
               }
             ],
-            "line": 61
-          },
-          "line": 57
+            "line": 61,
+            "annotations": [],
+            "leadingComments": [],
+            "trailingComments": []
+          }
         }
       ]
     }
-  ]
+  ],
+  "trailingComments": []
 }

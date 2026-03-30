@@ -65,6 +65,16 @@ Examples:
 - `semantic.transition-target-undeclared`
 - `lint.process-multiple-triggers`
 - `format.not-canonical`
+- `syntax.invalid-annotation`
+- `syntax.dangling-annotation`
+- `syntax.annotation-target-not-supported`
+- `syntax.comment-target-not-supported`
+- `syntax.inline-comments-not-supported`
+- `semantic.unsupported-annotation-key`
+- `semantic.duplicate-annotation-key`
+- `lint.comment-hidden-business-rule`
+- `lint.comment-hidden-requirement`
+- `lint.comment-hidden-permission`
 
 ## Top-level JSON structure
 
@@ -215,6 +225,35 @@ If `lint` cannot run because the file is syntactically or semantically invalid, 
 If canonical formatting differs, `format --check --json` returns an `error` diagnostic with code `format.not-canonical`.
 
 If the input file is invalid, the response stays `command: "format"` and returns syntax or semantic diagnostics with `inputValid: false`.
+
+## Comments and annotations
+
+Comments:
+
+- start with whole-line `#`
+- are excluded from canonical export
+- are excluded from AI context by default
+- do not appear in JSON diagnostics unless the comment itself causes a lint finding
+
+Annotations:
+
+- use `@key "value"`
+- are validated for syntax and allowlisted keys
+- appear in the canonical model when valid
+- are non-semantic metadata
+
+Typical annotation and comment-related diagnostics:
+
+- `syntax.invalid-annotation`
+- `syntax.dangling-annotation`
+- `syntax.annotation-target-not-supported`
+- `syntax.comment-target-not-supported`
+- `syntax.inline-comments-not-supported`
+- `semantic.unsupported-annotation-key`
+- `semantic.duplicate-annotation-key`
+- `lint.comment-hidden-business-rule`
+- `lint.comment-hidden-requirement`
+- `lint.comment-hidden-permission`
 
 ## Text output contract
 

@@ -8,6 +8,34 @@ OrgScript uses indentation-based blocks and a small set of reserved keywords.
 - Suggested extension: `.orgs`
 - UTF-8
 - Spaces for indentation
+- Whole-line comments use `#`
+- Whole-line annotations use `@key "value"`
+
+## Comments and annotations
+
+Comments are human-readable notes:
+
+```orgs
+# This note explains the flow to human readers.
+process LeadQualification
+```
+
+Annotations are structured metadata:
+
+```orgs
+@owner "sales_ops"
+@status "active"
+process LeadQualification
+```
+
+Rules for v1:
+
+- comments must be on their own line
+- inline `#` comments after code are intentionally unsupported
+- annotations must use `@key "value"`
+- supported annotation keys are `@note`, `@owner`, `@todo`, `@source`, `@status`, and `@review`
+- comments and annotations may attach to top-level blocks and statement lines
+- comments and annotations are not supported on `states`, `transitions`, `can`, `cannot`, `formula`, `owner`, `target`, or `applies to` lines in v1
 
 ## Top-level blocks
 
