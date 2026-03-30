@@ -15,6 +15,9 @@
     "url": "https://github.com/DKFuH/OrgScript/issues"
   },
   "homepage": "https://github.com/DKFuH/OrgScript#readme",
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [
     "business-logic",
     "workflow-language",
