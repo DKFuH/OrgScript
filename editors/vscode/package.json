@@ -2,7 +2,7 @@
   "name": "orgscript-vscode",
   "displayName": "OrgScript",
   "description": "Minimal VS Code language support for OrgScript (.orgs) files.",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "publisher": "dkfuh",
   "icon": "icon.png",
   "repository": {

@@ -6,6 +6,12 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 ## [Unreleased]
 
+## [0.9.2] - 2026-03-30
+
+- Normalized npm publish metadata so `bin.orgscript` and `repository.url` no longer require npm auto-correction during publish.
+- Kept `NOTICE` in the published package and tightened package keywords for npm/package discovery.
+- Confirmed publish readiness through `npm publish --dry-run` and local global-install verification from the packaged tarball.
+
 ## [0.9.1] - 2026-03-30
 
 - Added safe whole-line `#` comments for human-readable notes on supported blocks and statement lines.
