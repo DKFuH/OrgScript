@@ -91,4 +91,6 @@
 ### Flow Summary
 - transition `application.status` to `"received"` and notify `hr_team` with `"New candidate application"`.
 - If `candidate.role_match_score > 70`, transition `application.status` to `"screening"` and assign `application.assigned_to` to `"hiring_manager"`.
+- Otherwise, transition `application.status` to `"rejected"`, notify `candidate` with `"Thank you for your interest"`, and stop execution.
 - If `application.screening_outcome = "positive"`, transition `application.status` to `"interview-round-1"` and create `interview_invite`.
+- Otherwise, transition `application.status` to `"rejected"` and stop execution.

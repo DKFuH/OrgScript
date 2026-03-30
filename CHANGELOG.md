@@ -6,10 +6,16 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-03-30
+
 - Added safe whole-line `#` comments for human-readable notes on supported blocks and statement lines.
 - Added allowlisted structured annotations via `@key "value"` with AST and canonical-model support.
 - Added lint protection for suspicious business-logic-like comments to keep comments non-authoritative.
 - Updated the formatter, diagnostics, specs, editor grammar, and tests for comments and annotations.
+- Added optional annotation rendering for Markdown and HTML export via `--with-annotations`.
+- Added an explicit annotation metadata block to `export context` for AI and tooling consumers.
+- Added VS Code snippets plus small language-configuration improvements for comments and annotations.
+- Rewrote the DE/EN handbooks on the current language and tooling surface and removed legacy `.docx` artifacts.
 
 ## [0.9.0-rc1] - 2026-03-29
 

@@ -66,3 +66,4 @@
 - create `incident`, assign `incident.severity` to `"medium"`, and transition `incident.status` to `"open"`.
 - If `alert.source = "critical_infrastructure"`, assign `incident.severity` to `"high"` and notify `on_call_team` with `"Critical alert detected"`.
 - If `incident.status = "triaged"`, assign `incident.primary_responder` to `"on_call_engineer"` and transition `incident.status` to `"investigating"`.
+- Otherwise, notify `incident_manager` with `"Incident requiring triage"`.

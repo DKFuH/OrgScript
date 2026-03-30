@@ -46,8 +46,10 @@ flowchart TD
   class p2_action_10 action
   p2_action_11["transition incident.status to 'investigating'"]
   class p2_action_11 action
-  p2_end_12(["done"])
-  class p2_end_12 success
+  p2_action_12["notify incident_manager with #quot;Incident requiring triage#quot;"]
+  class p2_action_12 action
+  p2_end_13(["done"])
+  class p2_end_13 success
   p2_start_1 --> p2_trigger_2
   p2_trigger_2 --> p2_action_3
   p2_action_3 --> p2_action_4
@@ -59,8 +61,9 @@ flowchart TD
   p2_decision_6 -->|no| p2_decision_9
   p2_decision_9 -->|yes| p2_action_10
   p2_action_10 --> p2_action_11
-  p2_action_11 --> p2_end_12
-  p2_decision_9 -->|no| p2_end_12
+  p2_decision_9 -->|no| p2_action_12
+  p2_action_11 --> p2_end_13
+  p2_action_12 --> p2_end_13
 
   %% Styling
   classDef trigger fill:#f0f4ff,stroke:#5c7cfa,stroke-width:2px
