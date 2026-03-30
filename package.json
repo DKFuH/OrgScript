@@ -17,9 +17,12 @@
   "homepage": "https://github.com/DKFuH/OrgScript#readme",
   "keywords": [
     "business-logic",
-    "documentation",
-    "mermaid",
-    "markdown",
+    "workflow-language",
+    "specification-language",
+    "domain-specific-language",
+    "state-machines",
+    "ai-tools",
+    "developer-tools",
     "operational-logic",
     "automation"
   ],
@@ -28,6 +31,7 @@
     "src/",
     "spec/",
     "LICENSE",
+    "NOTICE",
     "README.md",
     "CHANGELOG.md"
   ],
