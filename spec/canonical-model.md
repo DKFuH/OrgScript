@@ -93,6 +93,7 @@ The top-level object represents an OrgScript document.
 - Supported nodes may expose an `annotations` array.
 - Annotations are metadata only. They do not affect execution semantics, transition legality, or analysis metrics.
 - Exporters may choose whether to render annotations in human-facing artifacts, but comments remain excluded by default.
+- `export context` may additionally surface annotations in a dedicated metadata block for downstream AI/tooling consumers.
 
 ## Stability Policy
 

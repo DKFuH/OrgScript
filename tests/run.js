@@ -9,6 +9,7 @@ const { buildModel } = require("../src/validate");
 const { toCanonicalModel } = require("../src/export-json");
 const { toMarkdownSummary } = require("../src/export-markdown");
 const { toMermaidMarkdown } = require("../src/export-mermaid");
+const { toHtmlDocumentation } = require("../src/export-html");
 const { toAiContext } = require("../src/export-context");
 const { analyzeDocument } = require("../src/analyze");
 const { lintDocument, renderLintReport, summarizeFindings } = require("../src/linter");
@@ -32,8 +33,10 @@ function run() {
   testCheckCommand();
   testMermaidExport();
   testMarkdownExport();
+  testHtmlExport();
   testMarkdownExporterAdditionalBlockKinds();
   testCommentsAndAnnotations();
+  testVsCodeArtifacts();
   console.log("All tests passed.");
 }
 
@@ -56,13 +59,15 @@ function testGoldenSnapshots() {
     const modelPath = path.join(goldenDir, `${baseName}.model.json`);
     const formattedPath = path.join(goldenDir, `${baseName}.formatted.orgs`);
     const summaryPath = path.join(goldenDir, `${baseName}.summary.md`);
+    const annotatedSummaryPath = path.join(goldenDir, `${baseName}.summary.annotations.md`);
     const mermaidPath = path.join(goldenDir, `${baseName}.mermaid.md`);
+    const canonicalModel = toCanonicalModel(result.ast);
 
     const actualAst = JSON.stringify(normalizeAst(result.ast), null, 2);
     const expectedAst = fs.readFileSync(astPath, "utf8").trimEnd();
     assert.strictEqual(actualAst, expectedAst, `AST snapshot mismatch for ${file}`);
 
-    const actualModel = JSON.stringify(toCanonicalModel(result.ast), null, 2);
+    const actualModel = JSON.stringify(canonicalModel, null, 2);
     const expectedModel = fs.readFileSync(modelPath, "utf8").trimEnd();
     assert.strictEqual(actualModel, expectedModel, `Model snapshot mismatch for ${file}`);
 
@@ -75,12 +80,24 @@ function testGoldenSnapshots() {
     );
 
     if (fs.existsSync(summaryPath)) {
-      const actualSummary = toMarkdownSummary(toCanonicalModel(result.ast));
+      const actualSummary = toMarkdownSummary(canonicalModel);
       const expectedSummary = fs.readFileSync(summaryPath, "utf8");
       assert.strictEqual(
         actualSummary,
         expectedSummary,
         `Markdown summary snapshot mismatch for ${file}`
+      );
+    }
+
+    if (fs.existsSync(annotatedSummaryPath)) {
+      const actualAnnotatedSummary = toMarkdownSummary(canonicalModel, {
+        includeAnnotations: true,
+      });
+      const expectedAnnotatedSummary = fs.readFileSync(annotatedSummaryPath, "utf8");
+      assert.strictEqual(
+        actualAnnotatedSummary,
+        expectedAnnotatedSummary,
+        `Annotated Markdown summary snapshot mismatch for ${file}`
       );
     }
 
@@ -367,6 +384,23 @@ function testCliDiagnosticsAndExitCodes() {
     "Expected Markdown export heading"
   );
 
+  const exportMarkdownWithAnnotations = runCli([
+    cliPath,
+    "export",
+    "markdown",
+    "./examples/lead-qualification.orgs",
+    "--with-annotations",
+  ]);
+  assert.strictEqual(exportMarkdownWithAnnotations.status, 0, "Expected annotated Markdown export to succeed");
+  assert.ok(
+    exportMarkdownWithAnnotations.stdout.includes("### Metadata"),
+    "Expected annotated Markdown export metadata section"
+  );
+  assert.ok(
+    exportMarkdownWithAnnotations.stdout.includes('@note="Track referral lead handling separately."'),
+    "Expected inline statement annotations in Markdown export"
+  );
+
   const exportMermaid = runCli([
     cliPath,
     "export",
@@ -388,6 +422,22 @@ function testCliDiagnosticsAndExitCodes() {
   assert.strictEqual(exportContext.status, 0, "Expected export context to succeed");
   const exportContextPayload = JSON.parse(exportContext.stdout);
   assert.strictEqual(exportContextPayload.source.model.version, "0.3");
+  assert.strictEqual(exportContextPayload.source.metadata.commentsIncluded, false);
+  assert.ok(exportContextPayload.source.metadata.annotations.total > 0);
+  assert.strictEqual(exportContextPayload.source.metadata.annotations.keys.owner, 1);
+  assert.strictEqual(exportContextPayload.source.metadata.annotations.keys.status, 1);
+  assert.ok(
+    exportContextPayload.source.metadata.annotations.entries.some(
+      (entry) => entry.path === "process:LeadQualification" && entry.key === "owner"
+    ),
+    "Expected top-level annotation entry in AI context metadata"
+  );
+  assert.ok(
+    exportContextPayload.source.metadata.annotations.entries.some(
+      (entry) => entry.path === "process:LeadQualification.body[1]" && entry.key === "note"
+    ),
+    "Expected statement annotation entry in AI context metadata"
+  );
   assert.ok(
     JSON.stringify(exportContextPayload).includes('"status"'),
     "Expected annotations to survive in AI context via canonical model"
@@ -678,6 +728,35 @@ function testMarkdownExport() {
   }
 }
 
+function testHtmlExport() {
+  const cliPath = path.join(repoRoot, "bin", "orgscript.js");
+
+  const exported = runCli([cliPath, "export", "html", "./examples/lead-qualification.orgs"]);
+  assert.strictEqual(exported.status, 0, "Expected HTML export to succeed");
+  assert.ok(exported.stdout.includes("<!DOCTYPE html>"), "Expected HTML document output");
+  assert.ok(
+    !exported.stdout.includes("<strong>Metadata:</strong>"),
+    "Expected default HTML export to omit annotations"
+  );
+
+  const exportedWithAnnotations = runCli([
+    cliPath,
+    "export",
+    "html",
+    "./examples/lead-qualification.orgs",
+    "--with-annotations",
+  ]);
+  assert.strictEqual(exportedWithAnnotations.status, 0, "Expected annotated HTML export to succeed");
+  assert.ok(
+    exportedWithAnnotations.stdout.includes("<strong>Metadata:</strong>"),
+    "Expected annotated HTML export metadata block"
+  );
+  assert.ok(
+    exportedWithAnnotations.stdout.includes("@owner"),
+    "Expected annotated HTML export to include annotation keys"
+  );
+}
+
 function testMarkdownExporterAdditionalBlockKinds() {
   const model = {
     version: "0.3",
@@ -742,9 +821,44 @@ function testCommentsAndAnnotations() {
   const context = toAiContext(canonical, []);
   const contextSerialized = JSON.stringify(context);
   assert.ok(contextSerialized.includes('"status"'), "Expected annotations in AI context");
+  assert.strictEqual(context.source.metadata.commentsIncluded, false);
+  assert.strictEqual(context.source.metadata.annotations.total, 4);
+  assert.strictEqual(context.source.metadata.annotations.keys.owner, 1);
+  assert.strictEqual(context.source.metadata.annotations.keys.status, 1);
+  assert.ok(
+    context.source.metadata.annotations.entries.some(
+      (entry) => entry.path === "process:LeadQualification.body[1]" && entry.key === "note"
+    ),
+    "Expected process statement annotation in AI context metadata"
+  );
   assert.ok(
     !contextSerialized.includes("Shared lead qualification path"),
     "Expected comments to stay out of AI context"
+  );
+
+  const defaultSummary = toMarkdownSummary(canonical);
+  assert.ok(
+    !defaultSummary.includes("### Metadata"),
+    "Expected default Markdown summary to omit annotations"
+  );
+  const annotatedSummary = toMarkdownSummary(canonical, { includeAnnotations: true });
+  assert.ok(
+    annotatedSummary.includes("### Metadata"),
+    "Expected annotated Markdown summary to include metadata"
+  );
+  assert.ok(
+    annotatedSummary.includes('@review="Revisit the budget threshold each quarter."'),
+    "Expected annotated Markdown summary to include inline annotations"
+  );
+
+  const defaultHtml = toHtmlDocumentation(canonical, "Lead Qualification");
+  assert.ok(!defaultHtml.includes("<strong>Metadata:</strong>"), "Expected default HTML to omit annotations");
+  const annotatedHtml = toHtmlDocumentation(canonical, "Lead Qualification", {
+    includeAnnotations: true,
+  });
+  assert.ok(
+    annotatedHtml.includes("<strong>Metadata:</strong>"),
+    "Expected annotated HTML to include metadata"
   );
 
   const analysis = analyzeDocument(canonical);
@@ -754,6 +868,38 @@ function testCommentsAndAnnotations() {
     1,
     "Expected analysis metrics to ignore annotations/comments"
   );
+}
+
+function testVsCodeArtifacts() {
+  const vscodeDir = path.join(repoRoot, "editors", "vscode");
+  const extensionManifest = JSON.parse(
+    fs.readFileSync(path.join(vscodeDir, "package.json"), "utf8")
+  );
+  const languageConfig = JSON.parse(
+    fs.readFileSync(path.join(vscodeDir, "language-configuration.json"), "utf8")
+  );
+  const snippets = JSON.parse(
+    fs.readFileSync(path.join(vscodeDir, "snippets", "orgscript.code-snippets"), "utf8")
+  );
+  const grammar = JSON.parse(
+    fs.readFileSync(path.join(vscodeDir, "syntaxes", "orgscript.tmLanguage.json"), "utf8")
+  );
+
+  assert.strictEqual(extensionManifest.contributes.languages[0].id, "orgscript");
+  assert.ok(
+    extensionManifest.contributes.snippets.some(
+      (entry) => entry.path === "./snippets/orgscript.code-snippets"
+    ),
+    "Expected VS Code extension to contribute OrgScript snippets"
+  );
+  assert.strictEqual(languageConfig.comments.lineComment, "#");
+  assert.ok(
+    typeof languageConfig.indentationRules.increaseIndentPattern === "string",
+    "Expected VS Code language configuration indentation rules"
+  );
+  assert.ok(snippets["OrgScript Annotation"], "Expected annotation snippet");
+  assert.ok(snippets["OrgScript Process Block"], "Expected process snippet");
+  assert.strictEqual(grammar.scopeName, "source.orgscript");
 }
 
 function runCli(args) {

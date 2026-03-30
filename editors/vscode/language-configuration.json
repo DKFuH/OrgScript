@@ -17,5 +17,9 @@
       "\""
     ]
   ],
+  "indentationRules": {
+    "increaseIndentPattern": "^\\s*(?:(?:process|stateflow|rule|role|policy|metric|event)\\b.*|(?:states|transitions|can|cannot)\\s*$|(?:if|else\\s+if)\\b.*\\bthen\\s*$|else\\s*$)",
+    "decreaseIndentPattern": "^\\s*(?:else\\b|else\\s+if\\b.*\\bthen\\s*)$"
+  },
   "wordPattern": "(@?[A-Za-z_][A-Za-z0-9_.-]*)|(-?\\d+(?:\\.\\d+)?)"
 }

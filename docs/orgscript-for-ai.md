@@ -22,6 +22,8 @@ Do not treat it as free-form natural language.
 - `#` comments are non-authoritative and must not be treated as business logic.
 - allowlisted annotations are metadata only.
 - comments are excluded from canonical export and AI context by default
+- `export context` exposes annotations again under an explicit `source.metadata.annotations` block.
+- human-facing exports only render annotations when explicitly requested.
 
 ## Core semantic distinctions
 

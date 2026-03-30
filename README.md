@@ -122,6 +122,12 @@ process LeadQualification
   when lead.created
 ```
 
+Export behavior:
+
+- `orgscript export markdown <file>` and `orgscript export html <file>` omit annotation callouts by default.
+- Add `--with-annotations` to Markdown or HTML export when you want allowlisted `@annotations` rendered in the generated documentation artifact.
+- `orgscript export context <file>` includes explicit annotation metadata in the structured context payload so downstream AI/indexing consumers do not need to recover it from prose.
+
 ## CLI Quick Reference
 
 ```bash
@@ -135,6 +141,14 @@ orgscript export mermaid <file>
 orgscript export html <file>
 orgscript export context <file>
 orgscript analyze <file> [--json]
+```
+
+Examples:
+
+```bash
+orgscript export markdown ./examples/lead-qualification.orgs --with-annotations
+orgscript export html ./examples/lead-qualification.orgs --with-annotations
+orgscript export context ./examples/lead-qualification.orgs
 ```
 
 ## Developer Path

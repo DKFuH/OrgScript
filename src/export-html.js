@@ -1,7 +1,7 @@
 const { toMermaidMarkdown } = require("./export-mermaid");
 
-function toHtmlDocumentation(model, title = "OrgScript Documentation") {
-  const sections = model.body.map((node) => renderNode(node)).filter(Boolean);
+function toHtmlDocumentation(model, title = "OrgScript Documentation", options = {}) {
+  const sections = model.body.map((node) => renderNode(node, options)).filter(Boolean);
 
   const toc = model.body
     .map((node) => {
@@ -141,7 +141,7 @@ function toHtmlDocumentation(model, title = "OrgScript Documentation") {
   return html;
 }
 
-function renderNode(node) {
+function renderNode(node, options) {
   const id = toAnchor(node);
   const kind = toKindLabel(node.type);
   const mermaid = getMermaidForNode(node);
@@ -151,7 +151,7 @@ function renderNode(node) {
       <span class="kind">${escapeHtml(kind)}</span>
       <h2>${escapeHtml(node.name)}</h2>
       <div class="summary-container">
-        ${renderSummary(node)}
+        ${renderSummary(node, options)}
       </div>
       ${mermaid ? `<div class="visual-container"><h3>Diagram</h3><pre class="mermaid">${escapeHtml(mermaid)}</pre></div>` : ""}
     </section>
@@ -165,9 +165,12 @@ function getMermaidForNode(node) {
   return match ? match[1] : null;
 }
 
-function renderSummary(node) {
+function renderSummary(node, options = {}) {
+  const metadata = renderAnnotationHtml(node, options);
+
   if (node.type === "role") {
     return `
+      ${metadata}
       <p><strong>Permissions:</strong></p>
       <ul>${(node.can || []).map((permission) => `<li>Can perform <code>${escapeHtml(permission)}</code></li>`).join("")}</ul>
       ${(node.cannot || []).length > 0 ? `<ul>${node.cannot.map((permission) => `<li>Cannot perform <code>${escapeHtml(permission)}</code></li>`).join("")}</ul>` : ""}
@@ -176,6 +179,7 @@ function renderSummary(node) {
 
   if (node.type === "stateflow") {
     return `
+      ${metadata}
       <p><strong>States:</strong> ${(node.states || []).map((state) => `<code>${escapeHtml(state)}</code>`).join(", ")}</p>
       <p><strong>Transitions:</strong> ${(node.transitions || []).length} paths defined.</p>
     `;
@@ -183,6 +187,7 @@ function renderSummary(node) {
 
   if (node.type === "rule") {
     return `
+      ${metadata}
       <p><strong>Scope:</strong> Applies to <code>${escapeHtml(node.appliesTo || "universal")}</code></p>
       <p>Contains behavioral constraints and logic for <code>${escapeHtml(node.name)}</code>.</p>
     `;
@@ -191,12 +196,13 @@ function renderSummary(node) {
   if (node.type === "process") {
     const triggers = (node.body || []).filter((statement) => statement.type === "when");
     return `
+      ${metadata}
       <p><strong>Triggered by:</strong> ${triggers.length > 0 ? triggers.map((trigger) => `<code>${escapeHtml(trigger.trigger)}</code>`).join(", ") : "<em>No explicit trigger</em>"}</p>
       <p>Orchestrates business logic and state transitions for the <code>${escapeHtml(node.name)}</code> process.</p>
     `;
   }
 
-  return `<p>Operational constraints and logic for <code>${escapeHtml(node.name)}</code>.</p>`;
+  return `${metadata}<p>Operational constraints and logic for <code>${escapeHtml(node.name)}</code>.</p>`;
 }
 
 function toAnchor(node) {
@@ -218,6 +224,21 @@ function escapeHtml(value) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
+}
+
+function renderAnnotationHtml(node, options = {}) {
+  if (!options.includeAnnotations || !(node.annotations || []).length) {
+    return "";
+  }
+
+  const items = node.annotations
+    .map(
+      (annotation) =>
+        `<li><code>@${escapeHtml(annotation.key)}</code>: <code>${escapeHtml(annotation.value)}</code></li>`
+    )
+    .join("");
+
+  return `<p><strong>Metadata:</strong></p><ul>${items}</ul>`;
 }
 
 module.exports = { toHtmlDocumentation };

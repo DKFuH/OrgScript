@@ -39,11 +39,13 @@ Export Kinds:
   markdown    Stakeholder-friendly logic summary
   mermaid     Process and stateflow diagrams (Markdown)
   html        Self-contained documentation page
+  context     AI/tooling context bundle
 
 Global Options:
   --help, -h     Show this help
   --version, -v  Show version number
   --json         Output machine-readable JSON (where supported)
+  --with-annotations  Include annotations in supported Markdown and HTML exports
 `);
 }
 
@@ -124,7 +126,11 @@ function run(args) {
     }
 
     try {
-      process.stdout.write(toMarkdownSummary(toCanonicalModel(result.ast)));
+      process.stdout.write(
+        toMarkdownSummary(toCanonicalModel(result.ast), {
+          includeAnnotations: options.withAnnotations,
+        })
+      );
       process.exit(0);
     } catch (error) {
       console.error(`Cannot export Markdown from ${absolutePath}: ${error.message}`);
@@ -167,7 +173,11 @@ function run(args) {
 
     try {
       const title = `OrgScript Documentation: ${path.basename(absolutePath)}`;
-      process.stdout.write(toHtmlDocumentation(toCanonicalModel(result.ast), title));
+      process.stdout.write(
+        toHtmlDocumentation(toCanonicalModel(result.ast), title, {
+          includeAnnotations: options.withAnnotations,
+        })
+      );
       process.exit(0);
     } catch (error) {
       console.error(`Cannot export HTML from ${absolutePath}: ${error.message}`);
@@ -340,6 +350,7 @@ function parseArgs(args) {
   const options = {
     check: false,
     json: false,
+    withAnnotations: false,
     positionals: [],
   };
 
@@ -351,6 +362,11 @@ function parseArgs(args) {
 
     if (argument === "--json") {
       options.json = true;
+      continue;
+    }
+
+    if (argument === "--with-annotations") {
+      options.withAnnotations = true;
       continue;
     }
 

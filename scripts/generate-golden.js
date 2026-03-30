@@ -33,6 +33,7 @@ for (const file of files) {
   const modelOutputPath = path.join(goldenDir, `${baseName}.model.json`);
   const formattedOutputPath = path.join(goldenDir, `${baseName}.formatted.orgs`);
   const summaryOutputPath = path.join(goldenDir, `${baseName}.summary.md`);
+  const annotatedSummaryOutputPath = path.join(goldenDir, `${baseName}.summary.annotations.md`);
   const mermaidOutputPath = path.join(goldenDir, `${baseName}.mermaid.md`);
   const canonicalModel = toCanonicalModel(result.ast);
 
@@ -48,6 +49,16 @@ for (const file of files) {
   );
   fs.writeFileSync(formattedOutputPath, formatDocument(result.ast), "utf8");
   fs.writeFileSync(summaryOutputPath, toMarkdownSummary(canonicalModel), "utf8");
+
+  if (hasAnnotations(canonicalModel)) {
+    fs.writeFileSync(
+      annotatedSummaryOutputPath,
+      toMarkdownSummary(canonicalModel, { includeAnnotations: true }),
+      "utf8"
+    );
+  } else if (fs.existsSync(annotatedSummaryOutputPath)) {
+    fs.unlinkSync(annotatedSummaryOutputPath);
+  }
 
   try {
     fs.writeFileSync(mermaidOutputPath, toMermaidMarkdown(canonicalModel), "utf8");
@@ -65,4 +76,8 @@ function normalizeAst(ast) {
     ...ast,
     filePath: path.relative(repoRoot, ast.filePath).replace(/\\/g, "/"),
   };
+}
+
+function hasAnnotations(model) {
+  return JSON.stringify(model).includes('"annotations":[{');
 }

@@ -38,6 +38,12 @@
         "scopeName": "source.orgscript",
         "path": "./syntaxes/orgscript.tmLanguage.json"
       }
+    ],
+    "snippets": [
+      {
+        "language": "orgscript",
+        "path": "./snippets/orgscript.code-snippets"
+      }
     ]
   }
 }

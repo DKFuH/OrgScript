@@ -1,0 +1,97 @@
+{
+  "OrgScript Comment": {
+    "prefix": "org-comment",
+    "body": [
+      "# ${1:comment}"
+    ],
+    "description": "Insert a whole-line OrgScript comment."
+  },
+  "OrgScript Annotation": {
+    "prefix": "org-annotation",
+    "body": [
+      "@${1:owner} \"${2:value}\""
+    ],
+    "description": "Insert a whole-line OrgScript annotation."
+  },
+  "OrgScript Process Block": {
+    "prefix": "org-process",
+    "body": [
+      "process ${1:ProcessName}",
+      "",
+      "  when ${2:event.trigger}",
+      "",
+      "  ${3:assign entity.field = \"value\"}"
+    ],
+    "description": "Insert a process block."
+  },
+  "OrgScript Stateflow Block": {
+    "prefix": "org-stateflow",
+    "body": [
+      "stateflow ${1:StateflowName}",
+      "",
+      "  states",
+      "    ${2:new}",
+      "    ${3:active}",
+      "",
+      "  transitions",
+      "    ${2:new} -> ${3:active}"
+    ],
+    "description": "Insert a stateflow block."
+  },
+  "OrgScript Rule Block": {
+    "prefix": "org-rule",
+    "body": [
+      "rule ${1:RuleName}",
+      "",
+      "  applies to ${2:entity}",
+      "",
+      "  if ${3:entity.field = false} then",
+      "    require ${4:requirement_name}"
+    ],
+    "description": "Insert a rule block."
+  },
+  "OrgScript Role Block": {
+    "prefix": "org-role",
+    "body": [
+      "role ${1:RoleName}",
+      "",
+      "  can",
+      "    ${2:update entity.field}",
+      "",
+      "  cannot",
+      "    ${3:delete entity}"
+    ],
+    "description": "Insert a role block."
+  },
+  "OrgScript Policy Block": {
+    "prefix": "org-policy",
+    "body": [
+      "policy ${1:PolicyName}",
+      "",
+      "  when ${2:entity.metric > 24}",
+      "  then",
+      "    ${3:notify owner with \"Escalate\"}"
+    ],
+    "description": "Insert a policy block."
+  },
+  "OrgScript Metric Block": {
+    "prefix": "org-metric",
+    "body": [
+      "metric ${1:MetricName}",
+      "",
+      "  formula ${2:numerator / denominator}",
+      "  owner ${3:team_name}",
+      "  target ${4:>= 0.95}"
+    ],
+    "description": "Insert a metric block."
+  },
+  "OrgScript Event Block": {
+    "prefix": "org-event",
+    "body": [
+      "event ${1:entity.event}",
+      "",
+      "  ${2:notify team with \"Event received\"}"
+    ],
+    "description": "Insert an event block."
+  }
+}

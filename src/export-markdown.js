@@ -1,7 +1,5 @@
-function toMarkdownSummary(model) {
-  const sections = model.body
-    .map((node) => renderTopLevelNode(node))
-    .filter(Boolean);
+function toMarkdownSummary(model, options = {}) {
+  const sections = model.body.map((node) => renderTopLevelNode(node, options)).filter(Boolean);
 
   if (sections.length === 0) {
     throw new Error("No Markdown-exportable blocks found.");
@@ -13,7 +11,7 @@ function toMarkdownSummary(model) {
     lines.push("## Contents");
     lines.push("");
     for (const node of model.body) {
-      const section = renderTopLevelNode(node);
+      const section = renderTopLevelNode(node, options);
       if (section) {
         lines.push(`- [${toKindLabel(node.type)}: ${node.name}](#${toAnchor(node)})`);
       }
@@ -23,11 +21,7 @@ function toMarkdownSummary(model) {
     lines.push("");
   }
 
-  // Use H2 for individual blocks since the file has an H1
-  const bodyPart = sections
-    .map((s) => s.replace(/^# /mg, "## "))
-    .join("\n\n---\n\n");
-
+  const bodyPart = sections.map((section) => section.replace(/^# /gm, "## ")).join("\n\n---\n\n");
   lines.push(bodyPart);
 
   return `${lines.join("\n")}\n`;
@@ -35,55 +29,56 @@ function toMarkdownSummary(model) {
 
 function toAnchor(node) {
   const label = `${toKindLabel(node.type)} ${node.name}`;
-  return label
-    .toLowerCase()
-    .replace(/ /g, "-")
-    .replace(/[^a-z0-9-]/g, "");
+  return label.toLowerCase().replace(/ /g, "-").replace(/[^a-z0-9-]/g, "");
 }
 
-function renderTopLevelNode(node) {
+function renderTopLevelNode(node, options) {
   if (node.type === "process") {
-    return renderProcess(node);
+    return renderProcess(node, options);
   }
 
   if (node.type === "stateflow") {
-    return renderStateflow(node);
+    return renderStateflow(node, options);
   }
 
   if (node.type === "rule") {
-    return renderRule(node);
+    return renderRule(node, options);
   }
 
   if (node.type === "role") {
-    return renderRole(node);
+    return renderRole(node, options);
   }
 
   if (node.type === "policy") {
-    return renderPolicy(node);
+    return renderPolicy(node, options);
   }
 
   if (node.type === "event") {
-    return renderEvent(node);
+    return renderEvent(node, options);
   }
 
   if (node.type === "metric") {
-    return renderMetric(node);
+    return renderMetric(node, options);
   }
 
   return null;
 }
 
-function renderProcess(node) {
+function renderProcess(node, options) {
   const triggers = (node.body || []).filter((statement) => statement.type === "when");
   const statements = (node.body || []).filter((statement) => statement.type !== "when");
-  const summary = summarizeStatementSequence(statements);
-  const lines = [`# Process: ${node.name}`, "", "### Trigger"];
+  const summary = summarizeStatementSequence(statements, options);
+  const lines = [`# Process: ${node.name}`];
+
+  appendAnnotationSection(lines, node, options);
+  lines.push("");
+  lines.push("### Trigger");
 
   if (triggers.length === 0) {
     lines.push("- No explicit trigger defined.");
   } else {
     for (const trigger of triggers) {
-      lines.push(`- Triggered when \`${trigger.trigger || "unknown"}\`.`);
+      lines.push(`- Triggered when \`${trigger.trigger || "unknown"}\`${formatInlineAnnotations(trigger, options)}.`);
     }
   }
 
@@ -101,8 +96,11 @@ function renderProcess(node) {
   return lines.join("\n");
 }
 
-function renderStateflow(node) {
-  const lines = [`# Stateflow: ${node.name}`, "", "### States"];
+function renderStateflow(node, options) {
+  const lines = [`# Stateflow: ${node.name}`];
+  appendAnnotationSection(lines, node, options);
+  lines.push("");
+  lines.push("### States");
 
   if ((node.states || []).length === 0) {
     lines.push("- No states are defined.");
@@ -126,8 +124,10 @@ function renderStateflow(node) {
   return lines.join("\n");
 }
 
-function renderRule(node) {
+function renderRule(node, options) {
   const lines = [`# Rule: ${node.name}`];
+
+  appendAnnotationSection(lines, node, options);
 
   if (node.appliesTo) {
     lines.push("");
@@ -138,7 +138,7 @@ function renderRule(node) {
   lines.push("");
   lines.push("### Rule Behavior");
 
-  const summary = summarizeStatementSequence(node.body || []);
+  const summary = summarizeStatementSequence(node.body || [], options);
   if (summary.length === 0) {
     lines.push("- No rule behavior is defined.");
   } else {
@@ -150,8 +150,11 @@ function renderRule(node) {
   return lines.join("\n");
 }
 
-function renderRole(node) {
-  const lines = [`# Role: ${node.name}`, "", "### Permissions"];
+function renderRole(node, options) {
+  const lines = [`# Role: ${node.name}`];
+  appendAnnotationSection(lines, node, options);
+  lines.push("");
+  lines.push("### Permissions");
 
   if ((node.can || []).length === 0) {
     lines.push("- No assigned permissions.");
@@ -170,8 +173,11 @@ function renderRole(node) {
   return lines.join("\n");
 }
 
-function renderPolicy(node) {
-  const lines = [`# Policy: ${node.name}`, "", "### Security / SLA Clauses"];
+function renderPolicy(node, options) {
+  const lines = [`# Policy: ${node.name}`];
+  appendAnnotationSection(lines, node, options);
+  lines.push("");
+  lines.push("### Security / SLA Clauses");
 
   if ((node.clauses || []).length === 0) {
     lines.push("- No policy clauses are defined.");
@@ -181,21 +187,25 @@ function renderPolicy(node) {
   for (const clause of node.clauses) {
     lines.push(
       `- If ${formatConditionCode(clause.condition)}, then ${formatStatementSequenceInline(
-        clause.then || []
-      )}.`
+        clause.then || [],
+        options
+      )}${formatInlineAnnotations(clause, options)}.`
     );
   }
 
   return lines.join("\n");
 }
 
-function renderEvent(node) {
-  const lines = [`# Event: ${node.name}`, "", "### Automated Reactions"];
+function renderEvent(node, options) {
+  const lines = [`# Event: ${node.name}`];
+  appendAnnotationSection(lines, node, options);
+  lines.push("");
+  lines.push("### Automated Reactions");
 
   if ((node.body || []).length === 0) {
     lines.push("- No automated reactions are defined.");
   } else {
-    for (const bullet of summarizeStatementSequence(node.body || [])) {
+    for (const bullet of summarizeStatementSequence(node.body || [], options)) {
       lines.push(`- ${bullet}`);
     }
   }
@@ -203,8 +213,11 @@ function renderEvent(node) {
   return lines.join("\n");
 }
 
-function renderMetric(node) {
-  const lines = [`# Metric: ${node.name}`, "", "### Monitoring Definition"];
+function renderMetric(node, options) {
+  const lines = [`# Metric: ${node.name}`];
+  appendAnnotationSection(lines, node, options);
+  lines.push("");
+  lines.push("### Monitoring Definition");
 
   lines.push(node.formula ? `- **Formula**: \`${node.formula}\`` : "- No formula defined.");
   lines.push(node.owner ? `- **Owner**: \`${node.owner}\`` : "- No owner assigned.");
@@ -213,7 +226,7 @@ function renderMetric(node) {
   return lines.join("\n");
 }
 
-function summarizeStatementSequence(statements) {
+function summarizeStatementSequence(statements, options) {
   const bullets = [];
   let buffer = [];
 
@@ -223,14 +236,14 @@ function summarizeStatementSequence(statements) {
     }
 
     const prefix = bullets.length === 0 ? "" : "Then ";
-    bullets.push(`${prefix}${formatActionGroup(buffer)}.`);
+    bullets.push(`${prefix}${formatActionGroup(buffer, options)}.`);
     buffer = [];
   }
 
   for (const statement of statements) {
     if (statement.type === "if") {
       flushBufferedActions();
-      bullets.push(...formatIfBullets(statement));
+      bullets.push(...formatIfBullets(statement, options));
       continue;
     }
 
@@ -241,39 +254,41 @@ function summarizeStatementSequence(statements) {
   return bullets;
 }
 
-function formatIfBullets(statement) {
+function formatIfBullets(statement, options) {
   const bullets = [];
   bullets.push(
     `If ${formatConditionCode(statement.condition)}, ${formatStatementSequenceInline(
-      statement.then || []
-    )}.`
+      statement.then || [],
+      options
+    )}${formatInlineAnnotations(statement, options)}.`
   );
 
   for (const branch of statement.elseIf || []) {
     bullets.push(
       `Else if ${formatConditionCode(branch.condition)}, ${formatStatementSequenceInline(
-        branch.then || []
-      )}.`
+        branch.then || [],
+        options
+      )}${formatInlineAnnotations(branch, options)}.`
     );
   }
 
   if (statement.else && (statement.else.body || []).length !== 0) {
-    bullets.push(`Otherwise, ${formatStatementSequenceInline(statement.else.body)}.`);
+    bullets.push(`Otherwise, ${formatStatementSequenceInline(statement.else.body, options)}${formatInlineAnnotations(statement.else, options)}.`);
   }
 
   return bullets;
 }
 
-function formatStatementSequenceInline(statements) {
+function formatStatementSequenceInline(statements, options) {
   const parts = [];
 
   for (const statement of statements) {
     if (statement.type === "if") {
-      parts.push(...formatIfInlineParts(statement));
+      parts.push(...formatIfInlineParts(statement, options));
       continue;
     }
 
-    parts.push(formatActionPhrase(statement));
+    parts.push(formatActionPhrase(statement, options));
   }
 
   if (parts.length === 0) {
@@ -283,67 +298,89 @@ function formatStatementSequenceInline(statements) {
   return joinParts(parts);
 }
 
-function formatIfInlineParts(statement) {
+function formatIfInlineParts(statement, options) {
   const parts = [
     `if ${formatConditionCode(statement.condition)}, ${formatStatementSequenceInline(
-      statement.then || []
-    )}`,
+      statement.then || [],
+      options
+    )}${formatInlineAnnotations(statement, options)}`,
   ];
 
   for (const branch of statement.elseIf || []) {
     parts.push(
       `else if ${formatConditionCode(branch.condition)}, ${formatStatementSequenceInline(
-        branch.then || []
-      )}`
+        branch.then || [],
+        options
+      )}${formatInlineAnnotations(branch, options)}`
     );
   }
 
   if (statement.else && (statement.else.body || []).length !== 0) {
-    parts.push(`else, ${formatStatementSequenceInline(statement.else.body)}`);
+    parts.push(`else, ${formatStatementSequenceInline(statement.else.body, options)}${formatInlineAnnotations(statement.else, options)}`);
   }
 
   return parts;
 }
 
-function formatActionGroup(statements) {
-  return joinParts(statements.map((statement) => formatActionPhrase(statement)));
+function formatActionGroup(statements, options) {
+  return joinParts(statements.map((statement) => formatActionPhrase(statement, options)));
 }
 
-function formatActionPhrase(statement) {
+function formatActionPhrase(statement, options) {
   if (statement.type === "assign") {
-    return `assign \`${statement.target || "?"}\` to ${formatExpressionCode(statement.value)}`;
+    return `assign \`${statement.target || "?"}\` to ${formatExpressionCode(statement.value)}${formatInlineAnnotations(statement, options)}`;
   }
 
   if (statement.type === "transition") {
-    return `transition \`${statement.target || "?"}\` to ${formatExpressionCode(statement.value)}`;
+    return `transition \`${statement.target || "?"}\` to ${formatExpressionCode(statement.value)}${formatInlineAnnotations(statement, options)}`;
   }
 
   if (statement.type === "notify") {
-    return `notify \`${statement.target}\` with ${formatStringLiteral(statement.message)}`;
+    return `notify \`${statement.target}\` with ${formatStringLiteral(statement.message)}${formatInlineAnnotations(statement, options)}`;
   }
 
   if (statement.type === "create") {
-    return `create \`${statement.entity}\``;
+    return `create \`${statement.entity}\`${formatInlineAnnotations(statement, options)}`;
   }
 
   if (statement.type === "update") {
-    const val = formatExpressionCode(statement.value);
-    return `update \`${statement.target || "?"}\` to ${val}`;
+    return `update \`${statement.target || "?"}\` to ${formatExpressionCode(statement.value)}${formatInlineAnnotations(statement, options)}`;
   }
 
   if (statement.type === "require") {
-    return `require \`${statement.requirement}\``;
+    return `require \`${statement.requirement}\`${formatInlineAnnotations(statement, options)}`;
   }
 
   if (statement.type === "when") {
-    return `trigger on \`${statement.trigger || "unknown"}\``;
+    return `trigger on \`${statement.trigger || "unknown"}\`${formatInlineAnnotations(statement, options)}`;
   }
 
   if (statement.type === "stop") {
-    return "stop execution";
+    return `stop execution${formatInlineAnnotations(statement, options)}`;
   }
 
-  return `handle unsupported action \`${statement.type}\``;
+  return `handle unsupported action \`${statement.type}\`${formatInlineAnnotations(statement, options)}`;
+}
+
+function appendAnnotationSection(lines, node, options = {}) {
+  if (!options.includeAnnotations || !(node.annotations || []).length) {
+    return;
+  }
+
+  lines.push("");
+  lines.push("### Metadata");
+  for (const annotation of node.annotations) {
+    lines.push(`- \`@${annotation.key}\`: \`${annotation.value}\``);
+  }
+}
+
+function formatInlineAnnotations(node, options = {}) {
+  if (!options.includeAnnotations || !(node.annotations || []).length) {
+    return "";
+  }
+
+  const values = node.annotations.map((annotation) => `@${annotation.key}="${annotation.value}"`);
+  return ` (${values.join(", ")})`;
 }
 
 function formatConditionCode(condition) {
@@ -359,9 +396,7 @@ function formatCondition(condition) {
     return condition.conditions.map((entry) => formatCondition(entry)).join(` ${condition.operator} `);
   }
 
-  return `${formatExpression(condition.left)} ${condition.operator} ${formatExpression(
-    condition.right
-  )}`;
+  return `${formatExpression(condition.left)} ${condition.operator} ${formatExpression(condition.right)}`;
 }
 
 function formatExpressionCode(expression) {
