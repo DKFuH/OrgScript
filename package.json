@@ -5,11 +5,11 @@
   "license": "Apache-2.0",
   "main": "./src/index.js",
   "bin": {
-    "orgscript": "./bin/orgscript.js"
+    "orgscript": "bin/orgscript.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/DKFuH/OrgScript"
+    "url": "git+https://github.com/DKFuH/OrgScript.git"
   },
   "bugs": {
     "url": "https://github.com/DKFuH/OrgScript/issues"
