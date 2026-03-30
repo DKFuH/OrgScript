@@ -1,40 +1,184 @@
 # OrgScript Handbuch (Deutsch)
 
-## Einführung
-OrgScript ist eine menschenlesbare, KI-freundliche Beschreibungssprache für operative Logik, Prozesse und Regeln. Es ist keine Programmiersprache im klassischen Sinne, sondern eine strukturierte Ebene zwischen natürlicher Sprache und technischer Ausführung.
+OrgScript ist eine menschenlesbare, KI-freundliche Beschreibungssprache fuer Geschaeftslogik, Workflows, Rollen, Regeln und Zustandsuebergaenge.
 
-## Kernkonzepte
+Dieses Handbuch ist der kurze praktische Einstieg. Die kanonische Sprachdefinition steht in `spec/language-spec.md`.
 
-### Prozesse (`process`)
-Ein Prozess beschreibt den operativen Ablauf einer Aufgabe. Er beginnt oft mit einem Auslöser (`when`) und enthält bedingte Anweisungen (`if`, `then`, `else`).
-- **Anweisungen**: `assign` (Zuweisung), `transition` (Zustandswechsel), `notify` (Benachrichtigung).
+## Wofuer OrgScript gedacht ist
 
-### Zustandsflüsse (`stateflow`)
-Zustandsflüsse definieren den Lebenszyklus eines Objekts (z. B. ein Auftrag oder ein Lead).
-- **states**: Die möglichen Zustände.
-- **transitions**: Die erlaubten Pfade zwischen den Zuständen.
+Nutze OrgScript, wenn du eine textbasierte gemeinsame Quelle fuer Folgendes brauchst:
 
-### Regeln (`rule`)
-Regeln definieren dauerhafte Bedingungen oder Validierungen, die für ein Objekt gelten ("Guardrails").
+- operative Prozesse
+- Freigabelogik
+- Berechtigungsgrenzen
+- Zustandsuebergaenge
+- Eskalationsregeln
+- Kennzahlen
+- KI- und Tooling-Kontexte
 
-### Rollen (`role`)
-Rollen definieren Berechtigungsgrenzen (`can`, `cannot`).
+OrgScript liegt zwischen Fliesstext-Dokumentation und Implementierungscode. Es beschreibt Logik, es fuehrt sie nicht aus.
 
-## Nutzung des CLI (Kommandozeile)
+## Zentrale Bausteine
 
-OrgScript bietet ein mächtiges CLI-Werkzeug (`orgscript`):
+### `process`
 
-1. **Check**: `orgscript check <datei>` — Validiert Syntax, lintert die Logik und prüft die Formatierung.
-2. **Analyse**: `orgscript analyze <datei>` — Liefert strukturelle Metriken und Komplexitätshinweise.
-3. **Export**: 
-   - `export mermaid`: Generiert Diagramme.
-   - `export html`: Erzeugt eine vollwertige Dokumentationsseite.
-   - `export context`: Bereitet die Logik für KI-Systeme auf.
+Nutze `process` fuer Schritt-fuer-Schritt-Ablaeufe.
 
-## Best Practices
-- **Inkrementell arbeiten**: Fange mit einfachen Zuständen an und füge Prozesse hinzu.
-- **KI nutzen**: Nutze `export context`, um KI-Agenten zuverlässig über deine internen Abläufe zu informieren.
-- **Git verwenden**: Versioniere deine Logik wie Code.
+Typische Beispiele:
 
----
-*Version 0.9.0-rc1 / OrgScript Release Candidate*
+- Lead-Qualifizierung
+- Angebot zu Auftrag
+- Onboarding
+- Rueckerstattungsprozess
+
+### `stateflow`
+
+Nutze `stateflow` fuer zulaessige Zustaende und erlaubte Uebergaenge.
+
+Typische Beispiele:
+
+- Auftragslebenszyklus
+- Ticket-Lebenszyklus
+- Lead-Lebenszyklus
+
+### `rule`
+
+Nutze `rule` fuer Regeln und Bedingungen, die immer gelten sollen, wenn eine Bedingung zutrifft.
+
+### `role`
+
+Nutze `role` fuer Berechtigungen und Grenzen mit `can` und `cannot`.
+
+### `policy`
+
+Nutze `policy` fuer kontext- oder zeitabhaengiges Organisationsverhalten.
+
+### `event`
+
+Nutze `event` fuer benannte Ausloeser mit Standardreaktionen.
+
+### `metric`
+
+Nutze `metric` fuer Kennzahlen mit Formel, Owner und Zielwert.
+
+## Erste nuetzliche Befehle
+
+```bash
+orgscript check ./examples/craft-business-lead-to-order.orgs
+orgscript export mermaid ./examples/craft-business-lead-to-order.orgs
+orgscript export markdown ./examples/lead-qualification.orgs --with-annotations
+orgscript export context ./examples/lead-qualification.orgs
+```
+
+Was sie tun:
+
+- `check` prueft Syntax, Lint-Regeln und kanonische Formatierung
+- `export mermaid` erzeugt ein diagrammfreundliches Artefakt
+- `export markdown` erzeugt eine kurze menschenlesbare Zusammenfassung
+- `export context` erzeugt ein strukturiertes Paket fuer KI und Tooling
+
+## Kommentare und Annotationen
+
+OrgScript unterstuetzt zwei Dokumentationsebenen:
+
+- `# comment`
+- `@key "value"`
+
+Kommentare:
+
+- sind nur fuer Menschen gedacht
+- muessen in v1 als eigene ganze Zeile `# ...` stehen
+- sind nicht normativ
+- werden nicht in kanonischen Export, KI-Kontext oder Analyse uebernommen
+
+Annotationen:
+
+- sind parsebare Metadaten
+- haengen sich an den folgenden unterstuetzten Block oder die folgende Anweisung
+- werden in AST und kanonisches Modell uebernommen
+- aendern die Semantik nicht
+
+Erlaubte Annotation-Keys in v1:
+
+- `@note`
+- `@owner`
+- `@todo`
+- `@source`
+- `@status`
+- `@review`
+
+Beispiel:
+
+```orgs
+# Gemeinsamer Lead-Qualifizierungspfad fuer eingehende Leads.
+@owner "sales_ops"
+@status "active"
+process LeadQualification
+
+  when lead.created
+
+  @note "Referral-Leads separat auswerten."
+  if lead.source = "referral" then
+    assign lead.priority = "high"
+    notify sales with "New referral lead"
+```
+
+Wichtige Regel:
+
+Wenn Geschaeftslogik wichtig ist, muss sie als OrgScript-Logik formuliert werden, nicht als Kommentar.
+
+Schlecht:
+
+```orgs
+# Immer Anzahlung vor Bestaetigung verlangen.
+```
+
+Gut:
+
+```orgs
+if order.deposit_received = false then
+  require finance_clearance
+  stop
+```
+
+## Exportverhalten
+
+Standardverhalten der Exporter:
+
+- Kommentare bleiben aus allen maschinenorientierten Exporten draussen
+- Kommentare erscheinen standardmaessig nicht in Markdown, Mermaid oder HTML
+- Annotationen sind im kanonischen JSON enthalten
+- Annotationen sind in `export context` enthalten
+- Annotationen erscheinen in Markdown und HTML nur mit `--with-annotations`
+
+So bleibt Geschaeftslogik explizit und Kommentare werden keine versteckte zweite Sprache.
+
+## Schreibregeln
+
+- eine Anweisung pro Zeile
+- explizite Logik statt stiller Annahmen
+- stabile Namen verwenden
+- Bloecke klein halten
+- Freigaben, Schwellenwerte und Berechtigungen nicht in Prosa verstecken
+- Kommentare sparsam zur Orientierung einsetzen
+- Annotationen fuer strukturierte Metadaten nutzen, nicht fuer Semantik
+
+## Empfohlene Lesereihenfolge
+
+Fuer den vollstaendigen Projektkontext:
+
+1. `docs/manifesto.md`
+2. `docs/language-principles.md`
+3. `spec/language-spec.md`
+4. `docs/orgscript-for-humans.md`
+5. `docs/orgscript-for-ai.md`
+
+## Praktischer Arbeitsablauf
+
+Fuer die meisten Teams ist dieser sichere Zyklus sinnvoll:
+
+1. Logik in `.orgs` modellieren
+2. `orgscript check` ausfuehren
+3. Markdown oder Mermaid zur Review erzeugen
+4. Context-Export fuer KI- oder Tooling-Nutzung erzeugen
+5. die `.orgs`-Datei als gepflegte Quelle der Wahrheit behalten
