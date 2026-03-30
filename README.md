@@ -21,9 +21,33 @@ OrgScript is designed for operators, team leads, analysts, and engineers who nee
 - Not free-form prose or narrative documentation
 - Not a replacement for implementation code
 
+## Installation
+
+OrgScript requires Node.js `>=18`.
+
+The CLI is not currently published on npm under `orgscript`, so use one of the repository-based installation paths below.
+
+### Local repository setup
+
+```bash
+git clone https://github.com/DKFuH/OrgScript.git
+cd OrgScript
+npm install
+```
+
+This is the best path if you want to explore examples, run tests, or contribute.
+
+### Global CLI from a local checkout
+
+```bash
+npm install -g .
+```
+
+That makes `orgscript` available on your shell path from the checked-out repository state.
+
 ## Quickstart in 60 Seconds
 
-Assuming you have the OrgScript CLI installed:
+After installation, run:
 
 ```bash
 # 1. Check a complete example end to end
