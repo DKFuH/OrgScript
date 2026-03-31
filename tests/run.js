@@ -365,12 +365,18 @@ function testCliDiagnosticsAndExitCodes() {
     cliPath,
     "export",
     "json",
-    "./examples/craft-business-lead-to-order.orgs",
+    "./examples/lead-qualification.orgs",
   ]);
   assert.strictEqual(exportJson.status, 0, "Expected export json to succeed");
   const exportPayload = JSON.parse(exportJson.stdout);
   assert.strictEqual(exportPayload.type, "document");
-  assert.strictEqual(exportPayload.version, "0.3");
+  assert.strictEqual(exportPayload.version, "0.4");
+  assert.deepStrictEqual(exportPayload.metadata.languages, {
+    source: "en",
+    comments: "en",
+    annotations: "en",
+    context: "en",
+  });
 
   const exportMarkdown = runCli([
     cliPath,
@@ -421,8 +427,14 @@ function testCliDiagnosticsAndExitCodes() {
   ]);
   assert.strictEqual(exportContext.status, 0, "Expected export context to succeed");
   const exportContextPayload = JSON.parse(exportContext.stdout);
-  assert.strictEqual(exportContextPayload.source.model.version, "0.3");
+  assert.strictEqual(exportContextPayload.source.model.version, "0.4");
   assert.strictEqual(exportContextPayload.source.metadata.commentsIncluded, false);
+  assert.deepStrictEqual(exportContextPayload.source.metadata.documentHeader.languages, {
+    source: "en",
+    comments: "en",
+    annotations: "en",
+    context: "en",
+  });
   assert.ok(exportContextPayload.source.metadata.annotations.total > 0);
   assert.strictEqual(exportContextPayload.source.metadata.annotations.keys.owner, 1);
   assert.strictEqual(exportContextPayload.source.metadata.annotations.keys.status, 1);
@@ -759,7 +771,7 @@ function testHtmlExport() {
 
 function testMarkdownExporterAdditionalBlockKinds() {
   const model = {
-    version: "0.3",
+    version: "0.4",
     type: "document",
     body: [
       {
@@ -801,6 +813,12 @@ function testCommentsAndAnnotations() {
   assert.ok(result.ok, "Expected annotated example to stay valid");
 
   const processNode = result.ast.body[0];
+  assert.deepStrictEqual(result.ast.metadata.languages, {
+    source: "en",
+    comments: "en",
+    annotations: "en",
+    context: "en",
+  });
   assert.strictEqual(processNode.annotations.length, 2, "Expected process annotations");
   assert.strictEqual(processNode.leadingComments.length, 1, "Expected process leading comment");
   assert.strictEqual(processNode.body[0].leadingComments.length, 1, "Expected statement leading comment");
@@ -814,6 +832,10 @@ function testCommentsAndAnnotations() {
     "Expected canonical model to contain annotations"
   );
   assert.ok(
+    serialized.includes('"metadata"'),
+    "Expected canonical model to contain document metadata"
+  );
+  assert.ok(
     !serialized.includes("Shared lead qualification path"),
     "Expected canonical model to exclude comments"
   );
@@ -822,6 +844,7 @@ function testCommentsAndAnnotations() {
   const contextSerialized = JSON.stringify(context);
   assert.ok(contextSerialized.includes('"status"'), "Expected annotations in AI context");
   assert.strictEqual(context.source.metadata.commentsIncluded, false);
+  assert.strictEqual(context.source.metadata.documentHeader.languages.comments, "en");
   assert.strictEqual(context.source.metadata.annotations.total, 4);
   assert.strictEqual(context.source.metadata.annotations.keys.owner, 1);
   assert.strictEqual(context.source.metadata.annotations.keys.status, 1);
@@ -847,6 +870,10 @@ function testCommentsAndAnnotations() {
     "Expected annotated Markdown summary to include metadata"
   );
   assert.ok(
+    annotatedSummary.includes("### Document Metadata"),
+    "Expected annotated Markdown summary to include document metadata"
+  );
+  assert.ok(
     annotatedSummary.includes('@review="Revisit the budget threshold each quarter."'),
     "Expected annotated Markdown summary to include inline annotations"
   );
@@ -859,6 +886,10 @@ function testCommentsAndAnnotations() {
   assert.ok(
     annotatedHtml.includes("<strong>Metadata:</strong>"),
     "Expected annotated HTML to include metadata"
+  );
+  assert.ok(
+    annotatedHtml.includes("<strong>Document metadata:</strong>"),
+    "Expected annotated HTML to include document metadata"
   );
 
   const analysis = analyzeDocument(canonical);
@@ -898,6 +929,7 @@ function testVsCodeArtifacts() {
     "Expected VS Code language configuration indentation rules"
   );
   assert.ok(snippets["OrgScript Annotation"], "Expected annotation snippet");
+  assert.ok(snippets["OrgScript Language Header"], "Expected language header snippet");
   assert.ok(snippets["OrgScript Process Block"], "Expected process snippet");
   assert.strictEqual(grammar.scopeName, "source.orgscript");
 }

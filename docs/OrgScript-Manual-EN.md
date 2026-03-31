@@ -79,8 +79,10 @@ What they do:
 
 ## Comments and annotations
 
-OrgScript supports two documentation layers:
+OrgScript supports an optional document language header plus two documentation layers:
 
+- `orgscript 1`
+- `source-language "en"` / `comment-language "de"` / `annotation-language "de"` / `context-language "de"`
 - `# comment`
 - `@key "value"`
 
@@ -110,6 +112,12 @@ Allowed annotation keys in v1:
 Example:
 
 ```orgs
+orgscript 1
+
+source-language "en"
+comment-language "en"
+annotation-language "en"
+
 # Shared lead qualification path for inbound leads.
 @owner "sales_ops"
 @status "active"
@@ -147,6 +155,7 @@ Default exporter policy:
 
 - comments stay out of all machine-facing exports
 - comments stay out of Markdown, Mermaid, and HTML by default
+- document language metadata is included in canonical JSON and `export context`
 - annotations are included in canonical JSON
 - annotations are included in `export context`
 - annotations appear in Markdown and HTML only when you pass `--with-annotations`

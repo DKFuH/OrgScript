@@ -19,10 +19,13 @@ Do not treat it as free-form natural language.
 - `stop` terminates the current branch.
 - `stateflow` defines legal transitions, not execution order.
 - `require` is a named gate, not a comment.
+- document language metadata is document-level metadata, not business logic
 - `#` comments are non-authoritative and must not be treated as business logic.
 - allowlisted annotations are metadata only.
 - comments are excluded from canonical export and AI context by default
+- document language metadata is included in canonical export and AI context when declared
 - `export context` exposes annotations again under an explicit `source.metadata.annotations` block.
+- `export context` exposes declared language metadata under `source.metadata.documentHeader`.
 - human-facing exports only render annotations when explicitly requested.
 
 ## Core semantic distinctions

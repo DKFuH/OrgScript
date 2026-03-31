@@ -22,15 +22,18 @@ const RULES = {
   "lint.comment-hidden-business-rule": { severity: SEVERITY.warning },
   "lint.comment-hidden-requirement": { severity: SEVERITY.warning },
   "lint.comment-hidden-permission": { severity: SEVERITY.warning },
+  "lint.comment-language-mismatch": { severity: SEVERITY.warning },
+  "lint.annotation-language-mismatch": { severity: SEVERITY.warning },
 };
 
 function lintDocument(ast) {
   const findings = [];
+  const documentLanguages = ast.metadata ? ast.metadata.languages || {} : {};
 
-  lintComments(ast.trailingComments || [], findings);
+  lintComments(ast.trailingComments || [], findings, documentLanguages.comments);
 
   for (const node of ast.body) {
-    lintNode(node, findings);
+    lintNode(node, findings, documentLanguages);
   }
 
   return sortFindings(findings);
@@ -71,23 +74,24 @@ function renderLintReport(filePath, findings) {
   return lines;
 }
 
-function lintNode(node, findings) {
-  lintComments(node.leadingComments || [], findings);
-  lintComments(node.trailingComments || [], findings);
+function lintNode(node, findings, documentLanguages) {
+  lintComments(node.leadingComments || [], findings, documentLanguages.comments);
+  lintComments(node.trailingComments || [], findings, documentLanguages.comments);
+  lintAnnotations(node.annotations || [], findings, documentLanguages.annotations);
 
   if (node.type === "ProcessNode") {
-    lintProcess(node, findings);
+    lintProcess(node, findings, documentLanguages);
     return;
   }
 
   if (node.type === "RuleNode") {
     lintRule(node, findings);
-    lintStatementBlock(node.body || [], findings);
+    lintStatementBlock(node.body || [], findings, documentLanguages);
     return;
   }
 
   if (node.type === "EventNode") {
-    lintStatementBlock(node.body || [], findings);
+    lintStatementBlock(node.body || [], findings, documentLanguages);
     return;
   }
 
@@ -103,14 +107,15 @@ function lintNode(node, findings) {
 
   if (node.type === "PolicyNode") {
     for (const clause of node.clauses || []) {
-      lintComments(clause.leadingComments || [], findings);
-      lintComments(clause.trailingComments || [], findings);
-      lintActionBlock(clause.body || [], findings);
+      lintComments(clause.leadingComments || [], findings, documentLanguages.comments);
+      lintComments(clause.trailingComments || [], findings, documentLanguages.comments);
+      lintAnnotations(clause.annotations || [], findings, documentLanguages.annotations);
+      lintActionBlock(clause.body || [], findings, documentLanguages);
     }
   }
 }
 
-function lintProcess(node, findings) {
+function lintProcess(node, findings, documentLanguages) {
   const body = node.body || [];
   const triggers = body.filter((statement) => statement.type === "WhenNode");
 
@@ -149,7 +154,7 @@ function lintProcess(node, findings) {
     }
   }
 
-  lintStatementBlock(body, findings);
+  lintStatementBlock(body, findings, documentLanguages);
 }
 
 function lintRule(node, findings) {
@@ -227,12 +232,13 @@ function lintRole(node, findings) {
   }
 }
 
-function lintStatementBlock(statements, findings) {
+function lintStatementBlock(statements, findings, documentLanguages) {
   let terminated = false;
 
   for (const statement of statements) {
-    lintComments(statement.leadingComments || [], findings);
-    lintComments(statement.trailingComments || [], findings);
+    lintComments(statement.leadingComments || [], findings, documentLanguages.comments);
+    lintComments(statement.trailingComments || [], findings, documentLanguages.comments);
+    lintAnnotations(statement.annotations || [], findings, documentLanguages.annotations);
 
     if (terminated) {
       findings.push(
@@ -245,18 +251,20 @@ function lintStatementBlock(statements, findings) {
     }
 
     if (statement.type === "IfNode") {
-      lintStatementBlock(statement.then || [], findings);
+      lintStatementBlock(statement.then || [], findings, documentLanguages);
 
       for (const branch of statement.elseIf || []) {
-        lintComments(branch.leadingComments || [], findings);
-        lintComments(branch.trailingComments || [], findings);
-        lintStatementBlock(branch.then || [], findings);
+        lintComments(branch.leadingComments || [], findings, documentLanguages.comments);
+        lintComments(branch.trailingComments || [], findings, documentLanguages.comments);
+        lintAnnotations(branch.annotations || [], findings, documentLanguages.annotations);
+        lintStatementBlock(branch.then || [], findings, documentLanguages);
       }
 
       if (statement.else) {
-        lintComments(statement.else.leadingComments || [], findings);
-        lintComments(statement.else.trailingComments || [], findings);
-        lintStatementBlock(statement.else.body || [], findings);
+        lintComments(statement.else.leadingComments || [], findings, documentLanguages.comments);
+        lintComments(statement.else.trailingComments || [], findings, documentLanguages.comments);
+        lintAnnotations(statement.else.annotations || [], findings, documentLanguages.annotations);
+        lintStatementBlock(statement.else.body || [], findings, documentLanguages);
       }
     }
 
@@ -264,12 +272,13 @@ function lintStatementBlock(statements, findings) {
   }
 }
 
-function lintActionBlock(statements, findings) {
+function lintActionBlock(statements, findings, documentLanguages) {
   let terminated = false;
 
   for (const statement of statements) {
-    lintComments(statement.leadingComments || [], findings);
-    lintComments(statement.trailingComments || [], findings);
+    lintComments(statement.leadingComments || [], findings, documentLanguages.comments);
+    lintComments(statement.trailingComments || [], findings, documentLanguages.comments);
+    lintAnnotations(statement.annotations || [], findings, documentLanguages.annotations);
 
     if (terminated) {
       findings.push(
@@ -313,14 +322,47 @@ function blockAlwaysStops(statements) {
   return statementAlwaysStops(statements[statements.length - 1]);
 }
 
-function lintComments(comments, findings) {
+function lintComments(comments, findings, expectedLanguage) {
   for (const comment of comments || []) {
     const rule = classifyComment(comment.text || "");
     if (!rule) {
+      if (expectedLanguage) {
+        const detectedLanguage = detectLanguage(comment.text || "");
+        if (detectedLanguage && detectedLanguage !== expectedLanguage) {
+          findings.push(
+            createLintIssue(
+              "lint.comment-language-mismatch",
+              comment.line || 1,
+              `Comment text looks like \`${detectedLanguage}\`, but the document declares comment-language \`${expectedLanguage}\`.`
+            )
+          );
+        }
+      }
       continue;
     }
 
     findings.push(createLintIssue(rule.code, comment.line || 1, rule.message));
+  }
+}
+
+function lintAnnotations(annotations, findings, expectedLanguage) {
+  if (!expectedLanguage) {
+    return;
+  }
+
+  for (const annotation of annotations || []) {
+    const detectedLanguage = detectLanguage(annotation.value || "");
+    if (!detectedLanguage || detectedLanguage === expectedLanguage) {
+      continue;
+    }
+
+    findings.push(
+      createLintIssue(
+        "lint.annotation-language-mismatch",
+        annotation.line || 1,
+        `Annotation value looks like \`${detectedLanguage}\`, but the document declares annotation-language \`${expectedLanguage}\`.`
+      )
+    );
   }
 }
 
@@ -365,6 +407,44 @@ function classifyComment(text) {
 
   return null;
 }
+
+function detectLanguage(text) {
+  const tokens = tokenizeLanguageText(text);
+  if (tokens.length < 2) {
+    return null;
+  }
+
+  const scores = Object.entries(LANGUAGE_STOPWORDS).map(([language, stopwords]) => ({
+    language,
+    score: tokens.filter((token) => stopwords.has(token)).length,
+  }));
+
+  scores.sort((left, right) => right.score - left.score);
+
+  if (scores[0].score < 2) {
+    return null;
+  }
+
+  if (scores[1] && scores[0].score === scores[1].score) {
+    return null;
+  }
+
+  return scores[0].language;
+}
+
+function tokenizeLanguageText(text) {
+  return String(text)
+    .toLowerCase()
+    .match(/[a-zA-ZÀ-ÿ]+/g) || [];
+}
+
+const LANGUAGE_STOPWORDS = {
+  en: new Set(["the", "and", "for", "with", "must", "should", "review", "track", "when", "before", "after", "new", "lead"]),
+  de: new Set(["der", "die", "das", "und", "mit", "fuer", "wenn", "muss", "soll", "vor", "nach", "neu", "pruefen", "vertrieb"]),
+  es: new Set(["el", "la", "los", "las", "y", "con", "para", "cuando", "debe", "antes", "despues", "nuevo", "revisar"]),
+  pt: new Set(["o", "a", "os", "as", "e", "com", "para", "quando", "deve", "antes", "depois", "novo", "revisar"]),
+  eo: new Set(["la", "kaj", "kun", "por", "kiam", "devas", "antau", "post", "nova", "revizii"]),
+};
 
 function sortFindings(findings) {
   return [...findings].sort((left, right) => {

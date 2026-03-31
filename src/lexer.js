@@ -1,3 +1,9 @@
+const {
+  DOCUMENT_LANGUAGE_KEYS,
+  isDocumentHeaderLine,
+  looksLikeDocumentHeaderLine,
+} = require("./document-metadata");
+
 function createSyntaxIssue(line, code, message) {
   return { line, code, message };
 }
@@ -54,6 +60,61 @@ function lex(source) {
         indent,
         level,
         text: trimmed.slice(1).trimStart(),
+      });
+      continue;
+    }
+
+    if (isDocumentHeaderLine(trimmed)) {
+      lines.push({
+        type: "DocumentHeaderToken",
+        line: lineNumber,
+        indent,
+        level,
+        version: 1,
+        text: trimmed,
+      });
+      continue;
+    }
+
+    if (looksLikeDocumentHeaderLine(trimmed)) {
+      lines.push({
+        type: "InvalidLineToken",
+        line: lineNumber,
+        indent,
+        level,
+        code: "syntax.invalid-document-header",
+        message: "Document header must use the exact form `orgscript 1` on its own line.",
+        text: trimmed,
+      });
+      continue;
+    }
+
+    const metadataMatch = trimmed.match(
+      /^([a-z][a-z-]*)\s+"((?:[^"\\]|\\.)*)"$/
+    );
+
+    if (metadataMatch && DOCUMENT_LANGUAGE_KEYS.includes(metadataMatch[1])) {
+      lines.push({
+        type: "DocumentMetadataToken",
+        line: lineNumber,
+        indent,
+        level,
+        key: metadataMatch[1],
+        value: unescapeString(metadataMatch[2]),
+      });
+      continue;
+    }
+
+    if (DOCUMENT_LANGUAGE_KEYS.some((key) => trimmed.startsWith(`${key} `) || trimmed === key)) {
+      lines.push({
+        type: "InvalidLineToken",
+        line: lineNumber,
+        indent,
+        level,
+        code: "syntax.invalid-document-metadata",
+        message:
+          "Document language metadata must use the form `key \"value\"` with a supported language key.",
+        text: trimmed,
       });
       continue;
     }

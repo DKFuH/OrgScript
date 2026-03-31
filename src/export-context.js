@@ -3,7 +3,7 @@ const { toMarkdownSummary } = require("./export-markdown");
 
 function toAiContext(model, diagnostics = []) {
   return {
-    version: "0.2",
+    version: "0.3",
     timestamp: new Date().toISOString(),
     source: {
       model,
@@ -11,6 +11,7 @@ function toAiContext(model, diagnostics = []) {
       diagnostics,
       metadata: {
         commentsIncluded: false,
+        documentHeader: model.metadata || null,
         annotations: collectAnnotationMetadata(model),
       },
     },

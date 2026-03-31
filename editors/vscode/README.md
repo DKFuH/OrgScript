@@ -8,6 +8,7 @@ Official language support for **OrgScript** (`.orgs`) - the human-readable, AI-f
 - **Language Detection**: Automatically recognizes `.orgs` files.
 - **Smart Indentation**: Lightweight configuration for indentation-based logic.
 - **Annotation-Aware Highlighting**: Highlights whole-line `# comments` and `@owner "value"`-style metadata.
+- **Header-Aware Highlighting**: Highlights `orgscript 1` and document language metadata fields.
 - **Snippets**: Core block, comment, and annotation templates for faster authoring.
 
 ## Supported Syntax
@@ -15,6 +16,7 @@ Official language support for **OrgScript** (`.orgs`) - the human-readable, AI-f
 - **Top-level Blocks**: `process`, `stateflow`, `rule`, `role`, `policy`, `metric`, `event`.
 - **Core Statements**: `when`, `if`, `else`, `then`, `assign`, `transition`, `notify`, `create`, `update`, `require`, `stop`.
 - **Comments and Annotations**: Whole-line `# comments` and `@owner "value"`-style metadata.
+- **Document Metadata Header**: Highlights `orgscript 1`, `source-language`, `comment-language`, `annotation-language`, and `context-language`.
 - **Dotted References**: Native support for field paths like `order.status` or `lead.source`.
 - **Rich Literals**: Highlights strings, booleans, and numeric values.
 
@@ -30,6 +32,7 @@ Recommended test file:
 
 It exercises:
 
+- the optional document language header
 - top-level annotations
 - statement-level annotations
 - whole-line comments
@@ -64,6 +67,7 @@ Current editor support for annotations:
 
 - `org-comment`
 - `org-annotation`
+- `org-header`
 - `org-process`
 - `org-stateflow`
 - `org-rule`

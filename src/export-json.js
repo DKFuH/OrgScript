@@ -1,9 +1,18 @@
 function toCanonicalModel(ast) {
-  return {
-    version: "0.3",
+  const model = {
+    version: "0.4",
     type: "document",
     body: ast.body.map(toCanonicalNode),
   };
+
+  if (ast.metadata && ast.metadata.languages && Object.keys(ast.metadata.languages).length > 0) {
+    model.metadata = {
+      headerVersion: ast.metadata.headerVersion || 1,
+      languages: { ...ast.metadata.languages },
+    };
+  }
+
+  return model;
 }
 
 function toCanonicalNode(node) {

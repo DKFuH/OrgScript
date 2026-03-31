@@ -15,7 +15,7 @@ This catalog is designed to help you learn OrgScript quickly through real-world 
 The best first read. This is a compact single-process file showing explicit decisions, safe comments, and allowlisted annotations.
 
 - **Models**: A basic sales lead qualification funnel.
-- **Demonstrates**: `process`, `when`, `if` / `else if`, `assign`, `notify`, `stop`, `transition`, `# comments`, `@owner`, `@status`, `@note`, and `@review`.
+- **Demonstrates**: `process`, `when`, `if` / `else if`, `assign`, `notify`, `stop`, `transition`, the optional `orgscript 1` language header, `# comments`, `@owner`, `@status`, `@note`, and `@review`.
 - **Outputs available**: Mermaid diagram, Markdown summary.
 
 ## Realistic

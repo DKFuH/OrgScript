@@ -5,6 +5,10 @@ const {
   createComment,
   createDocument,
 } = require("./ast");
+const {
+  createDocumentMetadata,
+  getDocumentLanguageProperty,
+} = require("./document-metadata");
 
 const TOP_LEVEL_KEYWORDS = new Set([
   "process",
@@ -28,6 +32,7 @@ function parseDocument(tokens, filePath) {
   };
   const body = [];
   const trailingComments = [];
+  const header = parseDocumentHeader(state);
 
   while (!isAtEnd(state)) {
     const metadata = consumeMetadata(state, 0);
@@ -41,6 +46,31 @@ function parseDocument(tokens, filePath) {
     const line = peek(state);
 
     if (line.type === "BlankLineToken") {
+      advance(state);
+      continue;
+    }
+
+    if (line.type === "DocumentHeaderToken") {
+      state.issues.push(
+        createSyntaxIssue(
+          line.line,
+          "syntax.document-header-must-be-first",
+          "Document header must appear before comments, annotations, and top-level blocks."
+        )
+      );
+      advance(state);
+      skipDocumentMetadataLines(state);
+      continue;
+    }
+
+    if (line.type === "DocumentMetadataToken") {
+      state.issues.push(
+        createSyntaxIssue(
+          line.line,
+          "syntax.document-metadata-outside-header",
+          "Document language metadata must appear in the document header immediately after `orgscript 1`."
+        )
+      );
       advance(state);
       continue;
     }
@@ -65,8 +95,86 @@ function parseDocument(tokens, filePath) {
   }
 
   return {
-    ast: createDocument(filePath, body, { trailingComments }),
+    ast: createDocument(filePath, body, {
+      trailingComments,
+      metadata: header ? header.metadata : null,
+      metadataEntries: header ? header.entries : [],
+    }),
     issues: state.issues,
+  };
+}
+
+function parseDocumentHeader(state) {
+  while (!isAtEnd(state) && peek(state).type === "BlankLineToken") {
+    advance(state);
+  }
+
+  if (isAtEnd(state) || peek(state).type !== "DocumentHeaderToken") {
+    return null;
+  }
+
+  const headerLine = advance(state);
+  const languages = {};
+  const entries = [];
+  let fieldCount = 0;
+
+  while (!isAtEnd(state)) {
+    const token = peek(state);
+
+    if (token.type === "BlankLineToken") {
+      advance(state);
+      continue;
+    }
+
+    if (token.type === "DocumentMetadataToken" && token.level === 0) {
+      const property = getDocumentLanguageProperty(token.key);
+
+      if (languages[property]) {
+        state.issues.push(
+          createSyntaxIssue(
+            token.line,
+            "syntax.duplicate-document-metadata-key",
+            `Duplicate document metadata key \`${token.key}\`.`
+          )
+        );
+      } else {
+        languages[property] = token.value;
+        entries.push({
+          property,
+          value: token.value,
+          line: token.line,
+        });
+      }
+
+      fieldCount += 1;
+      advance(state);
+      continue;
+    }
+
+    if (token.type === "InvalidLineToken" && token.code === "syntax.invalid-document-metadata") {
+      state.issues.push(createSyntaxIssue(token.line, token.code, token.message));
+      advance(state);
+      continue;
+    }
+
+    break;
+  }
+
+  if (fieldCount === 0) {
+    state.issues.push(
+      createSyntaxIssue(
+        headerLine.line,
+        "syntax.empty-document-header",
+        "Document header must declare at least one language metadata field."
+      )
+    );
+  }
+
+  const metadata = createDocumentMetadata(languages, { headerVersion: headerLine.version });
+
+  return {
+    metadata,
+    entries,
   };
 }
 
@@ -1123,6 +1231,31 @@ function pushUnsupportedTargetIssues(state, metadata, line, targetDescription) {
 
 function trailingOnlyMetadata(state, metadata) {
   pushDanglingAnnotationIssues(state, metadata.annotations || []);
+}
+
+function skipDocumentMetadataLines(state) {
+  while (!isAtEnd(state)) {
+    const token = peek(state);
+
+    if (token.type === "BlankLineToken") {
+      advance(state);
+      continue;
+    }
+
+    if (token.type === "DocumentMetadataToken") {
+      state.issues.push(
+        createSyntaxIssue(
+          token.line,
+          "syntax.document-metadata-outside-header",
+          "Document language metadata must appear in the document header immediately after `orgscript 1`."
+        )
+      );
+      advance(state);
+      continue;
+    }
+
+    break;
+  }
 }
 
 function skipNestedBlock(state, level) {

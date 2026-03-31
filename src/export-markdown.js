@@ -7,6 +7,8 @@ function toMarkdownSummary(model, options = {}) {
 
   const lines = ["# OrgScript Logic Summary", ""];
 
+  appendDocumentMetadata(lines, model, options);
+
   if (sections.length > 1) {
     lines.push("## Contents");
     lines.push("");
@@ -25,6 +27,23 @@ function toMarkdownSummary(model, options = {}) {
   lines.push(bodyPart);
 
   return `${lines.join("\n")}\n`;
+}
+
+function appendDocumentMetadata(lines, model, options = {}) {
+  if (!options.includeAnnotations || !model.metadata || !model.metadata.languages) {
+    return;
+  }
+
+  const entries = Object.entries(model.metadata.languages);
+  if (entries.length === 0) {
+    return;
+  }
+
+  lines.push("### Document Metadata");
+  for (const [key, value] of entries) {
+    lines.push(`- **${toDocumentLanguageLabel(key)}**: \`${value}\``);
+  }
+  lines.push("");
 }
 
 function toAnchor(node) {
@@ -449,6 +468,26 @@ function joinParts(parts) {
 
 function toKindLabel(type) {
   return type.replace(/([a-z])([A-Z])/g, "$1 $2").toLowerCase();
+}
+
+function toDocumentLanguageLabel(key) {
+  if (key === "source") {
+    return "Source language";
+  }
+
+  if (key === "comments") {
+    return "Comment language";
+  }
+
+  if (key === "annotations") {
+    return "Annotation language";
+  }
+
+  if (key === "context") {
+    return "Context language";
+  }
+
+  return key;
 }
 
 module.exports = {

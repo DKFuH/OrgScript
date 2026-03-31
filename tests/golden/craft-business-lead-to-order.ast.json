@@ -1,6 +1,7 @@
 {
   "type": "Document",
   "filePath": "examples/craft-business-lead-to-order.orgs",
+  "metadata": null,
   "body": [
     {
       "type": "ProcessNode",

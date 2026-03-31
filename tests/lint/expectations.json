@@ -69,5 +69,16 @@
       "lint.comment-hidden-requirement",
       "lint.comment-hidden-permission"
     ]
+  },
+  {
+    "file": "language-mismatch.orgs",
+    "expectedSeverities": {
+      "lint.comment-language-mismatch": "warning",
+      "lint.annotation-language-mismatch": "warning"
+    },
+    "expectedCodes": [
+      "lint.comment-language-mismatch",
+      "lint.annotation-language-mismatch"
+    ]
   }
 ]

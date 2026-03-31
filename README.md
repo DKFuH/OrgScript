@@ -124,6 +124,25 @@ The main showcase flow is:
 - `event`: named triggers with reactions
 - `metric`: tracked business measures
 
+## Document Language Header, Comments, and Annotations
+
+OrgScript can declare the intended language of human-authored text at document level:
+
+```orgs
+orgscript 1
+
+source-language "en"
+comment-language "de"
+annotation-language "de"
+context-language "de"
+```
+
+This header is metadata only:
+
+- `source-language` documents the canonical source syntax language and remains `en` in v1
+- `comment-language`, `annotation-language`, and `context-language` help humans, exporters, and AI understand the intended language of nearby text
+- declared languages are treated as a document contract and may trigger lint warnings when comments or annotation values clearly drift
+
 ## Comments and Annotations
 
 OrgScript supports two documentation layers:
@@ -145,6 +164,12 @@ Annotations are parseable metadata. In v1 the allowlist is:
 Example:
 
 ```orgs
+orgscript 1
+
+source-language "en"
+comment-language "en"
+annotation-language "en"
+
 # Shared lead qualification path for inbound leads.
 @owner "sales_ops"
 @status "active"
@@ -156,9 +181,9 @@ process LeadQualification
 
 Export behavior:
 
-- `orgscript export markdown <file>` and `orgscript export html <file>` omit annotation callouts by default.
-- Add `--with-annotations` to Markdown or HTML export when you want allowlisted `@annotations` rendered in the generated documentation artifact.
-- `orgscript export context <file>` includes explicit annotation metadata in the structured context payload so downstream AI/indexing consumers do not need to recover it from prose.
+- `orgscript export markdown <file>` and `orgscript export html <file>` omit annotation callouts and document language metadata by default.
+- Add `--with-annotations` to Markdown or HTML export when you want allowlisted `@annotations` and declared document language metadata rendered in the generated documentation artifact.
+- `orgscript export context <file>` includes explicit annotation metadata and declared document language metadata in the structured context payload so downstream AI/indexing consumers do not need to recover it from prose.
 
 ## CLI Quick Reference
 

@@ -1,0 +1,11 @@
+orgscript 1
+
+source-language "en"
+comment-language "de"
+annotation-language "de"
+
+process LanguageMismatch
+
+  # Review the lead with the sales team.
+  @note "Track referral lead handling separately."
+  when lead.created

@@ -45,7 +45,7 @@ Global Options:
   --help, -h     Show this help
   --version, -v  Show version number
   --json         Output machine-readable JSON (where supported)
-  --with-annotations  Include annotations in supported Markdown and HTML exports
+  --with-annotations  Include annotations and document metadata in supported Markdown and HTML exports
 `);
 }
 
@@ -196,7 +196,9 @@ function run(args) {
     // We package context even if not perfectly valid, so AI can help fix.
     // However, if we can't parse, we can only report diagnostics.
     if (!result.ok) {
-        console.log(JSON.stringify(toAiContext({ version: "0.3", body: [] }, validateReport.diagnostics), null, 2));
+        console.log(
+          JSON.stringify(toAiContext({ version: "0.4", type: "document", body: [] }, validateReport.diagnostics), null, 2)
+        );
         process.exit(1);
     }
 

@@ -1,3 +1,10 @@
+orgscript 1
+
+source-language "en"
+comment-language "en"
+annotation-language "en"
+context-language "en"
+
 # Shared lead qualification path for inbound leads.
 @owner "sales_ops"
 @status "active"

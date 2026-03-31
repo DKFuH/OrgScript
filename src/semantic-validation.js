@@ -10,10 +10,17 @@ const ALLOWED_ANNOTATION_KEYS = new Set([
   "status",
   "review",
 ]);
+const {
+  HEADER_LANGUAGE_ORDER,
+  isLanguageCode,
+  isSupportedSourceLanguage,
+} = require("./document-metadata");
 
 function validateDocument(ast) {
   const issues = [];
   const seenTopLevel = new Map();
+
+  validateDocumentMetadata(ast, issues);
 
   for (const node of ast.body) {
     const key = `${node.type}:${node.name}`;
@@ -34,6 +41,48 @@ function validateDocument(ast) {
   }
 
   return issues;
+}
+
+function validateDocumentMetadata(ast, issues) {
+  if (!ast.metadata || !ast.metadata.languages) {
+    return;
+  }
+
+  for (const property of HEADER_LANGUAGE_ORDER) {
+    const value = ast.metadata.languages[property];
+    if (!value) {
+      continue;
+    }
+
+    const line = findDocumentMetadataLine(ast, property);
+
+    if (!isLanguageCode(value)) {
+      issues.push(
+        createSemanticIssue(
+          line,
+          "semantic.invalid-document-language-code",
+          `Document language \`${value}\` is not a supported ISO-style language code.`
+        )
+      );
+      continue;
+    }
+
+    if (property === "source" && !isSupportedSourceLanguage(value)) {
+      issues.push(
+        createSemanticIssue(
+          line,
+          "semantic.unsupported-source-language",
+          `Unsupported source-language \`${value}\`. OrgScript source keywords remain canonical English in v1.`
+        )
+      );
+    }
+  }
+}
+
+function findDocumentMetadataLine(ast, property) {
+  const entries = ast.metadataEntries || [];
+  const match = entries.find((entry) => entry.property === property);
+  return match ? match.line : 1;
 }
 
 function validateNode(node, issues) {

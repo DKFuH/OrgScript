@@ -70,5 +70,32 @@
     "expectedMessages": [
       "Inline `#` comments are not supported in v1"
     ]
+  },
+  {
+    "file": "invalid-document-header.orgs",
+    "expectedCodes": [
+      "syntax.invalid-document-header"
+    ],
+    "expectedMessages": [
+      "Document header must use the exact form `orgscript 1`"
+    ]
+  },
+  {
+    "file": "invalid-source-language.orgs",
+    "expectedCodes": [
+      "semantic.unsupported-source-language"
+    ],
+    "expectedMessages": [
+      "Unsupported source-language `de`"
+    ]
+  },
+  {
+    "file": "invalid-document-metadata-outside-header.orgs",
+    "expectedCodes": [
+      "syntax.document-metadata-outside-header"
+    ],
+    "expectedMessages": [
+      "Document language metadata must appear in the document header"
+    ]
   }
 ]

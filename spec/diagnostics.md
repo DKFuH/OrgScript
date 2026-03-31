@@ -70,11 +70,21 @@ Examples:
 - `syntax.annotation-target-not-supported`
 - `syntax.comment-target-not-supported`
 - `syntax.inline-comments-not-supported`
+- `syntax.invalid-document-header`
+- `syntax.invalid-document-metadata`
+- `syntax.empty-document-header`
+- `syntax.document-header-must-be-first`
+- `syntax.document-metadata-outside-header`
+- `syntax.duplicate-document-metadata-key`
+- `semantic.invalid-document-language-code`
+- `semantic.unsupported-source-language`
 - `semantic.unsupported-annotation-key`
 - `semantic.duplicate-annotation-key`
 - `lint.comment-hidden-business-rule`
 - `lint.comment-hidden-requirement`
 - `lint.comment-hidden-permission`
+- `lint.comment-language-mismatch`
+- `lint.annotation-language-mismatch`
 
 ## Top-level JSON structure
 
@@ -234,6 +244,7 @@ Comments:
 - are excluded from canonical export
 - are excluded from AI context by default
 - do not appear in JSON diagnostics unless the comment itself causes a lint finding
+- may produce `lint.comment-language-mismatch` when the document declares `comment-language` and the mismatch is obvious
 
 Annotations:
 
@@ -241,6 +252,15 @@ Annotations:
 - are validated for syntax and allowlisted keys
 - appear in the canonical model when valid
 - are non-semantic metadata
+- may produce `lint.annotation-language-mismatch` when the document declares `annotation-language` and the mismatch is obvious
+
+Document language metadata:
+
+- is declared through an optional `orgscript 1` header at the start of the file
+- may include `source-language`, `comment-language`, `annotation-language`, and `context-language`
+- is included in canonical JSON as `metadata.languages`
+- is included in AI context metadata as `source.metadata.documentHeader`
+- does not change OrgScript semantics
 
 Typical annotation and comment-related diagnostics:
 
@@ -249,11 +269,21 @@ Typical annotation and comment-related diagnostics:
 - `syntax.annotation-target-not-supported`
 - `syntax.comment-target-not-supported`
 - `syntax.inline-comments-not-supported`
+- `syntax.invalid-document-header`
+- `syntax.invalid-document-metadata`
+- `syntax.empty-document-header`
+- `syntax.document-header-must-be-first`
+- `syntax.document-metadata-outside-header`
+- `syntax.duplicate-document-metadata-key`
+- `semantic.invalid-document-language-code`
+- `semantic.unsupported-source-language`
 - `semantic.unsupported-annotation-key`
 - `semantic.duplicate-annotation-key`
 - `lint.comment-hidden-business-rule`
 - `lint.comment-hidden-requirement`
 - `lint.comment-hidden-permission`
+- `lint.comment-language-mismatch`
+- `lint.annotation-language-mismatch`
 
 ## Text output contract
 

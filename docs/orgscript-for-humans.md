@@ -75,14 +75,36 @@ Use `metric` to define a tracked business measure.
 - Use stable names.
 - Use English for public OrgScript files.
 - Avoid prose paragraphs inside OrgScript.
+- Use the optional document language header when comments, annotations, or generated context should be read in a known human language.
 - Use `#` comments for human notes only.
 - Use annotations for structured metadata such as `@owner "sales_ops"`.
+
+## Document language header, comments, and annotations
+
+If you want the file to declare the intended language of comments, annotation values, or generated context, put a language header at the top:
+
+```orgs
+orgscript 1
+
+source-language "en"
+comment-language "de"
+annotation-language "de"
+context-language "de"
+```
+
+This header does not change OrgScript keywords. It only declares the language contract for human-authored text areas.
 
 ## Comments and annotations
 
 Use comments to help a reader orient themselves:
 
 ```orgs
+orgscript 1
+
+source-language "en"
+comment-language "en"
+annotation-language "en"
+
 # Shared lead qualification path for inbound leads.
 @owner "sales_ops"
 @status "active"
@@ -200,6 +222,7 @@ Before committing an OrgScript file:
 - Is the trigger explicit?
 - Are decisions written as `if` statements?
 - Are names specific and stable?
+- If you declared language metadata, do comments and annotation values actually follow it?
 - Did you avoid prose and hidden assumptions?
 - Does `orgscript validate` pass?
 - Does `orgscript format` keep the file stable?

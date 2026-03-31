@@ -7,6 +7,12 @@
       "include": "#comments"
     },
     {
+      "include": "#document-header"
+    },
+    {
+      "include": "#document-metadata"
+    },
+    {
       "include": "#annotations"
     },
     {
@@ -38,6 +44,36 @@
     }
   ],
   "repository": {
+    "document-header": {
+      "patterns": [
+        {
+          "match": "^(\\s*)(orgscript)(\\s+)(1)\\b",
+          "captures": {
+            "2": {
+              "name": "keyword.declaration.orgscript"
+            },
+            "4": {
+              "name": "constant.numeric.orgscript"
+            }
+          }
+        }
+      ]
+    },
+    "document-metadata": {
+      "patterns": [
+        {
+          "match": "^(\\s*)(source-language|comment-language|annotation-language|context-language)(\\s+)(\"(?:[^\"\\\\]|\\\\.)*\")",
+          "captures": {
+            "2": {
+              "name": "keyword.other.special-method.orgscript"
+            },
+            "4": {
+              "name": "string.quoted.double.orgscript"
+            }
+          }
+        }
+      ]
+    },
     "comments": {
       "patterns": [
         {

@@ -1,6 +1,7 @@
 {
   "type": "Document",
   "filePath": "examples/hiring-process.orgs",
+  "metadata": null,
   "body": [
     {
       "type": "StateflowNode",

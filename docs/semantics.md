@@ -38,11 +38,16 @@ The canonical model is the source for:
 
 ## Comments and annotations
 
+- Optional document language metadata declares the intended language of source-adjacent human text.
+- Document language metadata is non-semantic and does not change parsing, execution boundaries, or transition legality.
+- `source-language` is descriptive in v1 and remains fixed to canonical English source syntax.
 - `#` comments are non-authoritative human notes.
 - Comments do not affect parsing semantics, semantic validation, analysis, canonical export, or transition legality.
+- Comments may be linted if they clearly conflict with a declared `comment-language`.
 - `@key "value"` annotations are parseable metadata.
 - Annotations are included in the AST and canonical model.
 - Annotations are explicitly non-semantic in v1.
+- Annotation values may be linted if they clearly conflict with a declared `annotation-language`.
 
 If business logic matters, it must be modeled in OrgScript constructs instead of comments.
 

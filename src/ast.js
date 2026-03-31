@@ -2,6 +2,10 @@ function createDocument(filePath, body, extra = {}) {
   return {
     type: "Document",
     filePath,
+    metadata: extra.metadata,
+    metadataEntries: extra.metadataEntries && extra.metadataEntries.length > 0
+      ? extra.metadataEntries
+      : undefined,
     body,
     trailingComments: extra.trailingComments || [],
   };

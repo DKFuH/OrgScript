@@ -13,6 +13,19 @@
     ],
     "description": "Insert a whole-line OrgScript annotation."
   },
+  "OrgScript Language Header": {
+    "prefix": "org-header",
+    "body": [
+      "orgscript 1",
+      "",
+      "source-language \"en\"",
+      "comment-language \"${1:en}\"",
+      "annotation-language \"${2:en}\"",
+      "context-language \"${3:en}\"",
+      ""
+    ],
+    "description": "Insert an OrgScript document language header."
+  },
   "OrgScript Process Block": {
     "prefix": "org-process",
     "body": [

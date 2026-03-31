@@ -1,8 +1,19 @@
 (* Draft EBNF for OrgScript v0.1. Indentation handling is lexical and represented through INDENT/DEDENT tokens.
    Whole-line comments use "#" and are treated as trivia.
-   Whole-line annotations use @key "value" and attach to the following supported block or statement. *)
+   Whole-line annotations use @key "value" and attach to the following supported block or statement.
+   Optional document language metadata uses a top-of-file `orgscript 1` header. *)
 
-file            = { top_block } ;
+file            = [ document_header ] , { top_block } ;
+
+document_header = "orgscript" , "1" , NEWLINE ,
+                  { document_language_stmt } ;
+
+document_language_stmt = (
+                    "source-language"
+                  | "comment-language"
+                  | "annotation-language"
+                  | "context-language"
+                  ) , string , NEWLINE ;
 
 top_block       = process_block
                 | stateflow_block

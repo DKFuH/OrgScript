@@ -1,9 +1,27 @@
+const {
+  DOCUMENT_HEADER_TEXT,
+  getHeaderLanguageEntries,
+} = require("./document-metadata");
+
 function formatDocument(ast) {
   const lines = [];
   const blocks = ast.body || [];
 
+  if (ast.metadata && getHeaderLanguageEntries(ast.metadata).length > 0) {
+    lines.push(DOCUMENT_HEADER_TEXT);
+    lines.push("");
+
+    for (const entry of getHeaderLanguageEntries(ast.metadata)) {
+      lines.push(`${entry.key} ${formatString(entry.value)}`);
+    }
+
+    if (blocks.length > 0 || (ast.trailingComments || []).length > 0) {
+      lines.push("");
+    }
+  }
+
   blocks.forEach((block, index) => {
-    if (index > 0) {
+    if (index > 0 || (index === 0 && lines.length > 0 && lines[lines.length - 1] !== "")) {
       lines.push("");
     }
     lines.push(...formatTopLevelBlock(block));

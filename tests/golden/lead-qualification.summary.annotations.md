@@ -1,5 +1,11 @@
 # OrgScript Logic Summary
 
+### Document Metadata
+- **Source language**: `en`
+- **Comment language**: `en`
+- **Annotation language**: `en`
+- **Context language**: `en`
+
 ## Process: LeadQualification
 
 ### Metadata

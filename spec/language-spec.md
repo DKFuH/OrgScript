@@ -23,6 +23,8 @@ OrgScript is not a general-purpose programming language. It describes business l
 - Keywords are lowercase
 - Strings use double quotes
 - Suggested extension: `.orgs`
+- Optional document language header uses `orgscript 1`
+- Document language metadata uses whole-line `source-language "en"`-style fields in v1
 - Comments use whole-line `# ...` form in v1
 - Structured annotations use whole-line `@key "value"` form in v1
 
@@ -74,10 +76,32 @@ OrgScript uses indentation-based blocks and lexical keywords. The reference gram
 
 ### 6.0 Comments and annotations
 
-OrgScript supports two non-executable documentation forms:
+OrgScript supports three non-executable documentation forms:
 
+- document language metadata
 - comments
 - annotations
+
+Document language metadata:
+
+- may appear only in an optional document header at the start of the file
+- begins with `orgscript 1`
+- uses whole-line fields:
+  - `source-language "en"`
+  - `comment-language "de"`
+  - `annotation-language "de"`
+  - `context-language "de"`
+- is document-level metadata, not executable logic
+- is included in the AST and canonical model
+- does not change parsing semantics or execution semantics
+- is binding as a documentation contract for the corresponding human-authored text areas
+
+Rules for the document header in v1:
+
+- if present, it must be the first non-blank construct in the file
+- `source-language` is canonical source syntax metadata and only `en` is supported in v1
+- values must use ISO-style language codes such as `en`, `de`, `pt`, `es`, or `eo`
+- document metadata does not localize OrgScript keywords
 
 Comments:
 
@@ -86,6 +110,7 @@ Comments:
 - are human-oriented only
 - are not authoritative business logic
 - do not change parsing semantics, semantic validation, analysis, or transition legality
+- may be linted if they clearly conflict with a declared `comment-language`
 
 Annotations:
 
@@ -94,6 +119,7 @@ Annotations:
 - are parseable metadata
 - are non-semantic
 - are included in the AST and canonical model
+- may be linted if their values clearly conflict with a declared `annotation-language`
 
 Supported annotation keys in v1:
 
@@ -165,6 +191,7 @@ The canonical reading rules are:
 - explicit values and branch order must be preserved
 - comments are ignored by semantic interpretation
 - annotations are metadata only and do not alter semantics
+- document language metadata is metadata only and does not alter semantics
 
 OrgScript prefers explicit description over inference. If a statement is ambiguous, the language should favor a more explicit form rather than hidden defaults or shorthand.
 
@@ -187,6 +214,7 @@ Canonical model guidelines:
 - preserve explicit identifiers and values exactly
 - keep the model close to the source AST
 - do not invent business semantics during export
+- include document language metadata when present
 - include annotations on supported nodes
 - exclude comments
 
@@ -239,7 +267,10 @@ At minimum, validation should reject or flag:
 - undefined or illegal state transitions
 - empty blocks where content is required
 - duplicate top-level names within the same namespace, according to policy
+- malformed document headers
+- malformed or misplaced document language metadata
 - malformed annotation syntax
+- unsupported `source-language` values
 - unsupported annotation keys
 - misplaced annotations
 - inline `#` comments after code, which are intentionally unsupported in v1

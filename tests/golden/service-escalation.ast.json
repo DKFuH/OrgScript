@@ -1,6 +1,7 @@
 {
   "type": "Document",
   "filePath": "examples/service-escalation.orgs",
+  "metadata": null,
   "body": [
     {
       "type": "PolicyNode",

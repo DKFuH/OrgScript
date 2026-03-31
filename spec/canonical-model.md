@@ -1,4 +1,4 @@
-# Canonical Model v0.3
+# Canonical Model v0.4
 
 OrgScript text compiles into a language-neutral canonical model. This model is the intermediate representation used by all exporters (JSON, Markdown, Mermaid, HTML) and analysis tools.
 
@@ -21,8 +21,17 @@ The top-level object represents an OrgScript document.
 
 ```json
 {
-  "version": "0.3",
+  "version": "0.4",
   "type": "document",
+  "metadata": {
+    "headerVersion": 1,
+    "languages": {
+      "source": "en",
+      "comments": "en",
+      "annotations": "en",
+      "context": "en"
+    }
+  },
   "body": [
     {
       "type": "process",
@@ -90,6 +99,7 @@ The top-level object represents an OrgScript document.
 ## Comments and annotations
 
 - Comments are excluded from the canonical model.
+- Document language metadata is included at document root when declared.
 - Supported nodes may expose an `annotations` array.
 - Annotations are metadata only. They do not affect execution semantics, transition legality, or analysis metrics.
 - Exporters may choose whether to render annotations in human-facing artifacts, but comments remain excluded by default.

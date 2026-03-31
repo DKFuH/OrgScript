@@ -1,49 +1,80 @@
 {
   "type": "Document",
   "filePath": "examples/lead-qualification.orgs",
+  "metadata": {
+    "headerVersion": 1,
+    "languages": {
+      "source": "en",
+      "comments": "en",
+      "annotations": "en",
+      "context": "en"
+    }
+  },
+  "metadataEntries": [
+    {
+      "property": "source",
+      "value": "en",
+      "line": 3
+    },
+    {
+      "property": "comments",
+      "value": "en",
+      "line": 4
+    },
+    {
+      "property": "annotations",
+      "value": "en",
+      "line": 5
+    },
+    {
+      "property": "context",
+      "value": "en",
+      "line": 6
+    }
+  ],
   "body": [
     {
       "type": "ProcessNode",
       "name": "LeadQualification",
-      "line": 4,
+      "line": 11,
       "annotations": [
         {
           "type": "AnnotationNode",
           "key": "owner",
           "value": "sales_ops",
-          "line": 2
+          "line": 9
         },
         {
           "type": "AnnotationNode",
           "key": "status",
           "value": "active",
-          "line": 3
+          "line": 10
         }
       ],
       "leadingComments": [
         {
           "type": "CommentNode",
           "text": "Shared lead qualification path for inbound leads.",
-          "line": 1
+          "line": 8
         }
       ],
       "trailingComments": [
         {
           "type": "CommentNode",
           "text": "Sales can continue with the qualified lead.",
-          "line": 28
+          "line": 35
         }
       ],
       "body": [
         {
           "type": "WhenNode",
-          "line": 7,
+          "line": 14,
           "annotations": [],
           "leadingComments": [
             {
               "type": "CommentNode",
               "text": "New leads enter the qualification flow when created.",
-              "line": 6
+              "line": 13
             }
           ],
           "trailingComments": [],
@@ -54,20 +85,20 @@
         },
         {
           "type": "IfNode",
-          "line": 11,
+          "line": 18,
           "annotations": [
             {
               "type": "AnnotationNode",
               "key": "note",
               "value": "Track referral lead handling separately.",
-              "line": 10
+              "line": 17
             }
           ],
           "leadingComments": [
             {
               "type": "CommentNode",
               "text": "Referral leads follow the premium qualification path.",
-              "line": 9
+              "line": 16
             }
           ],
           "trailingComments": [],
@@ -83,12 +114,12 @@
               "valueType": "string",
               "value": "referral"
             },
-            "line": 11
+            "line": 18
           },
           "then": [
             {
               "type": "AssignNode",
-              "line": 12,
+              "line": 19,
               "annotations": [],
               "leadingComments": [],
               "trailingComments": [],
@@ -104,7 +135,7 @@
             },
             {
               "type": "AssignNode",
-              "line": 13,
+              "line": 20,
               "annotations": [],
               "leadingComments": [],
               "trailingComments": [],
@@ -120,7 +151,7 @@
             },
             {
               "type": "NotifyNode",
-              "line": 14,
+              "line": 21,
               "annotations": [],
               "leadingComments": [],
               "trailingComments": [],
@@ -143,12 +174,12 @@
                   "valueType": "string",
                   "value": "ads"
                 },
-                "line": 16
+                "line": 23
               },
               "then": [
                 {
                   "type": "AssignNode",
-                  "line": 17,
+                  "line": 24,
                   "annotations": [],
                   "leadingComments": [],
                   "trailingComments": [],
@@ -164,7 +195,7 @@
                 },
                 {
                   "type": "AssignNode",
-                  "line": 18,
+                  "line": 25,
                   "annotations": [],
                   "leadingComments": [],
                   "trailingComments": [],
@@ -179,7 +210,7 @@
                   }
                 }
               ],
-              "line": 16,
+              "line": 23,
               "annotations": [],
               "leadingComments": [],
               "trailingComments": []
@@ -189,13 +220,13 @@
         },
         {
           "type": "IfNode",
-          "line": 21,
+          "line": 28,
           "annotations": [
             {
               "type": "AnnotationNode",
               "key": "review",
               "value": "Revisit the budget threshold each quarter.",
-              "line": 20
+              "line": 27
             }
           ],
           "leadingComments": [],
@@ -212,12 +243,12 @@
               "valueType": "number",
               "value": 10000
             },
-            "line": 21
+            "line": 28
           },
           "then": [
             {
               "type": "TransitionNode",
-              "line": 22,
+              "line": 29,
               "annotations": [],
               "leadingComments": [],
               "trailingComments": [],
@@ -233,7 +264,7 @@
             },
             {
               "type": "NotifyNode",
-              "line": 23,
+              "line": 30,
               "annotations": [],
               "leadingComments": [],
               "trailingComments": [],
@@ -242,7 +273,7 @@
             },
             {
               "type": "StopNode",
-              "line": 24,
+              "line": 31,
               "annotations": [],
               "leadingComments": [],
               "trailingComments": []
@@ -253,7 +284,7 @@
         },
         {
           "type": "TransitionNode",
-          "line": 26,
+          "line": 33,
           "annotations": [],
           "leadingComments": [],
           "trailingComments": [],
