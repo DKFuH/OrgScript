@@ -8,8 +8,31 @@ OrgScript uses indentation-based blocks and a small set of reserved keywords.
 - Suggested extension: `.orgs`
 - UTF-8
 - Spaces for indentation
+- Optional document header uses `orgscript 1`
+- Document language metadata uses whole-line `source-language "en"`-style fields
 - Whole-line comments use `#`
 - Whole-line annotations use `@key "value"`
+
+## Document header, comments, and annotations
+
+Document-level language metadata may appear at the start of the file:
+
+```orgs
+orgscript 1
+
+source-language "en"
+comment-language "de"
+annotation-language "de"
+context-language "de"
+```
+
+Rules for v1:
+
+- the header is optional
+- if present, it must be the first non-blank construct in the file
+- `source-language` is the canonical source syntax language and only `en` is supported in v1
+- these fields are metadata only; they do not localize OrgScript keywords
+- declared languages are binding as a document-quality contract
 
 ## Comments and annotations
 
@@ -36,6 +59,7 @@ Rules for v1:
 - supported annotation keys are `@note`, `@owner`, `@todo`, `@source`, `@status`, and `@review`
 - comments and annotations may attach to top-level blocks and statement lines
 - comments and annotations are not supported on `states`, `transitions`, `can`, `cannot`, `formula`, `owner`, `target`, or `applies to` lines in v1
+- comments and annotation values may be linted when they clearly conflict with declared document language metadata
 
 ## Top-level blocks
 
