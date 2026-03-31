@@ -1,6 +1,6 @@
 {
   "name": "@dkfuh/orgscript",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "description": "A human-readable, AI-friendly description language for business logic and operational systems.",
   "license": "Apache-2.0",
   "main": "./src/index.js",

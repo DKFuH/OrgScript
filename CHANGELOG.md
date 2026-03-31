@@ -6,6 +6,14 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 ## [Unreleased]
 
+## [0.9.4] - 2026-03-31
+
+- Added an optional document language metadata header with `orgscript 1` plus `source-language`, `comment-language`, `annotation-language`, and `context-language`.
+- Treated declared language metadata as a stricter document contract while keeping the OrgScript core syntax canonical in English.
+- Added canonical JSON and context-export support for document metadata.
+- Added conservative lint checks for obvious comment and annotation language mismatches.
+- Updated the formatter, VS Code grammar/snippets, specs, examples, manuals, and tests for the new header.
+
 ## [0.9.3] - 2026-03-30
 
 - Renamed the npm package to `@dkfuh/orgscript` after npm rejected the unscoped `orgscript` name as too similar to an existing package.
