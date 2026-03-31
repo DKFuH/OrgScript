@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: OrgScript contribution guide
+    url: https://github.com/DKFuH/OrgScript/blob/main/CONTRIBUTING.md
+    about: Read the contribution guidelines before proposing larger language or tooling changes.
