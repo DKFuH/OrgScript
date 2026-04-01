@@ -10,6 +10,8 @@ const { toCanonicalModel } = require("../src/export-json");
 const { toMarkdownSummary } = require("../src/export-markdown");
 const { toMermaidMarkdown } = require("../src/export-mermaid");
 const { toHtmlDocumentation } = require("../src/export-html");
+const { toBpmnXml } = require("../src/export-bpmn");
+const { toLittleHorseSkeleton } = require("../src/export-littlehorse");
 const { toAiContext } = require("../src/export-context");
 const { analyzeDocument } = require("../src/analyze");
 const { lintDocument, renderLintReport, summarizeFindings } = require("../src/linter");
@@ -35,6 +37,7 @@ function run() {
   testMarkdownExport();
   testHtmlExport();
   testMarkdownExporterAdditionalBlockKinds();
+  testSkeletonExporters();
   testCommentsAndAnnotations();
   testVsCodeArtifacts();
   console.log("All tests passed.");
@@ -419,6 +422,30 @@ function testCliDiagnosticsAndExitCodes() {
     "Expected Mermaid export heading"
   );
 
+  const exportBpmn = runCli([
+    cliPath,
+    "export",
+    "bpmn",
+    "./examples/craft-business-lead-to-order.orgs",
+  ]);
+  assert.strictEqual(exportBpmn.status, 0, "Expected export bpmn to succeed");
+  assert.ok(
+    exportBpmn.stdout.includes("<bpmn:definitions"),
+    "Expected BPMN export to include definitions"
+  );
+
+  const exportLittleHorse = runCli([
+    cliPath,
+    "export",
+    "littlehorse",
+    "./examples/craft-business-lead-to-order.orgs",
+  ]);
+  assert.strictEqual(exportLittleHorse.status, 0, "Expected export littlehorse to succeed");
+  assert.ok(
+    exportLittleHorse.stdout.includes("OrgScript -> LittleHorse workflow skeleton"),
+    "Expected LittleHorse skeleton header"
+  );
+
   const exportContext = runCli([
     cliPath,
     "export",
@@ -488,6 +515,38 @@ function testCliDiagnosticsAndExitCodes() {
   assert.ok(
     exportMermaidUnsupported.stderr.includes("No Mermaid-exportable blocks found"),
     "Expected unsupported Mermaid export reason"
+  );
+
+  const exportBpmnUnsupported = runCli([
+    cliPath,
+    "export",
+    "bpmn",
+    "./examples/service-escalation.orgs",
+  ]);
+  assert.strictEqual(
+    exportBpmnUnsupported.status,
+    1,
+    "Expected export bpmn to fail when no supported blocks exist"
+  );
+  assert.ok(
+    exportBpmnUnsupported.stderr.includes("No BPMN-exportable blocks found"),
+    "Expected unsupported BPMN export reason"
+  );
+
+  const exportLittleHorseUnsupported = runCli([
+    cliPath,
+    "export",
+    "littlehorse",
+    "./examples/service-escalation.orgs",
+  ]);
+  assert.strictEqual(
+    exportLittleHorseUnsupported.status,
+    1,
+    "Expected export littlehorse to fail when no supported blocks exist"
+  );
+  assert.ok(
+    exportLittleHorseUnsupported.stderr.includes("No LittleHorse-exportable blocks found"),
+    "Expected unsupported LittleHorse export reason"
   );
 
   const formatCommand = runCli([
@@ -804,6 +863,52 @@ function testMarkdownExporterAdditionalBlockKinds() {
   assert.ok(output.includes("notify `finance` with `\"Payment received\"`"), "Expected event action");
   assert.ok(output.includes("# Metric: CloseRate"), "Expected metric summary heading");
   assert.ok(output.includes("`won_quotes / total_quotes`"), "Expected metric formula");
+}
+
+function testSkeletonExporters() {
+  const model = {
+    version: "0.4",
+    type: "document",
+    body: [
+      {
+        type: "process",
+        name: "OrderApproval",
+        body: [
+          {
+            type: "when",
+            trigger: "order.submitted",
+          },
+          {
+            type: "if",
+            condition: {
+              type: "comparison",
+              left: { type: "field", path: "order.amount" },
+              operator: ">",
+              right: { type: "number", value: 10000 },
+            },
+            then: [
+              { type: "notify", target: "finance", message: "High value order" },
+            ],
+            elseIf: [],
+            else: null,
+          },
+          {
+            type: "transition",
+            target: "order.status",
+            value: { type: "string", value: "approved" },
+          },
+        ],
+      },
+    ],
+  };
+
+  const bpmn = toBpmnXml(model);
+  assert.ok(bpmn.includes("<bpmn:process"), "Expected BPMN process");
+  assert.ok(bpmn.includes("OrderApproval"), "Expected BPMN process name");
+
+  const littleHorse = toLittleHorseSkeleton(model);
+  assert.ok(littleHorse.includes("OrderApprovalWorkflow"), "Expected LittleHorse class name");
+  assert.ok(littleHorse.includes("when order.submitted"), "Expected trigger comment");
 }
 
 function testCommentsAndAnnotations() {

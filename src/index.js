@@ -4,6 +4,8 @@ const { toCanonicalModel } = require("./export-json");
 const { toMarkdownSummary } = require("./export-markdown");
 const { toMermaidMarkdown } = require("./export-mermaid");
 const { toHtmlDocumentation } = require("./export-html");
+const { toBpmnXml } = require("./export-bpmn");
+const { toLittleHorseSkeleton } = require("./export-littlehorse");
 const { analyzeDocument } = require("./analyze");
 const { toAiContext } = require("./export-context");
 const { formatDocument } = require("./formatter");
@@ -24,5 +26,7 @@ module.exports = {
   toMarkdownSummary,
   toMermaidMarkdown,
   toHtmlDocumentation,
+  toBpmnXml,
+  toLittleHorseSkeleton,
   toAiContext,
 };

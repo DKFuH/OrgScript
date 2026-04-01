@@ -16,6 +16,8 @@ const { toCanonicalModel } = require("./export-json");
 const { toMarkdownSummary } = require("./export-markdown");
 const { toMermaidMarkdown } = require("./export-mermaid");
 const { toHtmlDocumentation } = require("./export-html");
+const { toBpmnXml } = require("./export-bpmn");
+const { toLittleHorseSkeleton } = require("./export-littlehorse");
 const { formatDocument } = require("./formatter");
 const { lintDocument, summarizeFindings } = require("./linter");
 const { buildModel, validateFile } = require("./validate");
@@ -153,6 +155,8 @@ Targets:
   markdown        Stakeholder-friendly logic summary
   mermaid         Process and stateflow diagrams (Markdown)
   html            Self-contained documentation page
+  bpmn            BPMN XML skeleton
+  littlehorse     LittleHorse workflow skeleton (pseudo-code)
 
 Options:
   --with-annotations  Include annotations and document metadata in supported Markdown and HTML exports
@@ -220,6 +224,26 @@ Usage:
 Options:
   --with-annotations  Include annotations and document metadata
   -h, --help          Show this help
+
+${docs}`);
+    return;
+  }
+
+  if (target === "bpmn") {
+    console.log(`orgscript export bpmn
+
+Usage:
+  orgscript export bpmn <file>
+
+${docs}`);
+    return;
+  }
+
+  if (target === "littlehorse") {
+    console.log(`orgscript export littlehorse
+
+Usage:
+  orgscript export littlehorse <file>
 
 ${docs}`);
     return;
@@ -417,6 +441,48 @@ function run(args) {
       process.exit(0);
     } catch (error) {
       console.error(`Cannot export Mermaid from ${absolutePath}: ${error.message}`);
+      process.exit(1);
+    }
+  }
+
+  if (command === "export" && maybeSubcommand === "bpmn") {
+    const absolutePath = resolveFile("export", maybeFile);
+    const result = buildModel(absolutePath);
+
+    if (!result.ok) {
+      printDiagnostics(
+        `EXPORT ${toDisplayPath(absolutePath)}`,
+        createValidateReport(absolutePath, result).diagnostics
+      );
+      process.exit(1);
+    }
+
+    try {
+      process.stdout.write(toBpmnXml(toCanonicalModel(result.ast)));
+      process.exit(0);
+    } catch (error) {
+      console.error(`Cannot export BPMN from ${absolutePath}: ${error.message}`);
+      process.exit(1);
+    }
+  }
+
+  if (command === "export" && maybeSubcommand === "littlehorse") {
+    const absolutePath = resolveFile("export", maybeFile);
+    const result = buildModel(absolutePath);
+
+    if (!result.ok) {
+      printDiagnostics(
+        `EXPORT ${toDisplayPath(absolutePath)}`,
+        createValidateReport(absolutePath, result).diagnostics
+      );
+      process.exit(1);
+    }
+
+    try {
+      process.stdout.write(toLittleHorseSkeleton(toCanonicalModel(result.ast)));
+      process.exit(0);
+    } catch (error) {
+      console.error(`Cannot export LittleHorse from ${absolutePath}: ${error.message}`);
       process.exit(1);
     }
   }

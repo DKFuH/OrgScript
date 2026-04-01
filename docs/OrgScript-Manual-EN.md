@@ -68,6 +68,8 @@ orgscript check ./examples/craft-business-lead-to-order.orgs
 orgscript export mermaid ./examples/craft-business-lead-to-order.orgs
 orgscript export markdown ./examples/lead-qualification.orgs --with-annotations
 orgscript export context ./examples/lead-qualification.orgs
+orgscript export bpmn ./examples/lead-qualification.orgs
+orgscript export littlehorse ./examples/lead-qualification.orgs
 ```
 
 What they do:
@@ -76,6 +78,8 @@ What they do:
 - `export mermaid` creates a diagram-friendly artifact
 - `export markdown` creates a short human-readable summary
 - `export context` creates a structured AI/tooling context bundle
+- `export bpmn` creates a BPMN XML skeleton for process blocks
+- `export littlehorse` creates a LittleHorse workflow skeleton (pseudo-code scaffold)
 
 ## Comments and annotations
 
@@ -159,6 +163,7 @@ Default exporter policy:
 - annotations are included in canonical JSON
 - annotations are included in `export context`
 - annotations appear in Markdown and HTML only when you pass `--with-annotations`
+- BPMN and LittleHorse exporters are skeletons and require manual review before use
 
 This keeps business meaning explicit and prevents comments from becoming a hidden second language.
 
