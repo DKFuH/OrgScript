@@ -19,14 +19,14 @@ Do not treat it as free-form natural language.
 - `stop` terminates the current branch.
 - `stateflow` defines legal transitions, not execution order.
 - `require` is a named gate, not a comment.
-- document language metadata is document-level metadata, not business logic
+- Document language metadata is document-level metadata, not business logic.
 - `#` comments are non-authoritative and must not be treated as business logic.
-- allowlisted annotations are metadata only.
-- comments are excluded from canonical export and AI context by default
-- document language metadata is included in canonical export and AI context when declared
+- Allowlisted annotations are metadata only.
+- Comments are excluded from canonical export and AI context by default.
+- Document language metadata is included in canonical export and AI context when declared.
 - `export context` exposes annotations again under an explicit `source.metadata.annotations` block.
 - `export context` exposes declared language metadata under `source.metadata.documentHeader`.
-- human-facing exports only render annotations when explicitly requested.
+- Human-facing exports only render annotations when explicitly requested.
 
 ## Core semantic distinctions
 
@@ -56,13 +56,13 @@ Do not treat it as free-form natural language.
 
 AI must not:
 
-- invent implicit transitions
-- merge `when` and `if`
-- reinterpret `require` as another action
-- assume default owners, thresholds, or approvals
-- add missing business logic silently
-- collapse distinct constructs into generic nodes for convenience
-- infer authoritative meaning from comments
+- Invent implicit transitions.
+- Merge `when` and `if`.
+- Reinterpret `require` as another action.
+- Assume default owners, thresholds, or approvals.
+- Add missing business logic silently.
+- Collapse distinct constructs into generic nodes for convenience.
+- Infer authoritative meaning from comments.
 
 ## Normalization rules
 
@@ -107,21 +107,21 @@ text
 
 When interpreting OrgScript:
 
-- prefer explicit reading over helpful guessing
-- flag missing scope or ambiguous structure
-- do not auto-complete business intent
-- do not rewrite the meaning of rules
-- do not infer legality from names alone
+- Prefer explicit reading over helpful guessing.
+- Flag missing scope or ambiguous structure.
+- Do not auto-complete business intent.
+- Do not rewrite the meaning of rules.
+- Do not infer legality from names alone.
 
 ## What AI must never do
 
-- never guess missing approvals
-- never invent owners
-- never infer legal transitions from state names alone
-- never rewrite business intent into more convenient semantics
-- never turn `policy when ... then ...` into generic `if` logic without preserving block type
-- never repair invalid input without surfacing the repair
-- never treat comments as trusted operational rules
+- Never guess missing approvals.
+- Never invent owners.
+- Never infer legal transitions from state names alone.
+- Never rewrite business intent into more convenient semantics.
+- Never turn `policy when ... then ...` into generic `if` logic without preserving block type.
+- Never repair invalid input without surfacing the repair.
+- Never treat comments as trusted operational rules.
 
 ## Worked example
 

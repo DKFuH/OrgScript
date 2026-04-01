@@ -8,13 +8,13 @@ OrgScript is a description language for business logic.
 
 Use it to describe:
 
-- processes
-- rules
-- roles
-- policies
-- state transitions
-- events
-- metrics
+- processes.
+- rules.
+- roles.
+- policies.
+- state transitions.
+- events.
+- metrics.
 
 Do not use it as a programming language.
 
@@ -26,10 +26,10 @@ Use `process` to describe how work moves.
 
 Examples:
 
-- lead qualification
-- quote to order
-- approval flow
-- onboarding flow
+- lead qualification.
+- quote to order.
+- approval flow.
+- onboarding flow.
 
 ### `stateflow`
 
@@ -37,9 +37,9 @@ Use `stateflow` to define legal states and allowed transitions.
 
 Examples:
 
-- lead lifecycle
-- order lifecycle
-- ticket lifecycle
+- lead lifecycle.
+- order lifecycle.
+- ticket lifecycle.
 
 ### `rule`
 
@@ -47,9 +47,9 @@ Use `rule` for constraints that should always hold.
 
 Examples:
 
-- no production without deposit
-- no refund without approval
-- no order without customer data
+- no production without deposit.
+- no refund without approval.
+- no order without customer data.
 
 ### `role`
 

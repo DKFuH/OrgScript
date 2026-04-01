@@ -168,6 +168,9 @@ Options:
   --with-annotations  Include annotations and document metadata in supported Markdown and HTML exports
   -h, --help          Show this help
 
+Note:
+  bpmn, plantuml, littlehorse, and contract are experimental scaffolds.
+
 Docs:
   README.md
   docs/OrgScript-Manual-EN.md

@@ -6,20 +6,20 @@ OrgScript is a human-readable, AI-friendly description language for business log
 
 OrgScript is designed for operators, team leads, analysts, and engineers who need a shared, text-first source of truth for business logic.
 
-## What It Is
+## What OrgScript is
 
-- A shared text layer for business logic
-- Readable by people
-- Parseable by software
-- Stable in Git and code review
-- Structured for AI analysis, validation, and export
+- A shared text layer for business logic.
+- Readable by people.
+- Parseable by software.
+- Stable in Git and code review.
+- Structured for AI analysis, validation, and export.
 
-## What It Is Not
+## What OrgScript is not
 
-- Not a general-purpose programming language
-- Not a workflow engine
-- Not free-form prose or narrative documentation
-- Not a replacement for implementation code
+- Not a general-purpose programming language.
+- Not a workflow engine.
+- Not free-form prose or narrative documentation.
+- Not a replacement for implementation code.
 
 ## Installation
 
@@ -53,7 +53,7 @@ npm install -g .
 
 That makes `orgscript` available on your shell path from the checked-out repository state.
 
-## Quickstart in 60 Seconds
+## Quickstart in 60 seconds
 
 After installation, run:
 
@@ -73,7 +73,7 @@ If you want the fastest first read, start with:
 - [craft-business-lead-to-order.orgs](./examples/craft-business-lead-to-order.orgs)
 - [examples/README.md](./examples/README.md)
 
-## Read This in Order
+## Read this in order
 
 If you are new to OrgScript, this is the intended reading path:
 
@@ -83,7 +83,7 @@ If you are new to OrgScript, this is the intended reading path:
 4. [docs/orgscript-for-humans.md](./docs/orgscript-for-humans.md) - How to write maintainable OrgScript files.
 5. [docs/orgscript-for-ai.md](./docs/orgscript-for-ai.md) - How tools and AI must interpret OrgScript without guessing.
 
-## Canonical Source of Truth
+## Canonical source of truth
 
 The normative language reference is:
 
@@ -91,27 +91,27 @@ The normative language reference is:
 
 Supporting docs exist to help people adopt, use, and govern the language. If implementation and docs ever disagree, the canonical spec wins.
 
-## From Source to Artifact
+## From source to artifact
 
 OrgScript is intentionally artifact-first. A single `.orgs` file can produce multiple useful outputs:
 
-1. Source logic in plain text
-2. Validation and linting diagnostics
-3. Mermaid diagrams
-4. Markdown summaries
-5. HTML documentation
-6. BPMN skeleton exports
-7. LittleHorse workflow skeletons
-8. Graph JSON exports
-9. PlantUML skeleton exports
-10. OpenAPI-style contract metadata
-11. AI-ready structured JSON exports
+1. Source logic in plain text.
+2. Validation and linting diagnostics.
+3. Mermaid diagrams.
+4. Markdown summaries.
+5. HTML documentation.
+6. BPMN skeleton exports.
+7. LittleHorse workflow skeletons.
+8. Graph JSON exports.
+9. PlantUML skeleton exports.
+10. OpenAPI-style contract metadata.
+11. AI-ready structured JSON exports.
 
 Generated examples live under:
 
 - [docs/demos](./docs/demos)
 
-## Exporter Maturity
+## Exporter maturity
 
 To avoid false expectations, exporters are grouped by maturity level.
 
@@ -132,7 +132,7 @@ Experimental / scaffold:
 
 Experimental exporters are intended as skeletons or integration scaffolds and may require manual review.
 
-## Hero Demo: Craft Business Lead to Order
+## Hero demo: Craft Business Lead to Order
 
 The main showcase flow is:
 
@@ -140,7 +140,7 @@ The main showcase flow is:
 - Mermaid demo: [docs/demos/mermaid/craft-business-lead-to-order.mermaid.md](./docs/demos/mermaid/craft-business-lead-to-order.mermaid.md)
 - Markdown demo: [docs/demos/markdown/craft-business-lead-to-order.summary.md](./docs/demos/markdown/craft-business-lead-to-order.summary.md)
 
-## Core Blocks
+## Core blocks
 
 - `process`: step-by-step operational workflows
 - `stateflow`: legal states and transitions
@@ -150,7 +150,7 @@ The main showcase flow is:
 - `event`: named triggers with reactions
 - `metric`: tracked business measures
 
-## Document Language Header, Comments, and Annotations
+## Document language header, comments, and annotations
 
 OrgScript can declare the intended language of human-authored text at document level:
 
@@ -169,7 +169,7 @@ This header is metadata only:
 - `comment-language`, `annotation-language`, and `context-language` help humans, exporters, and AI understand the intended language of nearby text
 - declared languages are treated as a document contract and may trigger lint warnings when comments or annotation values clearly drift
 
-## Comments and Annotations
+## Comments and annotations
 
 OrgScript supports two documentation layers:
 
@@ -211,7 +211,7 @@ Export behavior:
 - Add `--with-annotations` to Markdown or HTML export when you want allowlisted `@annotations` and declared document language metadata rendered in the generated documentation artifact.
 - `orgscript export context <file>` includes explicit annotation metadata and declared document language metadata in the structured context payload so downstream AI/indexing consumers do not need to recover it from prose.
 
-## CLI Quick Reference
+## CLI quick reference
 
 Need command help? Run `orgscript --help` or `orgscript help <command>`.
 
@@ -241,7 +241,7 @@ orgscript export html ./examples/lead-qualification.orgs --with-annotations
 orgscript export context ./examples/lead-qualification.orgs
 ```
 
-## Developer Path
+## Developer path
 
 If you want to contribute to the tooling or language, this is a practical sequence:
 
