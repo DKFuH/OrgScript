@@ -71,6 +71,7 @@ orgscript export context ./examples/lead-qualification.orgs
 orgscript export bpmn ./examples/lead-qualification.orgs
 orgscript export littlehorse ./examples/lead-qualification.orgs
 orgscript export graph ./examples/lead-qualification.orgs
+orgscript export graph ./examples/lead-qualification.orgs
 ```
 
 What they do:
@@ -81,6 +82,7 @@ What they do:
 - `export context` creates a structured AI/tooling context bundle
 - `export bpmn` creates a BPMN XML skeleton for process blocks
 - `export littlehorse` creates a LittleHorse workflow skeleton (pseudo-code scaffold)
+- `export graph` creates a minimal graph JSON (nodes + edges)
 - `export graph` creates a compact nodes-and-edges JSON graph
 
 ## Comments and annotations
@@ -166,6 +168,7 @@ Default exporter policy:
 - annotations are included in `export context`
 - annotations appear in Markdown and HTML only when you pass `--with-annotations`
 - BPMN and LittleHorse exporters are skeletons and require manual review before use
+- Graph JSON export is a compact integration artifact for tooling and visualization
 - Graph export is a compact structural view, not a semantic replacement for the canonical model
 
 This keeps business meaning explicit and prevents comments from becoming a hidden second language.

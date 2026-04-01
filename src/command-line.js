@@ -17,8 +17,8 @@ const { toMarkdownSummary } = require("./export-markdown");
 const { toMermaidMarkdown } = require("./export-mermaid");
 const { toHtmlDocumentation } = require("./export-html");
 const { toBpmnXml } = require("./export-bpmn");
-const { toLittleHorseSkeleton } = require("./export-littlehorse");
 const { toGraphJson } = require("./export-graph");
+const { toLittleHorseSkeleton } = require("./export-littlehorse");
 const { formatDocument } = require("./formatter");
 const { lintDocument, summarizeFindings } = require("./linter");
 const { buildModel, validateFile } = require("./validate");
@@ -157,8 +157,8 @@ Targets:
   mermaid         Process and stateflow diagrams (Markdown)
   html            Self-contained documentation page
   bpmn            BPMN XML skeleton
+  graph           Graph JSON (nodes + edges)
   littlehorse     LittleHorse workflow skeleton (pseudo-code)
-  graph           Compact nodes + edges graph JSON
 
 Options:
   --with-annotations  Include annotations and document metadata in supported Markdown and HTML exports
@@ -241,21 +241,21 @@ ${docs}`);
     return;
   }
 
-  if (target === "littlehorse") {
-    console.log(`orgscript export littlehorse
-
-Usage:
-  orgscript export littlehorse <file>
-
-${docs}`);
-    return;
-  }
-
   if (target === "graph") {
     console.log(`orgscript export graph
 
 Usage:
   orgscript export graph <file>
+
+${docs}`);
+    return;
+  }
+
+  if (target === "littlehorse") {
+    console.log(`orgscript export littlehorse
+
+Usage:
+  orgscript export littlehorse <file>
 
 ${docs}`);
     return;
@@ -478,6 +478,27 @@ function run(args) {
     }
   }
 
+  if (command === "export" && maybeSubcommand === "graph") {
+    const absolutePath = resolveFile("export", maybeFile);
+    const result = buildModel(absolutePath);
+
+    if (!result.ok) {
+      printDiagnostics(
+        `EXPORT ${toDisplayPath(absolutePath)}`,
+        createValidateReport(absolutePath, result).diagnostics
+      );
+      process.exit(1);
+    }
+
+    try {
+      process.stdout.write(toGraphJson(toCanonicalModel(result.ast)));
+      process.exit(0);
+    } catch (error) {
+      console.error(`Cannot export graph JSON from ${absolutePath}: ${error.message}`);
+      process.exit(1);
+    }
+  }
+
   if (command === "export" && maybeSubcommand === "littlehorse") {
     const absolutePath = resolveFile("export", maybeFile);
     const result = buildModel(absolutePath);
@@ -495,27 +516,6 @@ function run(args) {
       process.exit(0);
     } catch (error) {
       console.error(`Cannot export LittleHorse from ${absolutePath}: ${error.message}`);
-      process.exit(1);
-    }
-  }
-
-  if (command === "export" && maybeSubcommand === "graph") {
-    const absolutePath = resolveFile("export", maybeFile);
-    const result = buildModel(absolutePath);
-
-    if (!result.ok) {
-      printDiagnostics(
-        `EXPORT ${toDisplayPath(absolutePath)}`,
-        createValidateReport(absolutePath, result).diagnostics
-      );
-      process.exit(1);
-    }
-
-    try {
-      console.log(JSON.stringify(toGraphJson(toCanonicalModel(result.ast)), null, 2));
-      process.exit(0);
-    } catch (error) {
-      console.error(`Cannot export graph from ${absolutePath}: ${error.message}`);
       process.exit(1);
     }
   }

@@ -11,8 +11,8 @@ const { toMarkdownSummary } = require("../src/export-markdown");
 const { toMermaidMarkdown } = require("../src/export-mermaid");
 const { toHtmlDocumentation } = require("../src/export-html");
 const { toBpmnXml } = require("../src/export-bpmn");
-const { toLittleHorseSkeleton } = require("../src/export-littlehorse");
 const { toGraphJson } = require("../src/export-graph");
+const { toLittleHorseSkeleton } = require("../src/export-littlehorse");
 const { toAiContext } = require("../src/export-context");
 const { analyzeDocument } = require("../src/analyze");
 const { lintDocument, renderLintReport, summarizeFindings } = require("../src/linter");
@@ -454,10 +454,10 @@ function testCliDiagnosticsAndExitCodes() {
     "./examples/craft-business-lead-to-order.orgs",
   ]);
   assert.strictEqual(exportGraph.status, 0, "Expected export graph to succeed");
-  const graphPayload = JSON.parse(exportGraph.stdout);
-  assert.strictEqual(graphPayload.type, "graph");
-  assert.ok(Array.isArray(graphPayload.nodes), "Expected graph nodes array");
-  assert.ok(Array.isArray(graphPayload.edges), "Expected graph edges array");
+  const exportGraphPayload = JSON.parse(exportGraph.stdout);
+  assert.strictEqual(exportGraphPayload.type, "graph");
+  assert.ok(Array.isArray(exportGraphPayload.nodes));
+  assert.ok(Array.isArray(exportGraphPayload.edges));
 
   const exportContext = runCli([
     cliPath,
@@ -934,12 +934,13 @@ function testSkeletonExporters() {
   const bpmn = toBpmnXml(model);
   assert.ok(bpmn.includes("<bpmn:process"), "Expected BPMN process");
   assert.ok(bpmn.includes("OrderApproval"), "Expected BPMN process name");
+  assert.ok(bpmn.includes("<bpmndi:BPMNDiagram"), "Expected BPMN diagram");
 
   const littleHorse = toLittleHorseSkeleton(model);
   assert.ok(littleHorse.includes("OrderApprovalWorkflow"), "Expected LittleHorse class name");
   assert.ok(littleHorse.includes("when order.submitted"), "Expected trigger comment");
 
-  const graph = toGraphJson(model);
+  const graph = JSON.parse(toGraphJson(model));
   assert.strictEqual(graph.type, "graph");
   assert.ok(graph.nodes.length > 0, "Expected graph nodes");
   assert.ok(graph.edges.length > 0, "Expected graph edges");

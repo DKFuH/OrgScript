@@ -1,178 +1,152 @@
 function toGraphJson(model) {
   const nodes = [];
   const edges = [];
-  const supported = (model.body || []).filter(
-    (node) => node.type === "process" || node.type === "stateflow"
-  );
+  const processBlocks = (model.body || []).filter((node) => node.type === "process");
+  const stateflows = (model.body || []).filter((node) => node.type === "stateflow");
 
-  if (supported.length === 0) {
+  if (processBlocks.length === 0 && stateflows.length === 0) {
     throw new Error(
       "No graph-exportable blocks found. Supported block types: process, stateflow."
     );
   }
 
-  supported.forEach((node, index) => {
-    if (node.type === "process") {
-      renderProcessGraph(node, index + 1, nodes, edges);
-      return;
-    }
-
-    if (node.type === "stateflow") {
-      renderStateflowGraph(node, index + 1, nodes, edges);
-    }
+  processBlocks.forEach((processNode) => {
+    const graph = createProcessGraph(processNode);
+    nodes.push(...graph.nodes);
+    edges.push(...graph.edges);
   });
 
-  return {
-    version: "0.1",
-    type: "graph",
-    nodes,
-    edges,
-  };
+  stateflows.forEach((stateflow) => {
+    const graph = createStateflowGraph(stateflow);
+    nodes.push(...graph.nodes);
+    edges.push(...graph.edges);
+  });
+
+  return `${JSON.stringify(
+    {
+      version: "0.1",
+      type: "graph",
+      nodes,
+      edges,
+    },
+    null,
+    2
+  )}\n`;
 }
 
-function renderProcessGraph(node, index, nodes, edges) {
-  const groupId = `process:${node.name}`;
-  const prefix = `p${index}`;
-  nodes.push({
-    id: groupId,
-    type: "process",
-    label: node.name,
-  });
-
-  const builder = createGraphBuilder(prefix, groupId, nodes, edges);
-  const startId = builder.addNode("start", node.name || "start");
-  const exits = builder.renderSequence(node.body || [], [{ id: startId }]);
-
-  if (exits.length > 0) {
-    const endId = builder.addNode("end", "done");
-    builder.connectIncoming(exits, endId);
-  }
-}
-
-function renderStateflowGraph(node, index, nodes, edges) {
-  const groupId = `stateflow:${node.name}`;
-  nodes.push({
-    id: groupId,
-    type: "stateflow",
-    label: node.name,
-  });
-
-  const prefix = `s${index}`;
-  const stateIds = new Map();
-  (node.states || []).forEach((state, stateIndex) => {
-    const id = `${prefix}_state_${stateIndex + 1}`;
-    stateIds.set(state, id);
-    nodes.push({
-      id,
-      type: "state",
-      label: state,
-      group: groupId,
-    });
-  });
-
-  (node.transitions || []).forEach((edge) => {
-    const from = stateIds.get(edge.from) || `${prefix}_${sanitizeId(edge.from)}`;
-    const to = stateIds.get(edge.to) || `${prefix}_${sanitizeId(edge.to)}`;
-    edges.push({
-      from,
-      to,
-      label: "",
-      type: "transition",
-      group: groupId,
-    });
-  });
-}
-
-function createGraphBuilder(prefix, groupId, nodes, edges) {
+function createProcessGraph(processNode) {
+  const nodes = [];
+  const edges = [];
   let counter = 0;
 
-  function addNode(type, label) {
+  function addNode(kind, label) {
     counter += 1;
-    const id = `${prefix}_${type}_${counter}`;
+    const id = `process:${processNode.name}:${kind}:${counter}`;
     nodes.push({
       id,
-      type,
+      kind,
       label,
-      group: groupId,
+      group: `process:${processNode.name}`,
     });
     return id;
   }
 
-  function connectIncoming(connectors, targetId) {
-    connectors.forEach((connector) => {
-      edges.push({
-        from: connector.id,
-        to: targetId,
-        label: connector.label || "",
-        type: "flow",
-        group: groupId,
-      });
+  function addEdge(from, to, label) {
+    edges.push({
+      from,
+      to,
+      label,
     });
+  }
+
+  function connectIncoming(connectors, targetId) {
+    connectors.forEach((connector) => addEdge(connector.id, targetId, connector.label));
   }
 
   function renderSequence(statements, incoming) {
     let pending = incoming;
-
     for (const statement of statements) {
       pending = renderStatement(statement, pending);
     }
-
     return pending;
   }
 
   function renderStatement(statement, incoming) {
     if (statement.type === "when") {
-      const id = addNode("trigger", `when ${statement.trigger || "unknown"}`);
+      const id = addNode("when", `when ${statement.trigger || "unknown"}`);
       connectIncoming(incoming, id);
       return [{ id }];
     }
 
     if (statement.type === "if") {
-      const decisionId = addNode("decision", `if ${formatCondition(statement.condition)}`);
+      const decisionId = addNode("if", `if ${formatCondition(statement.condition)}`);
       connectIncoming(incoming, decisionId);
 
       const exits = [];
-      exits.push(
-        ...renderSequence(statement.then || [], [
-          { id: decisionId, label: `if ${formatCondition(statement.condition)}` },
-        ])
-      );
+      exits.push(...renderSequence(statement.then || [], [{ id: decisionId, label: "yes" }]));
+
+      let falseConnectors = [{ id: decisionId, label: "no" }];
 
       for (const branch of statement.elseIf || []) {
-        exits.push(
-          ...renderSequence(branch.then || [], [
-            { id: decisionId, label: `else if ${formatCondition(branch.condition)}` },
-          ])
-        );
+        const elseIfId = addNode("if", `if ${formatCondition(branch.condition)}`);
+        connectIncoming(falseConnectors, elseIfId);
+        exits.push(...renderSequence(branch.then || [], [{ id: elseIfId, label: "yes" }]));
+        falseConnectors = [{ id: elseIfId, label: "no" }];
       }
 
       if (statement.else && (statement.else.body || []).length > 0) {
-        exits.push(...renderSequence(statement.else.body || [], [{ id: decisionId, label: "else" }]));
+        exits.push(...renderSequence(statement.else.body || [], falseConnectors));
       } else {
-        exits.push({ id: decisionId, label: "else" });
+        exits.push(...falseConnectors);
       }
 
-      const joinId = addNode("merge", "merge");
-      connectIncoming(exits, joinId);
-      return [{ id: joinId }];
+      return exits;
     }
 
     if (statement.type === "stop") {
-      const endId = addNode("stop", "stop");
-      connectIncoming(incoming, endId);
+      const id = addNode("stop", "stop");
+      connectIncoming(incoming, id);
       return [];
     }
 
-    const id = addNode("action", formatAction(statement));
+    const id = addNode(statement.type, formatAction(statement));
     connectIncoming(incoming, id);
     return [{ id }];
   }
 
-  return {
-    addNode,
-    connectIncoming,
-    renderSequence,
-  };
+  const startId = addNode("start", processNode.name);
+  const exits = renderSequence(processNode.body || [], [{ id: startId }]);
+  if (exits.length > 0) {
+    const endId = addNode("end", "done");
+    connectIncoming(exits, endId);
+  }
+
+  return { nodes, edges };
+}
+
+function createStateflowGraph(stateflow) {
+  const nodes = [];
+  const edges = [];
+  const group = `stateflow:${stateflow.name}`;
+
+  (stateflow.states || []).forEach((state) => {
+    nodes.push({
+      id: `stateflow:${stateflow.name}:state:${state}`,
+      kind: "state",
+      label: state,
+      group,
+    });
+  });
+
+  (stateflow.transitions || []).forEach((edge) => {
+    edges.push({
+      from: `stateflow:${stateflow.name}:state:${edge.from}`,
+      to: `stateflow:${stateflow.name}:state:${edge.to}`,
+      label: "transition",
+    });
+  });
+
+  return { nodes, edges };
 }
 
 function formatAction(statement) {
@@ -237,12 +211,6 @@ function formatExpression(expression) {
   }
 
   return String(expression.value);
-}
-
-function sanitizeId(value) {
-  return String(value)
-    .replace(/[^A-Za-z0-9_]/g, "_")
-    .replace(/^(\d)/, "_$1");
 }
 
 module.exports = {
