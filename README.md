@@ -102,7 +102,8 @@ OrgScript is intentionally artifact-first. A single `.orgs` file can produce mul
 5. HTML documentation
 6. BPMN skeleton exports
 7. LittleHorse workflow skeletons
-8. AI-ready structured JSON exports
+8. Graph JSON exports
+9. AI-ready structured JSON exports
 
 Generated examples live under:
 
@@ -202,6 +203,7 @@ orgscript export mermaid <file>
 orgscript export html <file>
 orgscript export bpmn <file>
 orgscript export littlehorse <file>
+orgscript export graph <file>
 orgscript export context <file>
 orgscript analyze <file> [--json]
 ```

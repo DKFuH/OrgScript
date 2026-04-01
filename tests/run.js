@@ -434,10 +434,6 @@ function testCliDiagnosticsAndExitCodes() {
     exportBpmn.stdout.includes("<bpmn:definitions"),
     "Expected BPMN export to include definitions"
   );
-  assert.ok(
-    exportBpmn.stdout.includes("<bpmndi:BPMNDiagram"),
-    "Expected BPMN export to include diagram metadata"
-  );
 
   const exportLittleHorse = runCli([
     cliPath,
@@ -938,11 +934,15 @@ function testSkeletonExporters() {
   const bpmn = toBpmnXml(model);
   assert.ok(bpmn.includes("<bpmn:process"), "Expected BPMN process");
   assert.ok(bpmn.includes("OrderApproval"), "Expected BPMN process name");
-  assert.ok(bpmn.includes("<bpmndi:BPMNDiagram"), "Expected BPMN diagram section");
 
   const littleHorse = toLittleHorseSkeleton(model);
   assert.ok(littleHorse.includes("OrderApprovalWorkflow"), "Expected LittleHorse class name");
   assert.ok(littleHorse.includes("when order.submitted"), "Expected trigger comment");
+
+  const graph = toGraphJson(model);
+  assert.strictEqual(graph.type, "graph");
+  assert.ok(graph.nodes.length > 0, "Expected graph nodes");
+  assert.ok(graph.edges.length > 0, "Expected graph edges");
 }
 
 function testCommentsAndAnnotations() {

@@ -18,6 +18,7 @@ const { toMermaidMarkdown } = require("./export-mermaid");
 const { toHtmlDocumentation } = require("./export-html");
 const { toBpmnXml } = require("./export-bpmn");
 const { toLittleHorseSkeleton } = require("./export-littlehorse");
+const { toGraphJson } = require("./export-graph");
 const { formatDocument } = require("./formatter");
 const { lintDocument, summarizeFindings } = require("./linter");
 const { buildModel, validateFile } = require("./validate");
@@ -157,6 +158,7 @@ Targets:
   html            Self-contained documentation page
   bpmn            BPMN XML skeleton
   littlehorse     LittleHorse workflow skeleton (pseudo-code)
+  graph           Compact nodes + edges graph JSON
 
 Options:
   --with-annotations  Include annotations and document metadata in supported Markdown and HTML exports
@@ -244,6 +246,16 @@ ${docs}`);
 
 Usage:
   orgscript export littlehorse <file>
+
+${docs}`);
+    return;
+  }
+
+  if (target === "graph") {
+    console.log(`orgscript export graph
+
+Usage:
+  orgscript export graph <file>
 
 ${docs}`);
     return;
@@ -483,6 +495,27 @@ function run(args) {
       process.exit(0);
     } catch (error) {
       console.error(`Cannot export LittleHorse from ${absolutePath}: ${error.message}`);
+      process.exit(1);
+    }
+  }
+
+  if (command === "export" && maybeSubcommand === "graph") {
+    const absolutePath = resolveFile("export", maybeFile);
+    const result = buildModel(absolutePath);
+
+    if (!result.ok) {
+      printDiagnostics(
+        `EXPORT ${toDisplayPath(absolutePath)}`,
+        createValidateReport(absolutePath, result).diagnostics
+      );
+      process.exit(1);
+    }
+
+    try {
+      console.log(JSON.stringify(toGraphJson(toCanonicalModel(result.ast)), null, 2));
+      process.exit(0);
+    } catch (error) {
+      console.error(`Cannot export graph from ${absolutePath}: ${error.message}`);
       process.exit(1);
     }
   }
