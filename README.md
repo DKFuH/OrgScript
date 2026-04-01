@@ -111,6 +111,27 @@ Generated examples live under:
 
 - [docs/demos](./docs/demos)
 
+## Exporter Maturity
+
+To avoid false expectations, exporters are grouped by maturity level.
+
+Stable:
+
+- `json`
+- `context`
+- `markdown`
+- `html`
+- `graph`
+
+Experimental / scaffold:
+
+- `contract`
+- `bpmn`
+- `plantuml`
+- `littlehorse`
+
+Experimental exporters are intended as skeletons or integration scaffolds and may require manual review.
+
 ## Hero Demo: Craft Business Lead to Order
 
 The main showcase flow is:
@@ -237,6 +258,8 @@ npm test
 npm run check:all
 npm run demo:generate
 ```
+
+Note: files under `tests/lint/` are intentionally invalid and are used to verify lint findings. Running `orgscript lint` on those fixtures is expected to fail.
 
 ## Ecosystem
 

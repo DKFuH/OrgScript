@@ -178,6 +178,23 @@ Default exporter policy:
 
 This keeps business meaning explicit and prevents comments from becoming a hidden second language.
 
+## Exporter maturity
+
+Stable:
+
+- `json`
+- `context`
+- `markdown`
+- `html`
+- `graph`
+
+Experimental / scaffold:
+
+- `contract`
+- `bpmn`
+- `plantuml`
+- `littlehorse`
+
 ## Writing guidelines
 
 - keep one statement per line

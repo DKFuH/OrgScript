@@ -178,6 +178,23 @@ Standardverhalten der Exporter:
 
 So bleibt Geschaeftslogik explizit und Kommentare werden keine versteckte zweite Sprache.
 
+## Exporter-Reifegrade
+
+Stabil:
+
+- `json`
+- `context`
+- `markdown`
+- `html`
+- `graph`
+
+Experimentell / Scaffold:
+
+- `contract`
+- `bpmn`
+- `plantuml`
+- `littlehorse`
+
 ## Schreibregeln
 
 - eine Anweisung pro Zeile
