@@ -274,6 +274,10 @@ Note: files under `tests/lint/` are intentionally invalid and are used to verify
 - Code of Conduct: [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md)
 - Security policy: [SECURITY.md](./SECURITY.md)
 
+## Security posture
+
+An automated enterprise security scan found no sensitive data in source control, no hardcoded credentials, and no obvious insecure patterns in production code. External URLs and localhost references appear only in docs or demo/export artifacts. For production use, still review build/deploy pipelines, monitor dependencies, and perform periodic security testing. See [SECURITY.md](./SECURITY.md) for details and reporting guidance.
+
 ## License
 
 Apache-2.0
