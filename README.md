@@ -187,6 +187,8 @@ Export behavior:
 
 ## CLI Quick Reference
 
+Need command help? Run `orgscript --help` or `orgscript help <command>`.
+
 ```bash
 orgscript validate <file> [--json]
 orgscript lint <file> [--json]
