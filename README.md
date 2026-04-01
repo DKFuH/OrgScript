@@ -111,24 +111,21 @@ Generated examples live under:
 
 - [docs/demos](./docs/demos)
 
-## Exporter maturity
+## Exporter maturity matrix
 
 To avoid false expectations, exporters are grouped by maturity level.
 
-Stable:
-
-- `json`
-- `context`
-- `markdown`
-- `html`
-- `graph`
-
-Experimental / scaffold:
-
-- `contract`
-- `bpmn`
-- `plantuml`
-- `littlehorse`
+| Exporter | Status | Notes |
+| --- | --- | --- |
+| `json` | stable | canonical model |
+| `context` | stable | AI/tooling bundle |
+| `markdown` | stable | human summary |
+| `html` | stable | documentation page |
+| `graph` | stable | nodes + edges |
+| `contract` | experimental | scaffold |
+| `bpmn` | experimental | skeleton |
+| `plantuml` | experimental | skeleton |
+| `littlehorse` | experimental | scaffold |
 
 Experimental exporters are intended as skeletons or integration scaffolds and may require manual review.
 

@@ -178,22 +178,19 @@ Default exporter policy:
 
 This keeps business meaning explicit and prevents comments from becoming a hidden second language.
 
-## Exporter maturity
+## Exporter maturity matrix
 
-Stable:
-
-- `json`
-- `context`
-- `markdown`
-- `html`
-- `graph`
-
-Experimental / scaffold:
-
-- `contract`
-- `bpmn`
-- `plantuml`
-- `littlehorse`
+| Exporter | Status | Notes |
+| --- | --- | --- |
+| `json` | stable | canonical model |
+| `context` | stable | AI/tooling bundle |
+| `markdown` | stable | human summary |
+| `html` | stable | documentation page |
+| `graph` | stable | nodes + edges |
+| `contract` | experimental | scaffold |
+| `bpmn` | experimental | skeleton |
+| `plantuml` | experimental | skeleton |
+| `littlehorse` | experimental | scaffold |
 
 ## Writing guidelines
 

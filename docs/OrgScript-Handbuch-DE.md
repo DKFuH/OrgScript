@@ -178,22 +178,19 @@ Standardverhalten der Exporter:
 
 So bleibt Geschaeftslogik explizit und Kommentare werden keine versteckte zweite Sprache.
 
-## Exporter-Reifegrade
+## Exporter-Reifegrad-Matrix
 
-Stabil:
-
-- `json`
-- `context`
-- `markdown`
-- `html`
-- `graph`
-
-Experimentell / Scaffold:
-
-- `contract`
-- `bpmn`
-- `plantuml`
-- `littlehorse`
+| Exporter | Status | Hinweis |
+| --- | --- | --- |
+| `json` | stabil | kanonisches Modell |
+| `context` | stabil | KI-/Tooling-Paket |
+| `markdown` | stabil | Zusammenfassung |
+| `html` | stabil | Doku-Seite |
+| `graph` | stabil | Knoten + Kanten |
+| `contract` | experimentell | Scaffold |
+| `bpmn` | experimentell | Skelett |
+| `plantuml` | experimentell | Skelett |
+| `littlehorse` | experimentell | Scaffold |
 
 ## Schreibregeln
 
