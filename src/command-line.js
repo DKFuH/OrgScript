@@ -22,44 +22,306 @@ const { buildModel, validateFile } = require("./validate");
 const { analyzeDocument, renderTextAnalysis } = require("./analyze");
 const { toAiContext } = require("./export-context");
 
-function printUsage() {
+function printRootUsage() {
   console.log(`OrgScript CLI v${require("../package.json").version}
 
 A human-readable, AI-friendly description language for business logic.
 
 Usage:
-  orgscript check <file> [--json]       Run all quality checks (validate, lint, format)
-  orgscript validate <file> [--json]    Check syntax and semantic validity
-  orgscript lint <file> [--json]        Run static analysis rules
-  orgscript format <file> [--check]     Auto-format or check canonical style
-  orgscript export <kind> <file>        Export to different formats
+  orgscript <command> [options] [file]
 
-Export Kinds:
-  json        Canonical JSON model
-  markdown    Stakeholder-friendly logic summary
-  mermaid     Process and stateflow diagrams (Markdown)
-  html        Self-contained documentation page
-  context     AI/tooling context bundle
+Commands:
+  check           Run validate + lint + format-check
+  validate        Check syntax and semantic validity
+  lint            Run static analysis rules
+  format          Auto-format or check canonical style
+  analyze         Run deterministic structural analysis
+  export          Export derived artifacts
+  help            Show help for a command or topic
 
 Global Options:
-  --help, -h     Show this help
-  --version, -v  Show version number
-  --json         Output machine-readable JSON (where supported)
-  --with-annotations  Include annotations and document metadata in supported Markdown and HTML exports
+  -h, --help      Show help
+  -v, --version   Show version number
+
+Examples:
+  orgscript check ./examples/craft-business-lead-to-order.orgs
+  orgscript export markdown ./examples/order-approval.orgs
+  orgscript export html ./examples/order-approval.orgs --with-annotations
+
+Docs:
+  README.md
+  docs/OrgScript-Manual-EN.md
+  docs/OrgScript-Handbuch-DE.md
+  spec/language-spec.md
 `);
+}
+
+function printValidateUsage() {
+  console.log(`orgscript validate
+
+Usage:
+  orgscript validate <file> [--json]
+
+Options:
+  --json          Output machine-readable JSON diagnostics
+  -h, --help      Show this help
+
+Docs:
+  README.md
+  spec/language-spec.md
+`);
+}
+
+function printLintUsage() {
+  console.log(`orgscript lint
+
+Usage:
+  orgscript lint <file> [--json]
+
+Options:
+  --json          Output machine-readable JSON diagnostics
+  -h, --help      Show this help
+
+Docs:
+  README.md
+  docs/OrgScript-Manual-EN.md
+  docs/OrgScript-Handbuch-DE.md
+`);
+}
+
+function printCheckUsage() {
+  console.log(`orgscript check
+
+Usage:
+  orgscript check <file> [--json]
+
+Options:
+  --json          Output machine-readable JSON diagnostics
+  -h, --help      Show this help
+
+Docs:
+  README.md
+  docs/OrgScript-Manual-EN.md
+  docs/OrgScript-Handbuch-DE.md
+`);
+}
+
+function printFormatUsage() {
+  console.log(`orgscript format
+
+Usage:
+  orgscript format <file> [--check] [--json]
+
+Options:
+  --check         Check whether the file is canonically formatted
+  --json          Output machine-readable JSON diagnostics (only with --check)
+  -h, --help      Show this help
+
+Docs:
+  README.md
+  docs/OrgScript-Manual-EN.md
+  docs/OrgScript-Handbuch-DE.md
+`);
+}
+
+function printAnalyzeUsage() {
+  console.log(`orgscript analyze
+
+Usage:
+  orgscript analyze <file> [--json]
+
+Options:
+  --json          Output machine-readable JSON analysis
+  -h, --help      Show this help
+
+Docs:
+  README.md
+  docs/OrgScript-Manual-EN.md
+  docs/OrgScript-Handbuch-DE.md
+`);
+}
+
+function printExportUsage() {
+  console.log(`orgscript export
+
+Usage:
+  orgscript export <target> <file> [options]
+
+Targets:
+  json            Canonical JSON model
+  context         AI/tooling context bundle
+  markdown        Stakeholder-friendly logic summary
+  mermaid         Process and stateflow diagrams (Markdown)
+  html            Self-contained documentation page
+
+Options:
+  --with-annotations  Include annotations and document metadata in supported Markdown and HTML exports
+  -h, --help          Show this help
+
+Docs:
+  README.md
+  docs/OrgScript-Manual-EN.md
+  docs/OrgScript-Handbuch-DE.md
+`);
+}
+
+function printExportTargetUsage(target) {
+  const docs = `Docs:\n  README.md\n  docs/OrgScript-Manual-EN.md\n  docs/OrgScript-Handbuch-DE.md\n`;
+  if (target === "json") {
+    console.log(`orgscript export json
+
+Usage:
+  orgscript export json <file>
+
+${docs}`);
+    return;
+  }
+
+  if (target === "context") {
+    console.log(`orgscript export context
+
+Usage:
+  orgscript export context <file>
+
+${docs}`);
+    return;
+  }
+
+  if (target === "markdown") {
+    console.log(`orgscript export markdown
+
+Usage:
+  orgscript export markdown <file> [--with-annotations]
+
+Options:
+  --with-annotations  Include annotations and document metadata
+  -h, --help          Show this help
+
+${docs}`);
+    return;
+  }
+
+  if (target === "mermaid") {
+    console.log(`orgscript export mermaid
+
+Usage:
+  orgscript export mermaid <file>
+
+${docs}`);
+    return;
+  }
+
+  if (target === "html") {
+    console.log(`orgscript export html
+
+Usage:
+  orgscript export html <file> [--with-annotations]
+
+Options:
+  --with-annotations  Include annotations and document metadata
+  -h, --help          Show this help
+
+${docs}`);
+    return;
+  }
+
+  printExportUsage();
 }
 
 function run(args) {
   const options = parseArgs(args);
   const [command, maybeSubcommand, maybeFile] = options.positionals;
 
-  if (!command || command === "--help" || command === "-h") {
-    printUsage();
+  if (options.version) {
+    console.log(require("../package.json").version);
     process.exit(0);
   }
 
-  if (command === "--version" || command === "-v") {
-    console.log(require("../package.json").version);
+  if (!command) {
+    printRootUsage();
+    process.exit(0);
+  }
+
+  if (command === "help") {
+    if (!maybeSubcommand) {
+      printRootUsage();
+      process.exit(0);
+    }
+
+    if (maybeSubcommand === "export") {
+      if (maybeFile) {
+        printExportTargetUsage(maybeFile);
+      } else {
+        printExportUsage();
+      }
+      process.exit(0);
+    }
+
+    if (maybeSubcommand === "validate") {
+      printValidateUsage();
+      process.exit(0);
+    }
+
+    if (maybeSubcommand === "lint") {
+      printLintUsage();
+      process.exit(0);
+    }
+
+    if (maybeSubcommand === "check") {
+      printCheckUsage();
+      process.exit(0);
+    }
+
+    if (maybeSubcommand === "format") {
+      printFormatUsage();
+      process.exit(0);
+    }
+
+    if (maybeSubcommand === "analyze") {
+      printAnalyzeUsage();
+      process.exit(0);
+    }
+
+    printRootUsage();
+    process.exit(0);
+  }
+
+  if (options.help) {
+    if (command === "export") {
+      if (maybeSubcommand) {
+        printExportTargetUsage(maybeSubcommand);
+      } else {
+        printExportUsage();
+      }
+      process.exit(0);
+    }
+
+    if (command === "validate") {
+      printValidateUsage();
+      process.exit(0);
+    }
+
+    if (command === "lint") {
+      printLintUsage();
+      process.exit(0);
+    }
+
+    if (command === "check") {
+      printCheckUsage();
+      process.exit(0);
+    }
+
+    if (command === "format") {
+      printFormatUsage();
+      process.exit(0);
+    }
+
+    if (command === "analyze") {
+      printAnalyzeUsage();
+      process.exit(0);
+    }
+
+    printRootUsage();
     process.exit(0);
   }
 
@@ -353,10 +615,22 @@ function parseArgs(args) {
     check: false,
     json: false,
     withAnnotations: false,
+    help: false,
+    version: false,
     positionals: [],
   };
 
   for (const argument of args) {
+    if (argument === "--help" || argument === "-h") {
+      options.help = true;
+      continue;
+    }
+
+    if (argument === "--version" || argument === "-v") {
+      options.version = true;
+      continue;
+    }
+
     if (argument === "--check") {
       options.check = true;
       continue;
@@ -404,8 +678,7 @@ function exitCliError(command, code, message, jsonMode, filePath) {
     process.exit(1);
   }
 
-  console.error(`${message}\n`);
-  printUsage();
+  console.error(`${message}\nRun "orgscript --help" for usage.\n`);
   process.exit(1);
 }
 
