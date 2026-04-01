@@ -169,7 +169,7 @@ Options:
   -h, --help          Show this help
 
 Note:
-  bpmn, plantuml, littlehorse, and contract are experimental scaffolds.
+  Some export targets are experimental or scaffold-grade. See README.md for exporter maturity levels.
 
 Docs:
   README.md

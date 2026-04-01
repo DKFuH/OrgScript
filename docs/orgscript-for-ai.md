@@ -87,6 +87,16 @@ text
 -> downstream transforms
 ```
 
+## Exporter trust levels
+
+AI and tooling should treat OrgScript exporters according to their documented maturity level.
+
+Stable exporters are suitable for downstream automation and integration.
+Experimental exporters are useful for exploration, prototyping, and human review, but should not be treated as stable machine contracts.
+Scaffold exporters provide directional or structural output only and require manual completion.
+
+See the exporter maturity matrix in `README.md`.
+
 ### Text to AST
 
 - Parse structure before interpretation.
