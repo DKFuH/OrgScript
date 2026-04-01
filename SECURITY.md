@@ -27,3 +27,19 @@ OrgScript aims for responsible disclosure:
 - acknowledge valid reports
 - work on a fix before broad public disclosure when practical
 - publish relevant release notes once a fix is available
+
+## Security posture note
+
+The OrgScript repository has undergone an automated enterprise security scan with the following outcome:
+
+- no sensitive data such as passwords, tokens, or private keys were found in source control
+- no hardcoded credentials or obvious insecure patterns were detected in production code
+- external URLs and localhost references appear only in docs, metadata, or demo/export artifacts
+- `require`/`import`/`export` usage is limited to module structure and build/test scripts
+- no indications of unsafe cryptography or dangerous defaults
+
+This is a point-in-time summary. For enterprise production use, we still recommend:
+
+- reviewing the build and deployment pipeline
+- monitoring dependencies for security advisories
+- periodic penetration testing aligned with your risk profile
