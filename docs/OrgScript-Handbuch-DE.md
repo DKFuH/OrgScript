@@ -73,7 +73,6 @@ orgscript export littlehorse ./examples/lead-qualification.orgs
 orgscript export graph ./examples/lead-qualification.orgs
 orgscript export plantuml ./examples/lead-qualification.orgs
 orgscript export contract ./examples/lead-qualification.orgs
-orgscript export graph ./examples/lead-qualification.orgs
 ```
 
 Was sie tun:
@@ -87,7 +86,8 @@ Was sie tun:
 - `export graph` erzeugt ein kompaktes Graph-JSON (Nodes + Edges)
 - `export plantuml` erzeugt PlantUML-Skelette fuer Prozesse und Stateflows
 - `export contract` erzeugt ein OpenAPI-aehnliches Prozess-Contract-JSON
-- `export graph` erzeugt ein kompaktes Knoten-und-Kanten-JSON
+
+Hilfe: `orgscript --help` oder `orgscript help <command>`.
 
 ## Kommentare und Annotationen
 
