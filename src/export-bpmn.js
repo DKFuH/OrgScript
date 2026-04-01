@@ -9,9 +9,13 @@ function toBpmnXml(model) {
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"',
     '  xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"',
+    '  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"',
+    '  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"',
+    '  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"',
     '  id="OrgScriptDefinitions"',
     '  targetNamespace="https://orgscript.org/bpmn">',
   ];
+  const diagrams = [];
 
   processes.forEach((processNode, index) => {
     const builder = createBpmnBuilder(`Process_${index + 1}`);
@@ -24,14 +28,16 @@ function toBpmnXml(model) {
     }
 
     definitions.push(builder.renderProcess(processNode.name));
+    diagrams.push(builder.renderDiagram(index + 1));
   });
 
+  definitions.push(...diagrams);
   definitions.push("</bpmn:definitions>");
   return `${definitions.join("\n")}\n`;
 }
 
 function createBpmnBuilder(prefix) {
-  const elements = [];
+  const nodes = [];
   const flows = [];
   let counter = 0;
   let flowCounter = 0;
@@ -48,51 +54,63 @@ function createBpmnBuilder(prefix) {
 
   function addStartEvent(name) {
     const id = nextId("start");
-    elements.push(
-      `  <bpmn:startEvent id="${id}" name="${escapeXml(name || "start")}"/>`
-    );
+    nodes.push({
+      id,
+      type: "startEvent",
+      name: name || "start",
+    });
     return id;
   }
 
   function addEndEvent(name) {
     const id = nextId("end");
-    elements.push(
-      `  <bpmn:endEvent id="${id}" name="${escapeXml(name || "end")}"/>`
-    );
+    nodes.push({
+      id,
+      type: "endEvent",
+      name: name || "end",
+    });
     return id;
   }
 
   function addTask(label) {
     const id = nextId("task");
-    elements.push(
-      `  <bpmn:serviceTask id="${id}" name="${escapeXml(label)}"/>`
-    );
+    nodes.push({
+      id,
+      type: "serviceTask",
+      name: label,
+    });
     return id;
   }
 
   function addIntermediateEvent(label) {
     const id = nextId("event");
-    elements.push(
-      `  <bpmn:intermediateCatchEvent id="${id}" name="${escapeXml(label)}"/>`
-    );
+    nodes.push({
+      id,
+      type: "intermediateCatchEvent",
+      name: label,
+    });
     return id;
   }
 
   function addGateway(label) {
     const id = nextId("gateway");
-    elements.push(
-      `  <bpmn:exclusiveGateway id="${id}" name="${escapeXml(label || "decision")}"/>`
-    );
+    nodes.push({
+      id,
+      type: "exclusiveGateway",
+      name: label || "decision",
+    });
     return id;
   }
 
   function connectIncoming(connectors, targetId) {
     connectors.forEach((connector) => {
       const flowId = nextFlowId();
-      const name = connector.label ? ` name="${escapeXml(connector.label)}"` : "";
-      flows.push(
-        `  <bpmn:sequenceFlow id="${flowId}" sourceRef="${connector.id}" targetRef="${targetId}"${name}/>`
-      );
+      flows.push({
+        id: flowId,
+        sourceRef: connector.id,
+        targetRef: targetId,
+        name: connector.label || null,
+      });
     });
   }
 
@@ -155,11 +173,31 @@ function createBpmnBuilder(prefix) {
   }
 
   function renderProcess(name) {
+    const elementLines = nodes.map((node) => renderNodeXml(node));
+    const flowLines = flows.map((flow) => renderFlowXml(flow));
+
     return [
       `  <bpmn:process id="${sanitizeId(prefix)}" name="${escapeXml(name)}" isExecutable="false">`,
-      ...elements,
-      ...flows,
+      ...elementLines,
+      ...flowLines,
       "  </bpmn:process>",
+    ].join("\n");
+  }
+
+  function renderDiagram(processIndex) {
+    const planeId = `${sanitizeId(prefix)}_di`;
+    const diagramId = `${sanitizeId(prefix)}_diagram`;
+    const layout = layoutNodes(nodes, processIndex);
+    const shapeLines = layout.shapes.map(renderShapeXml);
+    const edgeLines = flows.map((flow) => renderEdgeXml(flow, layout.centers));
+
+    return [
+      `  <bpmndi:BPMNDiagram id="${diagramId}">`,
+      `    <bpmndi:BPMNPlane id="${planeId}" bpmnElement="${sanitizeId(prefix)}">`,
+      ...shapeLines,
+      ...edgeLines,
+      "    </bpmndi:BPMNPlane>",
+      "  </bpmndi:BPMNDiagram>",
     ].join("\n");
   }
 
@@ -168,6 +206,7 @@ function createBpmnBuilder(prefix) {
     addEndEvent,
     connectIncoming,
     renderProcess,
+    renderDiagram,
     renderSequence,
   };
 }
@@ -249,6 +288,72 @@ function escapeXml(value) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&apos;");
+}
+
+function renderNodeXml(node) {
+  const name = node.name ? ` name="${escapeXml(node.name)}"` : "";
+  return `  <bpmn:${node.type} id="${node.id}"${name}/>`;
+}
+
+function renderFlowXml(flow) {
+  const name = flow.name ? ` name="${escapeXml(flow.name)}"` : "";
+  return `  <bpmn:sequenceFlow id="${flow.id}" sourceRef="${flow.sourceRef}" targetRef="${flow.targetRef}"${name}/>`;
+}
+
+function layoutNodes(nodes, processIndex) {
+  const shapes = [];
+  const centers = new Map();
+  const baseX = 120;
+  const baseY = 120 + (processIndex - 1) * 220;
+  const spacingX = 180;
+
+  nodes.forEach((node, index) => {
+    const size = resolveNodeSize(node.type);
+    const x = baseX + index * spacingX;
+    const y = baseY;
+    shapes.push({
+      id: `${node.id}_di`,
+      bpmnElement: node.id,
+      x,
+      y,
+      width: size.width,
+      height: size.height,
+    });
+    centers.set(node.id, {
+      x: x + size.width / 2,
+      y: y + size.height / 2,
+    });
+  });
+
+  return { shapes, centers };
+}
+
+function resolveNodeSize(type) {
+  if (type === "startEvent" || type === "endEvent" || type === "intermediateCatchEvent") {
+    return { width: 36, height: 36 };
+  }
+  if (type === "exclusiveGateway") {
+    return { width: 50, height: 50 };
+  }
+  return { width: 120, height: 80 };
+}
+
+function renderShapeXml(shape) {
+  return `      <bpmndi:BPMNShape id="${shape.id}" bpmnElement="${shape.bpmnElement}">
+        <dc:Bounds x="${shape.x}" y="${shape.y}" width="${shape.width}" height="${shape.height}"/>
+      </bpmndi:BPMNShape>`;
+}
+
+function renderEdgeXml(flow, centers) {
+  const from = centers.get(flow.sourceRef);
+  const to = centers.get(flow.targetRef);
+  if (!from || !to) {
+    return "";
+  }
+  return `      <bpmndi:BPMNEdge id="${flow.id}_di" bpmnElement="${flow.id}">
+        <di:waypoint x="${from.x}" y="${from.y}"/>
+        <di:waypoint x="${to.x}" y="${to.y}"/>
+      </bpmndi:BPMNEdge>`;
 }
 
 module.exports = {

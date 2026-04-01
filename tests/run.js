@@ -12,6 +12,7 @@ const { toMermaidMarkdown } = require("../src/export-mermaid");
 const { toHtmlDocumentation } = require("../src/export-html");
 const { toBpmnXml } = require("../src/export-bpmn");
 const { toLittleHorseSkeleton } = require("../src/export-littlehorse");
+const { toGraphJson } = require("../src/export-graph");
 const { toAiContext } = require("../src/export-context");
 const { analyzeDocument } = require("../src/analyze");
 const { lintDocument, renderLintReport, summarizeFindings } = require("../src/linter");
@@ -433,6 +434,10 @@ function testCliDiagnosticsAndExitCodes() {
     exportBpmn.stdout.includes("<bpmn:definitions"),
     "Expected BPMN export to include definitions"
   );
+  assert.ok(
+    exportBpmn.stdout.includes("<bpmndi:BPMNDiagram"),
+    "Expected BPMN export to include diagram metadata"
+  );
 
   const exportLittleHorse = runCli([
     cliPath,
@@ -445,6 +450,18 @@ function testCliDiagnosticsAndExitCodes() {
     exportLittleHorse.stdout.includes("OrgScript -> LittleHorse workflow skeleton"),
     "Expected LittleHorse skeleton header"
   );
+
+  const exportGraph = runCli([
+    cliPath,
+    "export",
+    "graph",
+    "./examples/craft-business-lead-to-order.orgs",
+  ]);
+  assert.strictEqual(exportGraph.status, 0, "Expected export graph to succeed");
+  const graphPayload = JSON.parse(exportGraph.stdout);
+  assert.strictEqual(graphPayload.type, "graph");
+  assert.ok(Array.isArray(graphPayload.nodes), "Expected graph nodes array");
+  assert.ok(Array.isArray(graphPayload.edges), "Expected graph edges array");
 
   const exportContext = runCli([
     cliPath,
@@ -547,6 +564,22 @@ function testCliDiagnosticsAndExitCodes() {
   assert.ok(
     exportLittleHorseUnsupported.stderr.includes("No LittleHorse-exportable blocks found"),
     "Expected unsupported LittleHorse export reason"
+  );
+
+  const exportGraphUnsupported = runCli([
+    cliPath,
+    "export",
+    "graph",
+    "./examples/service-escalation.orgs",
+  ]);
+  assert.strictEqual(
+    exportGraphUnsupported.status,
+    1,
+    "Expected export graph to fail when no supported blocks exist"
+  );
+  assert.ok(
+    exportGraphUnsupported.stderr.includes("No graph-exportable blocks found"),
+    "Expected unsupported graph export reason"
   );
 
   const formatCommand = runCli([
@@ -905,6 +938,7 @@ function testSkeletonExporters() {
   const bpmn = toBpmnXml(model);
   assert.ok(bpmn.includes("<bpmn:process"), "Expected BPMN process");
   assert.ok(bpmn.includes("OrderApproval"), "Expected BPMN process name");
+  assert.ok(bpmn.includes("<bpmndi:BPMNDiagram"), "Expected BPMN diagram section");
 
   const littleHorse = toLittleHorseSkeleton(model);
   assert.ok(littleHorse.includes("OrderApprovalWorkflow"), "Expected LittleHorse class name");
