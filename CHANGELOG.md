@@ -8,6 +8,7 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 ## [0.9.5] - 2026-04-01
 
+- Added new export targets: BPMN skeleton, PlantUML skeleton, LittleHorse scaffold, Graph JSON, and Contract JSON.
 - Clarified exporter trust and maturity across README, manuals, and AI guidance.
 - Added exporter maturity matrix and trust-level notes to steer tooling expectations.
 - Documented security posture in SECURITY.md and summarized it in the README.
