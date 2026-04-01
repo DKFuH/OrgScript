@@ -82,10 +82,10 @@ To test the extension locally without publishing it:
 
 1. Open the `editors/vscode` folder in VS Code.
 2. Press **F5** to launch the Extension Development Host (configured in `.vscode/launch.json`).
-3. In the new VS Code window, open any `.orgs` file from the `examples/` folder.
+3. In the new VS Code window, open any `.orgs` file from the repository `examples/` folder (one level up).
 4. Use **Developer: Inspect Editor Tokens and Scopes** (via the Command Palette) to verify that tokens receive the expected TextMate scopes.
 
-Recommended test file: `examples/lead-qualification.orgs` — it exercises the header, annotations, dotted references, operators, and conditional blocks together.
+Recommended test file: `../examples/lead-qualification.orgs` — it exercises the header, annotations, dotted references, operators, and conditional blocks together.
 
 ## Contributing
 
