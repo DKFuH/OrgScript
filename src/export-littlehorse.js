@@ -185,16 +185,21 @@ function renderStatements(statements, indentSize) {
     if (statement.type === "if") {
       lines.push(`${indent}wf.doIf(/* ${formatCondition(statement.condition)} */, ifBody -> {`);
       lines.push(...renderStatements(statement.then || [], indentSize + 2));
-      lines.push(`${indent}});`);
+      lines.push(`${indent}})`);
 
-      for (const branch of statement.elseIf || []) {
-        lines.push(`${indent}// else if ${formatCondition(branch.condition)} (map to doElseIf)`);
+      const elseIfBranches = statement.elseIf || [];
+      for (const branch of elseIfBranches) {
+        lines.push(`${indent}.doElseIf(/* ${formatCondition(branch.condition)} */, elseIfBody -> {`);
         lines.push(...renderStatements(branch.then || [], indentSize + 2));
+        lines.push(`${indent}})`);
       }
 
       if (statement.else && (statement.else.body || []).length > 0) {
-        lines.push(`${indent}// else (map to doElse)`);
+        lines.push(`${indent}.doElse(elseBody -> {`);
         lines.push(...renderStatements(statement.else.body || [], indentSize + 2));
+        lines.push(`${indent}});`);
+      } else {
+        lines.push(`${indent};`);
       }
       continue;
     }
