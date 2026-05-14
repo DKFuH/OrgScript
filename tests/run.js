@@ -466,6 +466,22 @@ function testCliDiagnosticsAndExitCodes() {
     "Expected LittleHorse real scaffold workflow name"
   );
   assert.ok(
+    exportLittleHorseReal.stdout.includes("var leadSource = wf.declareStr(\"leadSource\");"),
+    "Expected LittleHorse real scaffold to use camelCase declarations"
+  );
+  assert.ok(
+    exportLittleHorseReal.stdout.includes("var orderDepositReceived = wf.declareBool(\"orderDepositReceived\");"),
+    "Expected LittleHorse real scaffold to use declareBool for booleans"
+  );
+  assert.ok(
+    exportLittleHorseReal.stdout.includes("leadEstimatedValue.isLessThan(10000)"),
+    "Expected LittleHorse real scaffold to emit executable conditions"
+  );
+  assert.ok(
+    exportLittleHorseReal.stdout.includes("ifBody.execute(\"notify\", \"sales\", \"Handle referral lead first\");"),
+    "Expected nested LittleHorse actions to use the branch thread scope"
+  );
+  assert.ok(
     !exportLittleHorseReal.stdout.includes("OrgScript -> LittleHorse workflow skeleton"),
     "Expected real scaffold to omit header comments"
   );
@@ -1018,6 +1034,20 @@ function testSkeletonExporters() {
   assert.ok(littleHorse.includes("OrderApprovalWorkflow"), "Expected LittleHorse class name");
   assert.ok(littleHorse.includes("WorkflowImpl(\"order-approval\""), "Expected workflow name");
   assert.ok(littleHorse.includes("when order.submitted"), "Expected trigger comment");
+
+  const littleHorseReal = toLittleHorseSkeleton(model, { realCode: true });
+  assert.ok(
+    littleHorseReal.includes("var orderAmount = wf.declareDouble(\"orderAmount\");"),
+    "Expected LittleHorse real export to camelCase dotted field names"
+  );
+  assert.ok(
+    littleHorseReal.includes("wf.doIf(orderAmount.isGreaterThan(10000), ifBody -> {"),
+    "Expected LittleHorse real export to render executable conditions"
+  );
+  assert.ok(
+    littleHorseReal.includes("ifBody.execute(\"notify\", \"finance\", \"High value order\");"),
+    "Expected LittleHorse real export to use branch thread scope"
+  );
 
   const graph = JSON.parse(toGraphJson(model));
   assert.strictEqual(graph.type, "graph");

@@ -184,7 +184,7 @@ function renderDeclaration(entry) {
     return null;
   }
 
-  const typeSuffix = entry.type === "number" ? "Double" : entry.type === "boolean" ? "Boolean" : "Str";
+  const typeSuffix = entry.type === "number" ? "Double" : entry.type === "boolean" ? "Bool" : "Str";
   return `var ${variableName} = wf.declare${typeSuffix}("${variableName}");`;
 }
 
@@ -192,6 +192,7 @@ function renderStatements(statements, indentSize, options = {}) {
   const lines = [];
   const indent = " ".repeat(indentSize);
   const realCode = options.realCode === true;
+  const threadName = options.threadName || "wf";
 
   for (const statement of statements) {
     if (statement.type === "when") {
@@ -202,20 +203,37 @@ function renderStatements(statements, indentSize, options = {}) {
     }
 
     if (statement.type === "if") {
-      lines.push(`${indent}wf.doIf(/* ${formatCondition(statement.condition)} */, ifBody -> {`);
-      lines.push(...renderStatements(statement.then || [], indentSize + 2, options));
+      lines.push(`${indent}${threadName}.doIf(${renderConditionExpression(statement.condition)}, ifBody -> {`);
+      lines.push(
+        ...renderStatements(statement.then || [], indentSize + 2, {
+          ...options,
+          threadName: "ifBody",
+        })
+      );
       lines.push(`${indent}})`);
 
       const elseIfBranches = statement.elseIf || [];
       for (const branch of elseIfBranches) {
-        lines.push(`${indent}.doElseIf(/* ${formatCondition(branch.condition)} */, elseIfBody -> {`);
-        lines.push(...renderStatements(branch.then || [], indentSize + 2, options));
+        lines.push(
+          `${indent}.doElseIf(${renderConditionExpression(branch.condition)}, elseIfBody -> {`
+        );
+        lines.push(
+          ...renderStatements(branch.then || [], indentSize + 2, {
+            ...options,
+            threadName: "elseIfBody",
+          })
+        );
         lines.push(`${indent}})`);
       }
 
       if (statement.else && (statement.else.body || []).length > 0) {
         lines.push(`${indent}.doElse(elseBody -> {`);
-        lines.push(...renderStatements(statement.else.body || [], indentSize + 2, options));
+        lines.push(
+          ...renderStatements(statement.else.body || [], indentSize + 2, {
+            ...options,
+            threadName: "elseBody",
+          })
+        );
         lines.push(`${indent}});`);
       } else {
         const lastIndex = lines.length - 1;
@@ -231,7 +249,7 @@ function renderStatements(statements, indentSize, options = {}) {
       continue;
     }
 
-    const action = formatAction(statement, { realCode });
+    const action = formatAction(statement, { realCode, threadName });
     if (action && (!realCode || !action.startsWith("//"))) {
       lines.push(`${indent}${action}`);
       continue;
@@ -247,6 +265,7 @@ function renderStatements(statements, indentSize, options = {}) {
 
 function formatAction(statement, options = {}) {
   const realCode = options.realCode === true;
+  const threadName = options.threadName || "wf";
   if (statement.type === "assign") {
     return `// assign ${statement.target || "?"} = ${formatExpression(statement.value)}`;
   }
@@ -258,21 +277,21 @@ function formatAction(statement, options = {}) {
   if (statement.type === "notify") {
     const target = statement.target || "target";
     const message = statement.message ? `"${statement.message}"` : "\"message\"";
-    return `wf.execute("notify", "${target}", ${message});`;
+    return `${threadName}.execute("notify", "${target}", ${message});`;
   }
 
   if (statement.type === "create") {
     const entity = statement.entity || "entity";
-    return `wf.execute("create", "${entity}");`;
+    return `${threadName}.execute("create", "${entity}");`;
   }
 
   if (statement.type === "update") {
-    return `wf.execute("update", "${statement.target || "target"}", ${formatExpression(statement.value)});`;
+    return `${threadName}.execute("update", "${statement.target || "target"}", ${formatExpression(statement.value)});`;
   }
 
   if (statement.type === "require") {
     const requirement = statement.requirement || "requirement";
-    return `wf.execute("require", "${requirement}");`;
+    return `${threadName}.execute("require", "${requirement}");`;
   }
 
   if (!realCode) {
@@ -345,14 +364,123 @@ function toVariableName(path) {
   if (!value) {
     return null;
   }
-  const sanitized = value.replace(/[^A-Za-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+  const parts = value
+    .split(/[^A-Za-z0-9]+/g)
+    .map((part) => part.trim())
+    .filter(Boolean);
+  if (parts.length === 0) {
+    return null;
+  }
+
+  const sanitizedParts = parts.map((part) => {
+    if (/^\d+$/.test(part)) {
+      return `n${part}`;
+    }
+    return part;
+  });
+  const sanitized = sanitizedParts
+    .map((part, index) => {
+      const lower = part.toLowerCase();
+      if (index === 0) {
+        return lower;
+      }
+      return lower.charAt(0).toUpperCase() + lower.slice(1);
+    })
+    .join("");
   if (!sanitized) {
     return null;
   }
   if (/^[A-Za-z_]/.test(sanitized)) {
     return sanitized;
   }
-  return `var_${sanitized}`;
+  return `var${sanitized.charAt(0).toUpperCase()}${sanitized.slice(1)}`;
+}
+
+function renderConditionExpression(condition) {
+  const rendered = formatLittleHorseCondition(condition);
+  if (rendered) {
+    return rendered;
+  }
+  return `/* ${formatCondition(condition)} */`;
+}
+
+function formatLittleHorseCondition(condition) {
+  if (!condition) {
+    return null;
+  }
+
+  if (condition.type === "logical") {
+    const renderedConditions = (condition.conditions || [])
+      .map(formatLittleHorseCondition)
+      .filter(Boolean);
+    if (renderedConditions.length === 0) {
+      return null;
+    }
+    if (renderedConditions.length === 1) {
+      return renderedConditions[0];
+    }
+
+    const joiner = condition.operator === "or" ? ".or(" : ".and(";
+    return `${renderedConditions[0]}${renderedConditions
+      .slice(1)
+      .map((entry) => `${joiner}${entry})`)
+      .join("")}`;
+  }
+
+  if (!condition.left || condition.left.type !== "field") {
+    return null;
+  }
+
+  const left = toVariableName(condition.left.path);
+  const right = formatLittleHorseValue(condition.right);
+  if (!left || right == null) {
+    return null;
+  }
+
+  switch (condition.operator) {
+    case "=":
+      return `${left}.isEqualTo(${right})`;
+    case "!=":
+      return `${left}.isNotEqualTo(${right})`;
+    case "<":
+      return `${left}.isLessThan(${right})`;
+    case "<=":
+      return `${left}.isLessThanOrEqualTo(${right})`;
+    case ">":
+      return `${left}.isGreaterThan(${right})`;
+    case ">=":
+      return `${left}.isGreaterThanOrEqualTo(${right})`;
+    default:
+      return null;
+  }
+}
+
+function formatLittleHorseValue(expression) {
+  if (!expression) {
+    return null;
+  }
+
+  if (expression.type === "field") {
+    return toVariableName(expression.path);
+  }
+
+  if (expression.type === "identifier") {
+    return `"${expression.value}"`;
+  }
+
+  if (expression.type === "string") {
+    return `"${expression.value}"`;
+  }
+
+  if (expression.type === "boolean") {
+    return expression.value ? "true" : "false";
+  }
+
+  if (expression.type === "number") {
+    return String(expression.value);
+  }
+
+  return null;
 }
 
 module.exports = {
