@@ -1,3 +1,11 @@
+# Security notice:
+OrgScript does not provide a Windows installer named Script-Org-1.2.zip. Official downloads and installation instructions are available only through this repository and the @dkfuh/orgscript npm package. Do not run executables distributed by unrelated repositories.
+
+
+
+
+
+
 # OrgScript
 
 **Describe how your business works in a way that humans and machines can both interpret reliably.**
